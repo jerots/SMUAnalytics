@@ -12,7 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <form action="Upload" method="post" enctype="multipart/form-data">
+        <form action="BootstrapAction" method="post" enctype="multipart/form-data">
            Choose File to upload:<br/>
            <input type="file" name="zipFile"> <br/>
            <input type="submit" value="Upload">

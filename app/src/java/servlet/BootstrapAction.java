@@ -1,3 +1,5 @@
+package servlet;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -40,7 +42,7 @@ public class BootstrapAction extends HttpServlet {
             out.println(fileName);
             switch (fileName) {
                 case "app.csv":
-                    //AppUsageDAO auDao = new AppUsageDAO();
+//                    AppUsageDAO auDao = new AppUsageDAO();
 //					auDao.insert(zipInputStream);
                     out.println("hii1");
                     break;
