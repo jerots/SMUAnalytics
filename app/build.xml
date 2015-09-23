@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="G3T3_SMUA" default="default" basedir=".">
-    <description>Builds, tests, and runs the project G3T3 SMUA.</description>
+<project name="app" default="default" basedir=".">
+    <description>Builds, tests, and runs the project app.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 

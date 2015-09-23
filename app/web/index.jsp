@@ -12,6 +12,11 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <form action="Upload" method="post" enctype="multipart/form-data">
+           Choose File to upload:<br/>
+           <input type="file" name="zipFile"> <br/>
+           <input type="submit" value="Upload">
+            
+        </form>
     </body>
 </html>
