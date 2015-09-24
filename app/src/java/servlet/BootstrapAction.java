@@ -1,9 +1,10 @@
 package servlet;
 
 import java.io.*;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -13,11 +14,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import dao.*;
 
 @WebServlet(urlPatterns = {"/BootstrapAction"})
 @MultipartConfig
 
 public class BootstrapAction extends HttpServlet {
+
+    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String DB_URL = "jdbc:mysql://localhost/is203";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -29,7 +36,7 @@ public class BootstrapAction extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, SQLException {
 
         Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
         InputStream fileContent = filePart.getInputStream();
@@ -48,7 +55,6 @@ public class BootstrapAction extends HttpServlet {
         while (zipInputStream.available() == 1) {
             ZipEntry entry = zipInputStream.getNextEntry();
             String fileName = entry.getName();
-            out.println(fileName);
             switch (fileName) {
 
                 case "app.csv":
@@ -67,20 +73,20 @@ public class BootstrapAction extends HttpServlet {
                     break;
 
                 case "demographics.csv":
-                    UserDAO uDao = new UserDAO();
-                    uDao.insert(zipInputStream);
+                  //  UserDAO uDao = new UserDAO();
+                    //uDao.insert(zipInputStream);
                     break;
 
                 case "location-lookup.csv":
-                    locationEntered = true;
-                    LocationDAO lDao = new LocationDAO();
-                    lDao.insert(zipInputStream);
+                   // locationEntered = true;
+                   // LocationDAO lDao = new LocationDAO();
+                   // lDao.insert(zipInputStream);
                     break;
 
                 case "location.csv":
                     if (appEntered) {
                         LocationUsageDAO luDao = new LocationUsageDAO();
-                        luDao.insert(zipInputStream);
+                        //luDao.insert(zipInputStream);
                     } else {
                         locationInputStream = zipInputStream;
                     }
@@ -88,22 +94,21 @@ public class BootstrapAction extends HttpServlet {
             }
 
             if (appInputStream != null) {
-                AppUsageDAO auDao = new AppUsageDAO();
-                auDao.insert(appInputStream);
+               // AppUsageDAO auDao = new AppUsageDAO();
+                //auDao.insert(appInputStream);
             }
 
             if (locationInputStream != null) {
-                LocationUsageDAO luDao = new LocationUsageDAO();
-                luDao.insert(locationInputStream);
+               // LocationUsageDAO luDao = new LocationUsageDAO();
+                //luDao.insert(locationInputStream);
             }
         }
     }
 
-    public void createTable(Connection conn) {
+    public void createTable(Connection conn) throws SQLException {
 
         Statement stmt = conn.createStatement();
         conn.setAutoCommit(false);
-        
 
         String appLookUpSQL = "CREATE TABLE IF NOT EXISTS app (\n"
                 + "  app-id int(8) NOT NULL,\n"
@@ -130,7 +135,6 @@ public class BootstrapAction extends HttpServlet {
                 + "  CONSTRAINT location_pk PRIMARY KEY (location-id)\n"
                 + ");";
         stmt.addBatch(locationLookUpSQL);
-     
 
         String locationUsageSQL = "CREATE TABLE IF NOT EXISTS locationUsage (\n"
                 + "  timestamp date NOT NULL,\n"
@@ -150,7 +154,7 @@ public class BootstrapAction extends HttpServlet {
                 + "  gender varchar(100) NOT NULL, \n"
                 + "  CONSTRAINT user_pk PRIMARY KEY (mac-address)\n"
                 + ");";
-        
+
         stmt.addBatch(userSQL);
 
     }

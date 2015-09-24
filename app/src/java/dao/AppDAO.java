@@ -23,10 +23,6 @@ import java.util.zip.ZipInputStream;
 public class AppDAO {
 
     private ArrayList<App> appList;
-    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost/is203";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
 
     public void insert(ZipInputStream zis) throws IOException {
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
@@ -37,20 +33,4 @@ public class AppDAO {
             String category = sc.next();
         }
     }
-
-    public void createAppConnection() throws SQLException {
-        
-
-        //create table
-        Statement stmt = conn.createStatement();
-        String sql = "CREATE TABLE IF NOT EXISTS `app` (\n"
-                + "  `app-id` int(8) NOT NULL primary key,\n"
-                + "  `app-name` varchar(128) NOT NULL, \n"
-                + "  `app-category` varchar(30) NOT NULL, \n"
-                + ");";
-
-        stmt.executeUpdate(sql);
-
-    }
-
 }
