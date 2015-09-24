@@ -46,11 +46,19 @@ public class BootstrapAction extends HttpServlet {
         ZipInputStream locationInputStream = null;
 
         boolean appEntered = false;
+        boolean demoEntered = false;
         boolean locationEntered = false;
-
         //connection
         Class.forName(JDBC_DRIVER).newInstance();
         Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        createTable(conn);
+        
+        AppDAO appDao = new AppDAO();
+        AppUsageDAO auDao = new AppUsageDAO();
+        LocationUsageDAO luDao = new LocationUsageDAO();
+        UserDAO uDao = new UserDAO();
+        LocationDAO lDao = new LocationDAO();
+        
 
         while (zipInputStream.available() == 1) {
             ZipEntry entry = zipInputStream.getNextEntry();
@@ -58,9 +66,8 @@ public class BootstrapAction extends HttpServlet {
             switch (fileName) {
 
                 case "app.csv":
-                    if (appEntered) {
-                        AppUsageDAO auDao = new AppUsageDAO();
-                        auDao.insert(zipInputStream);
+                    if (appEntered && demoEntered) {
+                        auDao.insert(appDao, uDao, zipInputStream, conn);
                     } else {
                         appInputStream = zipInputStream;
                     }
@@ -68,25 +75,22 @@ public class BootstrapAction extends HttpServlet {
 
                 case "app-lookup.csv":
                     appEntered = true;
-                    AppDAO appDao = new AppDAO();
-                    appDao.insert(zipInputStream);
+                    appDao.insert(zipInputStream, conn);
                     break;
 
                 case "demographics.csv":
-                  //  UserDAO uDao = new UserDAO();
-                    //uDao.insert(zipInputStream);
+                    demoEntered = true;
+                    uDao.insert(zipInputStream, conn);
                     break;
 
                 case "location-lookup.csv":
-                   // locationEntered = true;
-                   // LocationDAO lDao = new LocationDAO();
-                   // lDao.insert(zipInputStream);
+                    locationEntered = true;
+                    lDao.insert(zipInputStream, conn);
                     break;
 
                 case "location.csv":
-                    if (appEntered) {
-                        LocationUsageDAO luDao = new LocationUsageDAO();
-                        //luDao.insert(zipInputStream);
+                    if (locationEntered && demoEntered) {
+                        luDao.insert(lDao, uDao, zipInputStream, conn);
                     } else {
                         locationInputStream = zipInputStream;
                     }
@@ -94,14 +98,16 @@ public class BootstrapAction extends HttpServlet {
             }
 
             if (appInputStream != null) {
-               // AppUsageDAO auDao = new AppUsageDAO();
                 //auDao.insert(appInputStream);
             }
 
             if (locationInputStream != null) {
-               // LocationUsageDAO luDao = new LocationUsageDAO();
                 //luDao.insert(locationInputStream);
             }
+        }
+        
+        if(conn != null){
+            conn.close();
         }
     }
 
@@ -151,11 +157,14 @@ public class BootstrapAction extends HttpServlet {
                 + "  name varchar(100) NOT NULL, \n"
                 + "  password varchar(100) NOT NULL, \n"
                 + "  email varchar(100) NOT NULL, \n"
-                + "  gender varchar(100) NOT NULL, \n"
+                + "  gender char(1) NOT NULL, \n"
                 + "  CONSTRAINT user_pk PRIMARY KEY (mac-address)\n"
                 + ");";
 
         stmt.addBatch(userSQL);
+
+        stmt.executeBatch();
+        conn.commit();
 
     }
 

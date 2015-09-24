@@ -1,28 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package entity;
 
-/**
- *
- * @author ASUS-PC
- */
-public class Location{
+public class Location {
 
-    private String locationId;
+    private int locationId;
     private String semanticPlace;
 
-    public Location(String locationId, String semanticPlace) {
+    public Location(int locationId, String semanticPlace) {
         this.locationId = locationId;
         this.semanticPlace = semanticPlace;
     }
 
-    public String getLocationId() {
+    public int getLocationId() {
         return locationId;
     }
 
     public String getSemanticPlace() {
         return semanticPlace;
     }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
+    }
+
+    public void setSemanticPlace(String semanticPlace) {
+        this.semanticPlace = semanticPlace;
+    }
+
 }

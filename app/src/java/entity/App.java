@@ -12,18 +12,17 @@ package entity;
  * @author ASUS-PC
  */
 public class App {
-
-    private String appId;
+    private int appId;
     private String appName;
     private String appCategory;
 
-    public App(String appId, String appName, String appCategory) {
+    public App(int appId, String appName, String appCategory) {
         this.appId = appId;
         this.appName = appName;
         this.appCategory = appCategory;
     }
 
-    public String getAppId() {
+    public int getAppId() {
         return appId;
     }
 
@@ -34,8 +33,17 @@ public class App {
     public String getAppCategory() {
         return appCategory;
     }
-    
-    
-    
+
+    public void setAppId(int appId) {
+        this.appId = appId;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public void setAppCategory(String appCategory) {
+        this.appCategory = appCategory;
+    }
     
 }

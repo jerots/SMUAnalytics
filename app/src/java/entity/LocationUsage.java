@@ -1,26 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package entity;
 
-/**
- *
- * @author ASUS-PC
- */
+import java.sql.Date;
+
 public class LocationUsage {
 
-    private String timestamp;
+    private Date timestamp;
     private String macAddress;
-    private String locationId;
+    private int locationId;
 
-    public LocationUsage(String timestamp, String macAddress, String locationId) {
+    public LocationUsage(Date timestamp, String macAddress, int locationId) {
         this.timestamp = timestamp;
         this.macAddress = macAddress;
         this.locationId = locationId;
     }
 
-    public String getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
@@ -28,9 +22,23 @@ public class LocationUsage {
         return macAddress;
     }
 
-    public String getLocationId() {
+    public int getLocationId() {
         return locationId;
     }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
+    }
+
+
     
     
     
