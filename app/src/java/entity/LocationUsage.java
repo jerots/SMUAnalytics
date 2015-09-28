@@ -5,8 +5,8 @@ import java.sql.Date;
 public class LocationUsage {
 
     private Date timestamp;
-    private String macAddress;
-    private int locationId;
+    private String macAddress;//user obj
+    private int locationId;//location obj
 
     public LocationUsage(Date timestamp, String macAddress, int locationId) {
         this.timestamp = timestamp;
