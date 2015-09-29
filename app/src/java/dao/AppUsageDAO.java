@@ -22,6 +22,7 @@ public class AppUsageDAO {
     }
 
     public void insert(AppDAO aDao, UserDAO uDao, ZipInputStream zis, Connection conn) throws IOException, SQLException {
+        System.out.println("CATCH APPUSAGE WHEN U CAN");
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title

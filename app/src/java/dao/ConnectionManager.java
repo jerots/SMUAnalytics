@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class ConnectionManager {
 
-  private static final String PROPS_FILENAME = "/is203/connection.properties";
+  private static final String PROPS_FILENAME = "/dao/connection.properties";
   private static String dbUser;
   private static String dbPassword;
   private static String dbURL;
@@ -97,7 +97,6 @@ public class ConnectionManager {
             + "  , dbUser: " + dbUser
             + "  , dbPassword: " + dbPassword;
     Logger.getLogger(ConnectionManager.class.getName()).log(Level.INFO, message);
-
     return DriverManager.getConnection(dbURL, dbUser, dbPassword);
 
   }
