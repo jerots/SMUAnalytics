@@ -15,10 +15,9 @@ import java.sql.Statement;
  */
 public class InitDAO {
 	public static void createTable() throws SQLException {
-        
 		Connection conn = ConnectionManager.getConnection();
 		Statement stmt = conn.createStatement();
-        conn.setAutoCommit(false);
+                conn.setAutoCommit(false);
 		
 		stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
                 + "  username varchar(128) NOT NULL,\n"
@@ -85,6 +84,6 @@ public class InitDAO {
         stmt.executeBatch();
         conn.commit();
 		
-		ConnectionManager.close(conn,stmt);
+        ConnectionManager.close(conn,stmt);
     }
 }

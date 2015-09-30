@@ -26,28 +26,22 @@ public class AppDAO {
 
     public AppDAO() {
         appList = new ArrayList<>();
-        System.out.println("happy CNY!");
     }
 
     public void insert(ZipInputStream zis, Connection conn) throws IOException, SQLException {
-        System.out.print("SOLVE THIS");
         PreparedStatement stmt = null;
-        System.out.print("hahaha");
-
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
-        System.out.print("haha");
         sc.nextLine(); //flush title
 
         while (sc.hasNext()) {
-            System.out.print(sc.next());
             //retrieving per row
             boolean err = false;
-/*
+
             int appId = Utility.parseInt(sc.next());
             if (appId <= 0) {
                 unsuccessful.add("invalid app id");
                 err = true;
-            }*/
+            }
 
             String name = Utility.parseString(sc.next());
             if (name == null) {
@@ -58,29 +52,22 @@ public class AppDAO {
             if (category == null) {
                 unsuccessful.add("category cannot be blank.");
                 err = true;
-
             }
+            
             if (Utility.checkCategory(category)) {
                 unsuccessful.add("invalid category.");
                 err = true;
-      
             }
-/*
+            System.out.println(conn.isClosed());
+
             if (!err) {
-                System.out.println(appId);
-                System.out.println(name);
-                System.out.println(category);
-                App app = new App(appId, name, category);
-                appList.add(app);
                 //insert into tables
-                String sql = "insert into app (app-id, app-name, app-category values(?,?,?))";
-                
+                String sql = "insert into app (appid, appname, appcategory) values(?,?,?))";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, appId);
                 stmt.setString(2, "\"" + name + "\"");
                 stmt.setString(3, "\"" + category + "\"");
-
-            }*/
+            }
 
             //adding to batch
             stmt.addBatch();

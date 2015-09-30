@@ -21,11 +21,6 @@ import dao.*;
 
 public class BootstrapAction extends HttpServlet {
 
-    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost/dao";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -118,7 +113,8 @@ System.out.println("Starthere!");
                 conn.close();
             }
         } catch (Exception e) {
-
+            System.out.println("Exception Caught in bootstrap action.java");
+               e.printStackTrace();
         }
     }
 

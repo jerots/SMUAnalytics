@@ -24,8 +24,9 @@
 					
 					try {
 							InitDAO.createTable();
-						} catch (SQLException e) {
+                                            } catch (SQLException e) {
 							out.println("CREATE TABLE FAILED");
+                                                        e.printStackTrace();
 						}
 					
 					String username = (String) request.getAttribute("username");
