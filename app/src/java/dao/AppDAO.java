@@ -42,8 +42,10 @@ public class AppDAO {
                 unsuccessful.add("invalid app id");
                 err = true;
             }
-
-            String name = Utility.parseString(sc.next());
+			
+			
+			String name2 = sc.next();
+            String name = Utility.parseString(name2);
             if (name == null) {
                 unsuccessful.add("Name cannot be blank.");
                 err = true;

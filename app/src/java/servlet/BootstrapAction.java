@@ -21,142 +21,139 @@ import dao.*;
 
 public class BootstrapAction extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
-        System.out.println("MERRY xmas!");
-        try {
-            Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
-            InputStream fileContent = filePart.getInputStream();
-            ZipInputStream zipInputStream = new ZipInputStream(fileContent);
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		System.out.println("MERRY xmas!");
+		try {
+			Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
+			InputStream fileContent = filePart.getInputStream();
+			ZipInputStream zipInputStream = new ZipInputStream(fileContent);
 
-            ZipInputStream appInputStream = null;
-            ZipInputStream locationInputStream = null;
+			ZipInputStream appInputStream = null;
+			ZipInputStream locationInputStream = null;
 
-            boolean appEntered = false;
-            boolean demoEntered = false;
-            boolean locationEntered = false;
+			boolean appEntered = false;
+			boolean demoEntered = false;
+			boolean locationEntered = false;
             //connection
-System.out.println("Starthere!");
-            Connection conn = ConnectionManager.getConnection();
-            System.out.println("STOP!");
-            
-            AppDAO appDao = new AppDAO();
-            AppUsageDAO auDao = new AppUsageDAO();
-            LocationUsageDAO luDao = new LocationUsageDAO();
-            UserDAO uDao = new UserDAO();
-            LocationDAO lDao = new LocationDAO();
-            
+			System.out.println("Starthere!");
+			Connection conn = ConnectionManager.getConnection();
+			System.out.println("STOP!");
 
-            while (zipInputStream.available() == 1) {
-                System.out.print("WHERE AM I?");
-                ZipEntry entry = zipInputStream.getNextEntry();
-                String fileName = entry.getName();
-                switch (fileName) {
+			AppDAO appDao = new AppDAO();
+			AppUsageDAO auDao = new AppUsageDAO();
+			LocationUsageDAO luDao = new LocationUsageDAO();
+			UserDAO uDao = new UserDAO();
+			LocationDAO lDao = new LocationDAO();
 
-                    case "app.csv":
-                        System.out.println("HIa");
-                        if (appEntered && demoEntered) {
-                            auDao.insert(appDao, uDao, zipInputStream, conn);
-                        } else {
-                            appInputStream = zipInputStream;
-                        }
-                        break;
+			while (zipInputStream.available() == 1) {
+				ZipEntry entry = zipInputStream.getNextEntry();
+				String fileName = entry.getName();
+				System.out.println();
+				switch (fileName) {
 
-                    case "app-lookup.csv":
-                        System.out.println("HIb");
-                        appEntered = true;
-                        appDao.insert(zipInputStream, conn);
-                        break;
+					case "app.csv":
+						System.out.println("HIa");
+						if (appEntered && demoEntered) {
+							auDao.insert(appDao, uDao, zipInputStream, conn);
+						} else {
+							appInputStream = zipInputStream;
+						}
+						break;
 
-                    case "demographics.csv":
-                        System.out.println("HIc");
-                        demoEntered = true;
-                        uDao.insert(zipInputStream, conn);
-                        break;
+					case "app-lookup.csv":
+						System.out.println("HIb");
+						appEntered = true;
+						appDao.insert(zipInputStream, conn);
+						break;
 
-                    case "location-lookup.csv":
-                        System.out.println("HId");
-                        locationEntered = true;
-                        lDao.insert(zipInputStream, conn);
-                        break;
+					case "demographics.csv":
+						System.out.println("HIc");
+						demoEntered = true;
+						uDao.insert(zipInputStream, conn);
+						break;
 
-                    case "location.csv":
-                        System.out.println("HIe");
-                        if (locationEntered && demoEntered) {
-                            luDao.insert(lDao, uDao, zipInputStream, conn);
-                        } else {
-                            locationInputStream = zipInputStream;
-                        }
-                        break;
-                }
+					case "location-lookup.csv":
+						System.out.println("HId");
+						locationEntered = true;
+						lDao.insert(zipInputStream, conn);
+						break;
 
-                if (appInputStream != null) {
-                    //auDao.insert(appInputStream);
-                }
+					case "location.csv":
+						System.out.println("HIe");
+						if (locationEntered && demoEntered) {
+							luDao.insert(lDao, uDao, zipInputStream, conn);
+						} else {
+							locationInputStream = zipInputStream;
+						}
+						break;
+				}
 
-                if (locationInputStream != null) {
-                    //luDao.insert(locationInputStream);
-                }
-            }
+				if (appInputStream != null) {
+					//auDao.insert(appInputStream);
+				}
 
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (Exception e) {
-            System.out.println("Exception Caught in bootstrap action.java");
-               e.printStackTrace();
-        }
-    }
+				if (locationInputStream != null) {
+					//luDao.insert(locationInputStream);
+				}
+			}
 
-    
+			if (conn != null) {
+				conn.close();
+			}
+		} catch (Exception e) {
+			System.out.println("Exception Caught in bootstrap action.java");
+			e.printStackTrace();
+		}
+	}
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+	/**
+	 * Handles the HTTP <code>GET</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+	/**
+	 * Handles the HTTP <code>POST</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+	/**
+	 * Returns a short description of the servlet.
+	 *
+	 * @return a String containing servlet description
+	 */
+	@Override
+	public String getServletInfo() {
+		return "Short description";
+	}// </editor-fold>
 
 }

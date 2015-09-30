@@ -16,22 +16,25 @@
 		<link rel="stylesheet" type="text/css" href="css/index.css">
     </head>
     <body>
-	<!--LOGIN BOX-->
+		<!--LOGIN BOX-->
 		<div id='login-div'>
 			<h1>SMUA Login</h1>
 			<form method='POST' action='LoginAction'>
 				<%
-					
+
 					try {
-							InitDAO.createTable();
-                                            } catch (SQLException e) {
-							out.println("CREATE TABLE FAILED");
-                                                        e.printStackTrace();
-						}
-					
+						InitDAO.createTable();
+					} catch (SQLException e) {
+						out.println("CREATE TABLE FAILED");
+						e.printStackTrace();
+					}
+
 					String username = (String) request.getAttribute("username");
+					if (username == null) {
+						username = "";
+					}
 					String error = (String) request.getAttribute("error");
-					if (error != null){
+					if (error != null) {
 						out.println("<h4 class='errorMsg'>" + error + "</h4>");
 					}
 				%>
@@ -44,14 +47,14 @@
 					<input type="password" class="form-control" name='password' id="password" placeholder="Password" required>
 				</div>
 				<center>
-				<input class='btn btn-default' type='submit'>
+					<input class='btn btn-default' type='submit'>
 				</center>
 
 			</form>
 		</div>
-	<!--END OF LOGIN BOX-->
+		<!--END OF LOGIN BOX-->
 
 
-	<script src="css/bootstrap.js"></script>
-</body>
+		<script src="css/bootstrap.js"></script>
+	</body>
 </html>
