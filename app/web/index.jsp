@@ -14,7 +14,7 @@
 		<link rel="stylesheet" type="text/css" href="css/index.css">
     </head>
     <body>
-	<!--<center>-->
+	<!--LOGIN BOX-->
 		<div id='login-div'>
 			<h1>SMUA Login</h1>
 			<form method='POST' action='LoginAction'>
@@ -39,7 +39,7 @@
 
 			</form>
 		</div>
-	<!--</center>-->
+	<!--END OF LOGIN BOX-->
 
 
 	<script src="css/bootstrap.js"></script>
