@@ -14,6 +14,6 @@
     </head>
     <body>
         <h1>This is home page for admins!</h1>
-		<a href="../logout.jsp">LOGOUT</a>
+		<a href="logout.jsp"><button>LOGOUT</button></a>
     </body>
 </html>
