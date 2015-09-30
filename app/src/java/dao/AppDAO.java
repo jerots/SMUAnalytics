@@ -48,12 +48,17 @@ public class AppDAO {
                 unsuccessful.add("Name cannot be blank.");
                 err = true;
             }
-            String category = Utility.parseString(sc.next());
-            if (category == null) {
+            String cat = Utility.parseString(sc.next());
+            if (cat== null) {
                 unsuccessful.add("category cannot be blank.");
                 err = true;
+                
             }
-            
+            String category = null;
+            if(cat != null){
+                category = cat.substring(1, cat.length() - 1);
+            }
+
             if (Utility.checkCategory(category)) {
                 unsuccessful.add("invalid category.");
                 err = true;

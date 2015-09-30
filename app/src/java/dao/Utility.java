@@ -20,7 +20,7 @@ public final class Utility {
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
 
-    public Utility() {
+    static {
         loadSchools();
         loadCategories();
     }
@@ -85,7 +85,7 @@ public final class Utility {
     }
     
      public static boolean checkCategory(String str) {
-     return schoolList.contains(str);
+        return categories.contains(str);
      }
 
     public static void loadSchools() {
