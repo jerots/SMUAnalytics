@@ -1,30 +1,33 @@
+package json;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
 
 import dao.AdminDAO;
-import dao.InitDAO;
 import dao.UserDAO;
 import entity.Admin;
 import entity.User;
+import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import net.minidev.json.JSONObject;
 
 /**
  *
  * @author jeremyongts92
  */
-public class LoginAction extends HttpServlet {
+@WebServlet(urlPatterns = {"/authenticate"})
+public class Authenticate extends HttpServlet {
 
 	/**
 	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,43 +40,47 @@ public class LoginAction extends HttpServlet {
 	 */
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
+		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
-			/* TODO output your page here. You may use following sample code. */
-			HttpSession session = request.getSession();
+			JSONObject result = new JSONObject();
 
-			
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
+			
+			String token = JWTUtility.sign("zhihui", username);
 
 			//CHECK WHETHER ADMIN LOGIN SUCCESS
 			AdminDAO adminDAO = new AdminDAO();
 			Admin admin = adminDAO.retrieve(username, password);
 			if (admin != null) {
-				session.setAttribute("admin", admin);
-				response.sendRedirect("admin/home.jsp");
+				result.put("status", "success");
+				result.put("token", token);
+				out.println(result.toJSONString());
 				return;
 				//redirect to admin page
 
 			}
+//			out.println(admin);
 
 			//IF NOT, CHECK WHETHER STUDENT LOGIN SUCCESS
 			UserDAO userDAO = new UserDAO();
 			User user = userDAO.retrieveByEmailId(username, password);
 			System.out.println(user);
 			if (user != null) {
-				session.setAttribute("user", user);
-				response.sendRedirect("home.jsp");
+				result.put("status", "success");
+				result.put("token", token);
+				out.println(result.toJSONString());
 				return;
 				//redirect to student page
 
 			}
 
+//			out.println(user);
 			//IF ALL FAIL.
-			request.setAttribute("username", username);
-			request.setAttribute("error", "Invalid username/password");
-			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
-			rd.forward(request, response);
+			result.put("status", "error");
+			out.println(result.toJSONString());
+			
+
 		}
 	}
 

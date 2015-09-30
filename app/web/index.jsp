@@ -4,6 +4,8 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="java.sql.SQLException"%>
+<%@page import="dao.InitDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -19,6 +21,13 @@
 			<h1>SMUA Login</h1>
 			<form method='POST' action='LoginAction'>
 				<%
+					
+					try {
+							InitDAO.createTable();
+						} catch (SQLException e) {
+							out.println("CREATE TABLE FAILED");
+						}
+					
 					String username = (String) request.getAttribute("username");
 					String error = (String) request.getAttribute("error");
 					if (error != null){
