@@ -53,7 +53,6 @@ public class BootstrapAction extends HttpServlet {
             //connection
 System.out.println("Starthere!");
             Connection conn = ConnectionManager.getConnection();
-            createTable(conn);
             System.out.println("STOP!");
             
             AppDAO appDao = new AppDAO();
@@ -123,65 +122,7 @@ System.out.println("Starthere!");
         }
     }
 
-    public void createTable(Connection conn) throws SQLException {
-        System.out.println("why WHYWHYYWYHYHWY");
-        Statement stmt = conn.createStatement();
-        System.out.println("why aint u appearing?");
-        conn.setAutoCommit(false);
-        System.out.println("why aint u appearing?");
-
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS app (\n"
-                + "  appid int NOT NULL,\n"
-                + "  appname varchar(128) NOT NULL, \n"
-                + "  appcategory varchar(30) NOT NULL, \n"
-                + "   CONSTRAINT app_pk PRIMARY KEY(appid)\n"
-                + "   \n"
-                + ");");
-     
-        
-       
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS appUsage (\n"
-                + "  timestamp date NOT NULL,\n"
-                + "  macaddress varchar(128) NOT NULL, \n"
-                + "  appid int(8) NOT NULL  , \n"
-                + "   CONSTRAINT appUsageID_pk PRIMARY KEY (timestamp,macaddress), \n"
-                + "   CONSTRAINT appUsageID_fk1 FOREIGN KEY (macaddress) REFERENCES user(macaddress), \n"
-                + "   CONSTRAINT appUsageID_fk2 FOREIGN KEY (appid) REFERENCES app(appid) \n"
-                + ");");
-
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS location (\n"
-                + "  locationid varchar(100) NOT NULL,\n"
-                + "  semanticplace varchar(100) NOT NULL, \n"
-                + "  CONSTRAINT location_pk PRIMARY KEY (locationid)\n"
-                + ");");
-
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS locationUsage (\n"
-                + "  timestamp date NOT NULL,\n"
-                + "  macaddress varchar(100), \n"
-                + "  locationid varchar(100) NOT NULL, \n"
-                + "  CONSTRAINT locationUsage_pk PRIMARY KEY (`timestamp`,`locationid`), \n"
-                + "   CONSTRAINT locationUsage_fk1 FOREIGN KEY (macaddress) REFERENCES user(macaddress), \n"
-                + "   CONSTRAINT locationUsage_fk2 FOREIGN KEY (locationid) REFERENCES location(locationid) \n"
-                + ");");
-
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS `user` (\n"
-                + "  macaddress varchar(100) NOT NULL,\n"
-                + "  name varchar(100) NOT NULL, \n"
-                + "  password varchar(100) NOT NULL, \n"
-                + "  email varchar(100) NOT NULL, \n"
-                + "  gender char(1) NOT NULL, \n"
-                + "  CONSTRAINT user_pk PRIMARY KEY (macaddress)\n"
-                + ");");
-        
-        //int[] recordsAffected;
-        //recordsAffected = stmt.executeBatch();
- 
-        //conn.commit();
-           
-        stmt.executeBatch();
-        conn.commit();
-        System.out.println("Batch executed");
-    }
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

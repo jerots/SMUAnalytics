@@ -5,11 +5,13 @@
  */
 package dao;
 
+import entity.Admin;
 import entity.App;
 import entity.User;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -121,6 +123,65 @@ public class UserDAO {
             sc.close();
         }
     }
+	
+	public User retrieve(String username, String password){
+		String sql = "SELECT * FROM user WHERE email=? AND password=?";
+		
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, username);
+			ps.setString(2, password);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				
+				return new User(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5));
+				
+			}
+			
+			
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return null;
+	}
+	
+	
+	public User retrieveByEmailId(String username, String password){
+		String sql = "SELECT * FROM user WHERE email LIKE ? AND password=?";
+		
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, username + "@%.smu.edu.sg");
+			ps.setString(2, password);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				
+				return new User(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5));
+				
+			}
+			
+			
+			
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+	}
+	
+	
     
     public boolean hasMacAdd(String str){
         for(User u: userList){

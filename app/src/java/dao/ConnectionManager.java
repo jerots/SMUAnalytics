@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class ConnectionManager {
 
-  private static final String PROPS_FILENAME = "/dao/connection.properties";
+  private static final String PROPS_FILENAME = "connection.properties";
   private static String dbUser;
   private static String dbPassword;
   private static String dbURL;
