@@ -37,7 +37,7 @@ public class BootstrapAction extends HttpServlet {
         try {
             Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
             InputStream fileContent = filePart.getInputStream();
-            ZipInputStream zipInputStream = null;
+            ZipInputStream zipInputStream = new ZipInputStream(fileContent);
             //connection
             System.out.println("Starthere!");
             Connection conn = ConnectionManager.getConnection();
@@ -49,46 +49,54 @@ public class BootstrapAction extends HttpServlet {
             UserDAO uDao = new UserDAO();
             LocationDAO lDao = new LocationDAO();
 
-            /*while (zipInputStream.available() == 1) {
-             ZipEntry entry = zipInputStream.getNextEntry();
-             String fileName = entry.getName();
-             if (fileName.equals("app-lookup.csv")){
-             appDao.insert(zipInputStream, conn);
-             }
-             zipInputStream.closeEntry();
-             }
-             zipInputStream.close();*/
-            
-            zipInputStream = new ZipInputStream(fileContent);
             ZipEntry entry = null;
             try{
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("app-lookup.csv")) {
+                        appDao.insert(zipInputStream, conn);
+                    } else {
+                        zipInputStream.closeEntry();
+                    }
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }catch(BatchUpdateException e){
+                e.printStackTrace();
+                zipInputStream.close();
+            }
+
+            zipInputStream = new ZipInputStream(fileContent);
+            entry = null;
+            try{
                 while ((entry = zipInputStream.getNextEntry())!=null) {
-                    System.out.println("hww");
                     String fileName = entry.getName();
                     System.out.println(fileName);
                     if (fileName.equals("demographics.csv")) {
                         uDao.insert(zipInputStream, conn);
                     }else{
                         zipInputStream.closeEntry();
-                        System.out.println("haha");
                     }
                 }
             }catch (IOException e){
-                
+                e.printStackTrace();
             }
-
+            
             zipInputStream = new ZipInputStream(fileContent);
             entry = null;
-            while ((entry = zipInputStream.getNextEntry())!=null) {
-                String fileName = entry.getName();
-                if (fileName.equals("app.csv")) {
-                    auDao.insert(appDao, uDao, zipInputStream, conn);
-
+            try{
+                while ((entry = zipInputStream.getNextEntry())!=null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("app.csv")) {
+                        auDao.insert(appDao, uDao, zipInputStream, conn);
+                    }else{
+                        zipInputStream.closeEntry();
+                    }
                 }
-                zipInputStream.closeEntry();
+            }catch (IOException e){
+                e.printStackTrace();
             }
-            zipInputStream.close();
-
+            /*
             zipInputStream = new ZipInputStream(fileContent);
             entry = null;
             
@@ -116,8 +124,8 @@ public class BootstrapAction extends HttpServlet {
 
             if (conn != null) {
                 conn.close();
-            }
-        } catch (Exception e) {
+            }*/
+        }catch (Exception e) { 
             System.out.println("Exception Caught in bootstrap action.java");
             e.printStackTrace();
         }

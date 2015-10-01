@@ -13,23 +13,23 @@ import java.util.zip.*;
 
 public class AppUsageDAO {
 
-    private ArrayList<AppUsage> appUsageList;
-
     private ArrayList<String> unsuccessful = new ArrayList<>();
 
     public AppUsageDAO() {
-        this.appUsageList = appUsageList;
     }
 
     public void insert(AppDAO aDao, UserDAO uDao, ZipInputStream zis, Connection conn) throws IOException, SQLException {
-        System.out.println("CATCH APPUSAGE WHEN U CAN");
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
+        
+        String sql = "insert into appusage (timestamp, macaddress, appid) values(?,?,?))";
+        stmt = conn.prepareStatement(sql);
+        conn.setAutoCommit(false);
+        
         sc.nextLine(); //flush title
 
         while (sc.hasNext()) {
             //retrieving per row
-
             boolean err = false;
 
             //check timestamp
@@ -69,23 +69,13 @@ public class AppUsageDAO {
 
             if (!err) {
                 //add to list
-                
-                AppUsage appU = new AppUsage(date, macAdd, appId);
-                appUsageList.add(appU);
+                stmt.setDate(1, date);
+                stmt.setString(2, macAdd);
+                stmt.setInt(3, appId);
+                stmt.addBatch();
                 //insert into tables
             }
         }
-        for (AppUsage aUsage : appUsageList) {
-            String sql = "insert into app (timestamp, mac-address, app-id values(?,?,?))";
-            stmt = conn.prepareStatement(sql);
-            stmt.setDate(1, aUsage.getTimestamp());
-            stmt.setString(2, "\"" + aUsage.getMacAddress() + "\"");
-            stmt.setInt(3, aUsage.getAppId());
-        }
-
-        //adding to batch
-        stmt.addBatch();
-
         //closing
         if (stmt != null) {
             stmt.executeBatch();
