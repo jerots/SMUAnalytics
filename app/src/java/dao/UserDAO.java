@@ -35,6 +35,10 @@ public class UserDAO {
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
+        
+        String sql = "insert into user (macAdd , name , password , email , gender) values(?,?,?,?,?);";
+        stmt = conn.prepareStatement(sql);
+        conn.setAutoCommit(false);
 
         while (sc.hasNext()) {
 
@@ -81,13 +85,13 @@ public class UserDAO {
                 err = true;
             }
 
-            String gender = Utility.parseString(sc.next());
-            if (gender == null) {
+            String g = Utility.parseString(sc.next());
+            if (g == null) {
                 unsuccessful.add("gender cannot be blank");
                 err = true;
             }
 
-            gender.toLowerCase();
+            String gender = g.toLowerCase();
 
             if (!gender.equals("f") || !gender.equals("g")) {
                 unsuccessful.add("invalid gender");
@@ -96,21 +100,14 @@ public class UserDAO {
 
             if (!err) {
                 //add to list
-                User user = new User(macAdd, name, password, email, gender);
-                userList.add(user);
                 //insert into tables
-                String sql = "insert into user (macAdd , name , password , email , gender values(?,?,?,?,?))";
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, "\"" + macAdd + "\"");
-                stmt.setString(2, "\"" + name + "\"");
-                stmt.setString(3, "\"" + password + "\"");
-                stmt.setString(4, "\"" + email + "\"");
-                stmt.setString(5, "\"" + gender + "\"");
+                stmt.setString(1, macAdd);
+                stmt.setString(2, name);
+                stmt.setString(3, password);
+                stmt.setString(4, email);
+                stmt.setString(5, gender);
+                stmt.addBatch();
             }
-
-            //adding to batch
-            stmt.addBatch();
-
         }
 
         //closing
@@ -122,6 +119,7 @@ public class UserDAO {
         if (sc != null) {
             sc.close();
         }
+
     }
 	
 	public User retrieve(String username, String password){

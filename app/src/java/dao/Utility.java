@@ -80,7 +80,7 @@ public final class Utility {
         if (2011 >= year || 2015 <= year) {
             return false;
         }
-        int position = backEmail.indexOf("\\.");
+        int position = backEmail.indexOf(".");
         return (schoolList.contains(backEmail.substring(0, position)) && backEmail.substring(position).equals(".smu.edu.sg"));
     }
     
