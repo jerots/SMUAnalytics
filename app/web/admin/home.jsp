@@ -75,8 +75,7 @@
 							<input type="file" name="zipFile">
 						</div>
 						<input type="radio" value="bootstrap" name="option" checked> Bootstrap<br>
-						<input type="radio" value="add-data" name="option"> Add additional data<br>
-						<input type="radio" value="delete" name="option"> Delete<br><br>
+						<input type="radio" value="add-data" name="option"> Add additional data<br><br>
 						<input type="submit" class="btn btn-default" value="Upload">
 
 
