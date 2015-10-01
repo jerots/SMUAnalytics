@@ -36,9 +36,9 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
-						<li><a href="delete-location.jsp">Delete Location data</a></li>
-						
+						<li><a href="home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
+						<li class="active"><a href="delete-location.jsp">Delete Location data</a></li>
+
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
@@ -56,15 +56,23 @@
 			<div class="row">
 				<div class="theme-div" style="width:37%">
 
-					<form action="../BootstrapAction" method="post" enctype="multipart/form-data">
-						Choose File to upload:<br/>
+					<form action="../DeleteLocationAction" method="post" enctype="multipart/form-data">
+						<br/>
+
 						<div class="form-group">
-							<label for="exampleInputFile">File input</label>
-							<input type="file" name="zipFile" required>
+							<label for="exampleInputEmail1">MAC Address</label>
+							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" required>
 						</div>
-						<input type="radio" value="bootstrap" name="option" checked> Bootstrap<br>
-						<input type="radio" value="add-data" name="option"> Add additional data<br><br>
-						<input type="submit" class="btn btn-default" value="Upload">
+						<div class="form-group">
+							<label for="exampleInputEmail1">Start Date</label>
+							<input type="date" class="form-control" id="startDate" name="startdate" required>
+						</div>
+						<div class="form-group">
+							<label for="exampleInputEmail1">End Date</label>
+							<input type="date" class="form-control" id="endDate" name="enddate" required>
+						</div>
+
+						<input type="submit" class="btn btn-default" value="Delete location data">
 
 
 
@@ -73,7 +81,7 @@
 				<div class="theme-div theme-content" style="width:60%">
 
 					<h1>Result</h1>
-					You have not uploaded any files.
+					You have not chosen anything to delete.
 				</div>
 
 			</div>
