@@ -28,8 +28,7 @@ public class AppDAO {
         appList = new ArrayList<>();
     }
 
-    public void insert(ZipInputStream zis) throws IOException, SQLException {
-		Connection conn = ConnectionManager.getConnection();
+    public void insert(ZipInputStream zis, Connection conn) throws IOException, SQLException {
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title

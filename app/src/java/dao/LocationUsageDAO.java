@@ -24,9 +24,8 @@ public class LocationUsageDAO {
     private ArrayList<String> unsuccessful = new ArrayList<>();
     private ArrayList<LocationUsage> locationUsageList = new ArrayList<>();
 
-    public void insert(LocationDAO lDao, UserDAO uDao, ZipInputStream zis) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
-		PreparedStatement stmt = null;
+    public void insert(LocationDAO lDao, UserDAO uDao, ZipInputStream zis, Connection conn) throws IOException, SQLException {
+        PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
 

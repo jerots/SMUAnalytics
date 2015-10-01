@@ -1,9 +1,9 @@
 package servlet;
 
-
-
 import java.io.*;
 import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.zip.ZipEntry;
@@ -33,17 +33,21 @@ public class BootstrapAction extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
+		System.out.println("MERRY xmas!");
 		try {
-
 			Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
 			InputStream fileContent = filePart.getInputStream();
-			
+			ZipInputStream zipInputStream = new ZipInputStream(fileContent);
 
+			ZipInputStream appInputStream = null;
+			ZipInputStream locationInputStream = null;
 
 			boolean appEntered = false;
 			boolean demoEntered = false;
 			boolean locationEntered = false;
-			createTable();
+            //connection
+			System.out.println("Starthere!");
+			Connection conn = ConnectionManager.getConnection();
 			System.out.println("STOP!");
 
 			AppDAO appDao = new AppDAO();
@@ -52,124 +56,65 @@ public class BootstrapAction extends HttpServlet {
 			UserDAO uDao = new UserDAO();
 			LocationDAO lDao = new LocationDAO();
 
-			
-			ZipInputStream zipInputStream = new ZipInputStream(fileContent);
 			while (zipInputStream.available() == 1) {
 				ZipEntry entry = zipInputStream.getNextEntry();
 				String fileName = entry.getName();
-				if (fileName.equals("app-lookup.csv")){
-					appDao.insert(zipInputStream);
-				
+				System.out.println();
+				switch (fileName) {
+
+					case "app.csv":
+						System.out.println("HIa");
+						if (appEntered && demoEntered) {
+							auDao.insert(appDao, uDao, zipInputStream, conn);
+						} else {
+							appInputStream = zipInputStream;
+						}
+						break;
+
+					case "app-lookup.csv":
+						System.out.println("HIb");
+						appEntered = true;
+						appDao.insert(zipInputStream, conn);
+						break;
+
+					case "demographics.csv":
+						System.out.println("HIc");
+						demoEntered = true;
+						uDao.insert(zipInputStream, conn);
+						break;
+
+					case "location-lookup.csv":
+						System.out.println("HId");
+						locationEntered = true;
+						lDao.insert(zipInputStream, conn);
+						break;
+
+					case "location.csv":
+						System.out.println("HIe");
+						if (locationEntered && demoEntered) {
+							luDao.insert(lDao, uDao, zipInputStream, conn);
+						} else {
+							locationInputStream = zipInputStream;
+						}
+						break;
 				}
-				zipInputStream.closeEntry();
+
+				if (appInputStream != null) {
+					//auDao.insert(appInputStream);
+				}
+
+				if (locationInputStream != null) {
+					//luDao.insert(locationInputStream);
+				}
 			}
-			zipInputStream.close();
-//			zipInputStream = new ZipInputStream(fileContent);
-//			while (zipInputStream.available() == 1) {
-//				ZipEntry entry = zipInputStream.getNextEntry();
-//				String fileName = entry.getName();
-//				if (fileName.equals("demographics.csv")){
-//					uDao.insert(zipInputStream);
-//				
-//				}
-//				zipInputStream.closeEntry();
-//			}
-//			zipInputStream.close();
-//			zipInputStream = new ZipInputStream(fileContent);
-//			while (zipInputStream.available() == 1) {
-//				ZipEntry entry = zipInputStream.getNextEntry();
-//				String fileName = entry.getName();
-//				if (fileName.equals("app.csv")){
-//					auDao.insert(appDao, uDao, zipInputStream);
-//				
-//				}
-//				zipInputStream.closeEntry();
-//			}
-//			zipInputStream.close();
-//			zipInputStream = new ZipInputStream(fileContent);
-//			while (zipInputStream.available() == 1) {
-//				ZipEntry entry = zipInputStream.getNextEntry();
-//				String fileName = entry.getName();
-//				if (fileName.equals("location-lookup.csv")){
-//					lDao.insert(zipInputStream);
-//				
-//				}
-//				zipInputStream.closeEntry();
-//			}
-//			zipInputStream.close();
-//			zipInputStream = new ZipInputStream(fileContent);
-//			while (zipInputStream.available() == 1) {
-//				ZipEntry entry = zipInputStream.getNextEntry();
-//				String fileName = entry.getName();
-//				if (fileName.equals("location.csv")){
-//					luDao.insert(lDao, uDao, zipInputStream);
-//				
-//				}
-//				zipInputStream.closeEntry();
-//			}
-			zipInputStream.close();
-			
-			
-			
+
+			if (conn != null) {
+				conn.close();
+			}
 		} catch (Exception e) {
-			System.out.println("Exception caught");
+			System.out.println("Exception Caught in bootstrap action.java");
 			e.printStackTrace();
 		}
-
-	}
-
-	public static void createTable() throws SQLException {
-		Connection conn = ConnectionManager.getConnection();
-		Statement stmt = conn.createStatement();
-		conn.setAutoCommit(false);
-
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS app (\n"
-				+ "  appid int NOT NULL,\n"
-				+ "  appname varchar(128) NOT NULL, \n"
-				+ "  appcategory varchar(30) NOT NULL, \n"
-				+ "   CONSTRAINT app_pk PRIMARY KEY(appid)\n"
-				+ "   \n"
-				+ ");");
-
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS location (\n"
-				+ "  locationid varchar(100) NOT NULL,\n"
-				+ "  semanticplace varchar(100) NOT NULL, \n"
-				+ "  CONSTRAINT location_pk PRIMARY KEY (locationid)\n"
-				+ ");");
-
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS `user` (\n"
-				+ "  macaddress varchar(100) NOT NULL,\n"
-				+ "  name varchar(100) NOT NULL, \n"
-				+ "  password varchar(100) NOT NULL, \n"
-				+ "  email varchar(100) NOT NULL, \n"
-				+ "  gender char(1) NOT NULL, \n"
-				+ "  CONSTRAINT user_pk PRIMARY KEY (macaddress)\n"
-				+ ");");
-
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS appUsage (\n"
-				+ "  timestamp date NOT NULL,\n"
-				+ "  macaddress varchar(128) NOT NULL, \n"
-				+ "  appid int(8) NOT NULL  , \n"
-				+ "   CONSTRAINT appUsageID_pk PRIMARY KEY (timestamp,macaddress), \n"
-				+ "   CONSTRAINT appUsageID_fk1 FOREIGN KEY (macaddress) REFERENCES user(macaddress), \n"
-				+ "   CONSTRAINT appUsageID_fk2 FOREIGN KEY (appid) REFERENCES app(appid) \n"
-				+ ");");
-
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS locationUsage (\n"
-				+ "  timestamp date NOT NULL,\n"
-				+ "  macaddress varchar(100), \n"
-				+ "  locationid varchar(100) NOT NULL, \n"
-				+ "  CONSTRAINT locationUsage_pk PRIMARY KEY (`timestamp`,`locationid`), \n"
-				+ "   CONSTRAINT locationUsage_fk1 FOREIGN KEY (macaddress) REFERENCES user(macaddress), \n"
-				+ "   CONSTRAINT locationUsage_fk2 FOREIGN KEY (locationid) REFERENCES location(locationid) \n"
-				+ ");");
-
-        //int[] recordsAffected;
-		//recordsAffected = stmt.executeBatch();
-		//conn.commit();
-		stmt.executeBatch();
-		conn.commit();
-		ConnectionManager.close(conn,stmt);
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
