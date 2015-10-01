@@ -49,13 +49,13 @@ public class AppDAO {
                 }
 
                 String name = Utility.parseString(sc.next());
-                System.out.println(name);
+
                 if (name == null) {
                     unsuccessful.add("Name cannot be blank.");
                     err = true;
                 }
                 String cat = Utility.parseString(sc.next());
-                System.out.println(cat);
+
                 if (cat== null) {
                     unsuccessful.add("category cannot be blank.");
                     err = true;

@@ -35,8 +35,8 @@ public class UserDAO {
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
-        
-        String sql = "insert into user (macAdd , name , password , email , gender) values(?,?,?,?,?);";
+        System.out.println("gogo");
+        String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
         stmt = conn.prepareStatement(sql);
         conn.setAutoCommit(false);
 
@@ -80,7 +80,7 @@ public class UserDAO {
                 unsuccessful.add("email cannot be blank");
                 err = true;
             }
-            if (Utility.checkEmail(email)) {
+            if (!Utility.checkEmail(email)) {
                 unsuccessful.add("invalid email");
                 err = true;
             }
@@ -93,13 +93,14 @@ public class UserDAO {
 
             String gender = g.toLowerCase();
 
-            if (!gender.equals("f") || !gender.equals("g")) {
+            if (!gender.equals("f") && !gender.equals("m")) {
                 unsuccessful.add("invalid gender");
                 err = true;
             }
 
             if (!err) {
-                System.out.println("pullhe");
+                User user = new User(macAdd, name, password, email, gender);
+                userList.add(user);
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
@@ -108,13 +109,9 @@ public class UserDAO {
                 stmt.setString(4, email);
                 stmt.setString(5, gender);
                 stmt.addBatch();
-            }
-            
-            
+            }  
         }
-        for(String whee : unsuccessful) {
-            System.out.println(whee);
-        }
+        
 
         //closing
         if (stmt != null) {

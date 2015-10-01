@@ -48,7 +48,7 @@ public final class Utility {
     }
 
     public static boolean checkHexadecimal(String str) {
-        return (str.length() == 40 && str.matches("/[0-9a-fA-F]+/"));
+        return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
     }
 
     public static String parseString(String str) {
@@ -60,7 +60,7 @@ public final class Utility {
     }
 
     public static boolean checkPassword(String str) {
-        return (str.length() > 8 && !str.matches("\\s"));
+        return (str.length() >= 8 && !str.contains("\\s"));
     }
 
     public static boolean checkEmail(String str) {
@@ -76,8 +76,7 @@ public final class Utility {
                 }
             }
         }
-
-        if (2011 >= year || 2015 <= year) {
+        if (2011 > year || 2015 < year) {
             return false;
         }
         int position = backEmail.indexOf(".");
