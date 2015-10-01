@@ -41,7 +41,7 @@ public class UserDAO {
         conn.setAutoCommit(false);
 
         while (sc.hasNext()) {
-
+            
             //retrieving per row
             int locationId = -1;
             boolean err = false;
@@ -99,6 +99,7 @@ public class UserDAO {
             }
 
             if (!err) {
+                System.out.println("pullhe");
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
@@ -108,6 +109,11 @@ public class UserDAO {
                 stmt.setString(5, gender);
                 stmt.addBatch();
             }
+            
+            
+        }
+        for(String whee : unsuccessful) {
+            System.out.println(whee);
         }
 
         //closing
