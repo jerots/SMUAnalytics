@@ -54,7 +54,7 @@
 		</div>
 		<!--END OF LOGIN BOX-->
 
-
-		<script src="css/bootstrap.js"></script>
+		<script src="js/jquery-2.1.4.min"></script>
+		<script src="js/bootstrap.js"></script>
 	</body>
 </html>

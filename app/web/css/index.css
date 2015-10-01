@@ -9,10 +9,10 @@ and open the template in the editor.
 */
 
 
-body {
+body,html {
 	
 	background-color:lavender;
-	
+	height:100%;
 }
 
 #login-div {
@@ -27,6 +27,13 @@ body {
 	margin-top: 10%;
 	background-color:white;
 	
+	
+}
+
+.theme-div{
+	border-radius: 15px;
+	background-color:white;
+	height:100%;
 	
 }
 

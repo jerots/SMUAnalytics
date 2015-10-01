@@ -1,13 +1,13 @@
 <%-- 
     Document   : home
-    Created on : Sep 30, 2015, 1:12:53 PM
+    Created on : Sep 30, 2015, 1:22:22 PM
     Author     : jeremyongts92
 --%>
 
-<%@page import="entity.Admin"%>
+<%@page import="entity.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="/protect-admin.jsp" %>
+<%@include file="../protect-user.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -16,7 +16,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/style.css">
     </head>
     <body>
-		<%			Admin admin = (Admin) session.getAttribute("admin");
+		<%			User user = (User) session.getAttribute("user");
 		%>	
 		<!--NAVBAR-->
 		<nav class="navbar navbar-default">
@@ -29,7 +29,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<!--<a class="navbar-brand" href="#"><%=admin.getUsername() + " (admin)"%></a>-->
+					<!--<a class="navbar-brand" href="#"><%=user.getName()+ " (student)"%></a>-->
 				</div>
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
@@ -54,17 +54,15 @@
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
-						<li><a>Welcome, <%=admin.getUsername() + " (admin)"%></a></li>
+						<li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
 						<li><a href="../logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
 		</nav>
 		<!--END OF NAV BAR-->
-
-<div class="theme-div">
-        <h1>This is home page for admins!</h1>
-</div>
+        <h1>This is home page for student users!</h1>
+		
 		<script src="../js/jquery-2.1.4.min.js"></script>
 		<script src="../js/bootstrap.js"></script>
     </body>
