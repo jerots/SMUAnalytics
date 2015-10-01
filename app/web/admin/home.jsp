@@ -19,7 +19,7 @@
 		<%			Admin admin = (Admin) session.getAttribute("admin");
 		%>	
 		<!--NAVBAR-->
-		<nav class="navbar navbar-default">
+		<nav class="navbar-static-top navbar-default">
 			<div class="container-fluid">
 				<!-- Brand and toggle get grouped for better mobile display -->
 				<div class="navbar-header">
@@ -62,9 +62,41 @@
 		</nav>
 		<!--END OF NAV BAR-->
 
-<div class="theme-div">
-        <h1>This is home page for admins!</h1>
-</div>
+
+		<!--START OF CONTENT-->
+		<div class="theme-div">
+			
+			
+			
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			<h1>This is home page for admins!</h1>
+			
+			<h1>This is home page for admins!</h1>
+			
+			
+			
+		</div>
+		<!--END OF CONTENT-->
 		<script src="../js/jquery-2.1.4.min.js"></script>
 		<script src="../js/bootstrap.js"></script>
     </body>

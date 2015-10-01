@@ -19,6 +19,13 @@ body, html {
 	border-radius: 8px;
 	background-color:white;
 	padding:1%;
-	margin:1%;
+	position:absolute;
+	margin-top:1%;
+	margin-left:1%;
+	margin-right:1%;
+	width:98%;
+	min-height: 86%;
+	/*bottom: 0px;*/
+	/*margin-bottom: 0px;*/
 	
 }
