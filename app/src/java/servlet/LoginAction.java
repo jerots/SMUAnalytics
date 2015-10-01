@@ -63,7 +63,7 @@ public class LoginAction extends HttpServlet {
 			System.out.println(user);
 			if (user != null) {
 				session.setAttribute("user", user);
-				response.sendRedirect("home.jsp");
+				response.sendRedirect("student/home.jsp");
 				return;
 				//redirect to student page
 
