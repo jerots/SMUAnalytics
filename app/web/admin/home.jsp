@@ -64,37 +64,32 @@
 
 
 		<!--START OF CONTENT-->
-		<div class="theme-div">
-			
-			
-			
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			<h1>This is home page for admins!</h1>
-			
-			<h1>This is home page for admins!</h1>
-			
-			
-			
+		<div class="theme-container container">
+			<div class="row">
+				<div class="theme-div" style="width:37%">
+
+					<form action="../BootstrapAction" method="post" enctype="multipart/form-data">
+						Choose File to upload:<br/>
+						<div class="form-group">
+							<label for="exampleInputFile">File input</label>
+							<input type="file" name="zipFile">
+						</div>
+						<input type="radio" value="bootstrap" name="option" checked> Bootstrap<br>
+						<input type="radio" value="add-data" name="option"> Add additional data<br>
+						<input type="radio" value="delete" name="option"> Delete<br><br>
+						<input type="submit" class="btn btn-default" value="Upload">
+
+
+
+					</form>
+				</div>
+				<div class="theme-div theme-content" style="width:60%">
+
+					<h1>Result</h1>
+					You have not uploaded any files.
+				</div>
+
+			</div>
 		</div>
 		<!--END OF CONTENT-->
 		<script src="../js/jquery-2.1.4.min.js"></script>
