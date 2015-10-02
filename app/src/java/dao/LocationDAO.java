@@ -18,25 +18,29 @@ public class LocationDAO {
         locationList = new ArrayList<>();
     }
 
-    public void insert(ZipInputStream zis, Connection conn) throws IOException, SQLException {
+    public void insert(ZipInputStream zis) throws IOException, SQLException {
+        Connection conn = ConnectionManager.getConnection();
         PreparedStatement stmt = null;
+        conn.setAutoCommit(false);
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
+        String sql = "insert into location (locationid, semanticplace) values(?,?);";
+        stmt = conn.prepareStatement(sql);
 
-        while (sc.hasNext()) {
-
+        while (sc.hasNextLine()) {
+            String currLine = sc.nextLine();
+            String[] arr = currLine.split(",");
             //retrieving per row
             int locationId = -1;
             boolean err = false;
 
-            locationId = Utility.parseInt(sc.next());
+            locationId = Utility.parseInt(arr[0]);
             if (locationId <= 0) {
                 unsuccessful.add("invalid location id");
                 err = true;
             }
 
-            String semanticPl = Utility.parseString(sc.next());
-
+            String semanticPl = Utility.parseString(arr[1]);
             if (semanticPl == null) {
                 unsuccessful.add("semantic place cannot be blank");
                 err = true;
@@ -45,7 +49,7 @@ public class LocationDAO {
             String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
             int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
 
-            if (!((school.equals("SMUSISL") || school.equals("SMUSISB")) && (levelNum >= 1 || levelNum <= 5))) {
+            if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
                 unsuccessful.add("invalid sematic place");
                 err = true;
             }
@@ -55,27 +59,21 @@ public class LocationDAO {
                 Location location = new Location(locationId, semanticPl);
                 locationList.add(location);
                 //insert into tables
-                String sql = "insert into location (location-id, semantic-place values(?,?))";
-                stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, +locationId);
-                stmt.setString(2, "\"" + semanticPl + "\"");
-
+                stmt.setInt(1, locationId);
+                stmt.setString(2, semanticPl);
+                stmt.addBatch();
             }
 
-            //adding to batch
-            stmt.addBatch();
-
         }
-
         //closing
         if (stmt != null) {
             stmt.executeBatch();
             conn.commit();
-            stmt.close();
         }
         if (sc != null) {
             sc.close();
         }
+        ConnectionManager.close(conn,stmt);
     }
 
     public boolean hasLocationId(int lId) {
