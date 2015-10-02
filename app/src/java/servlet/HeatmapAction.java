@@ -5,8 +5,13 @@
  */
 package servlet;
 
+import dao.AppUsageDAO;
+import entity.AppUsage;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,16 +38,24 @@ public class HeatmapAction extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		try (PrintWriter out = response.getWriter()) {
-			/* TODO output your page here. You may use following sample code. */
-			out.println("<!DOCTYPE html>");
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Servlet HeatmapAction</title>");			
-			out.println("</head>");
-			out.println("<body>");
-			out.println("<h1>Servlet HeatmapAction at " + request.getContextPath() + "</h1>");
-			out.println("</body>");
-			out.println("</html>");
+			AppUsageDAO auDAO = new AppUsageDAO();
+			
+			String dateStr = request.getParameter("date");
+			String timeStr = request.getParameter("time");
+			out.println(dateStr + ",");
+			out.println(timeStr);
+			out.println(new Date(dateStr + " " + timeStr));
+			String floor = request.getParameter("floor");
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat();
+//			Date datetime = dateFormat.parse("", );
+			
+			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
+//			ArrayList<AppUsage> auList = auDAO.retrieve(datetime, floor);
+			
+			//for each location, count unique users
+			
+			//return HashMap<location,numUsers>
 		}
 	}
 
