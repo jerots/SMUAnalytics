@@ -47,7 +47,7 @@ public class HeatmapAction extends HttpServlet {
 			out.println(new Date(dateStr + " " + timeStr));
 			String floor = request.getParameter("floor");
 			
-			SimpleDateFormat dateFormat = new SimpleDateFormat();
+//			SimpleDateFormat dateFormat = new SimpleDateFormat();
 //			Date datetime = dateFormat.parse("", );
 			
 			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
