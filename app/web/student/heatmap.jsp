@@ -1,13 +1,13 @@
 <%-- 
     Document   : home
-    Created on : Sep 30, 2015, 1:12:53 PM
+    Created on : Sep 30, 2015, 1:22:22 PM
     Author     : jeremyongts92
 --%>
 
-<%@page import="entity.Admin"%>
+<%@page import="entity.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="/protect-admin.jsp" %>
+<%@include file="../protect-user.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -16,7 +16,8 @@
 		<link rel="stylesheet" type="text/css" href="../css/style.css">
     </head>
     <body>
-		<%			Admin admin = (Admin) session.getAttribute("admin");
+		<%			User user = (User) session.getAttribute("user");
+					
 		%>	
 		<!--NAVBAR-->
 		<nav class="navbar-static-top navbar-default">
@@ -29,64 +30,67 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<!--<a class="navbar-brand" href="#"><%=admin.getUsername() + " (admin)"%></a>-->
+					<!--<a class="navbar-brand" href="#"><%=user.getName()+ " (student)"%></a>-->
 				</div>
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 					<ul class="nav navbar-nav">
-						<li><a href="home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
-						<li class="active"><a href="delete-location.jsp">Delete Location data</a></li>
-
+						<li><a href="home.jsp">Basic App Usage</a></li>
+						<li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
+						<li><a href="#">Smartphone Overuse</a></li>
+						<li class="active"><a href="#">Smartphone Usage Heatmap</a></li>
+						<li><a href="#">Social Activeness</a></li>
+						
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
-						<li><a>Welcome, <%=admin.getUsername() + " (admin)"%></a></li>
+						<li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
 						<li><a href="../logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
 		</nav>
 		<!--END OF NAV BAR-->
-
-
-		<!--START OF CONTENT-->
+        <!--START OF CONTENT-->
 		<div class="theme-container container">
 			<div class="row">
 				<div class="theme-div" style="width:37%">
-
-					<form action="../DeleteLocationAction" method="post" enctype="multipart/form-data">
-						<br/>
-
-						<div class="form-group">
-							<label for="macadd">MAC Address</label>
-							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" required>
+					<form action="../HeatmapAction" method="GET">
+					<div class="form-group">
+							<label for="date">Date</label>
+							<input type="date" class="form-control" id="date" name="date" required>
 						</div>
 						<div class="form-group">
-							<label for="startDate">Start Date</label>
-							<input type="date" class="form-control" id="startDate" name="startdate" required>
+							<label for="date">Time</label>
+							<input type="time" class="form-control" id="time" name="date" required>
 						</div>
 						<div class="form-group">
-							<label for="endDate">End Date</label>
-							<input type="date" class="form-control" id="endDate" name="enddate" required>
+							<label for="startdate">Floor</label>
+							<select class="form-control">
+								<option value="B1">B1</option>
+								<%
+								for (int i = 1; i <= 5; i ++){
+									out.println("<option value='L"+i+"'>L"+ i +"</option>");
+								}
+								%>
+							</select>
 						</div>
 
-						<input type="submit" class="btn btn-default" value="Delete location data">
-
-
-
+						<input type="submit" class="btn btn-default" value="Generate">
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
 
 					<h1>Result</h1>
-					You have not chosen anything to delete.
+					You have not uploaded any files.
 				</div>
 
 			</div>
 		</div>
 		<!--END OF CONTENT-->
+		
 		<script src="../js/jquery-2.1.4.min.js"></script>
 		<script src="../js/bootstrap.js"></script>
     </body>
