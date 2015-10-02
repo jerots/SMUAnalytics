@@ -72,6 +72,7 @@ public final class Utility {
     }
 
     public static boolean checkEmail(String str) {
+        System.out.println(str);
         String[] split = str.split("@");
         String frontEmail = split[0];
         String backEmail = split[1];

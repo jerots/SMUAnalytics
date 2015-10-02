@@ -4,6 +4,7 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -13,12 +14,10 @@
     </head>
     <body>
         <form action="BootstrapAction" method="post" enctype="multipart/form-data">
+           
            Choose File to upload:<br/>
            <input type="file" name="zipFile"> <br/>
            <input type="submit" value="Upload">
-           
-           
-           
             
         </form>
     </body>

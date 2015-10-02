@@ -30,96 +30,95 @@ public class UserDAO {
         userList = new ArrayList<>();
     }
 
-    public void insert(ZipInputStream zis) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
-        PreparedStatement stmt = null;
-        Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
-        sc.nextLine(); //flush title
-        String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
-        stmt = conn.prepareStatement(sql);
-        conn.setAutoCommit(false);
+    public void insert(CSVReader reader) throws IOException, SQLException {
+        try{
+            Connection conn = ConnectionManager.getConnection();
+            conn.setAutoCommit(false);
+            String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
 
-        while (sc.hasNextLine()) {
-            String currLine = sc.nextLine();
-            String[] arr = currLine.split(",");
-            //retrieving per row
-            boolean err = false;
+            String arr[];
+            
+            while ((arr = reader.readNext()) != null) {
+                //retrieving per row
+                boolean err = false;
 
-            String macAdd = Utility.parseString(arr[0]);
-            if (macAdd == null) {
-                unsuccessful.add("mac add cannot be blank");
-                err = true;
+                String macAdd = Utility.parseString(arr[0]);
+                if (macAdd == null) {
+                    unsuccessful.add("mac add cannot be blank");
+                    err = true;
+                }
+
+                if (!Utility.checkHexadecimal(macAdd)) {
+                    unsuccessful.add("invalid macAddress");
+                    err = true;
+                }
+
+                String name = Utility.parseString(arr[1]);
+
+                if (name == null) {
+                    unsuccessful.add("name cannot be blank");
+                    err = true;
+                }
+
+                String password = Utility.parseString(arr[2]);
+                if (password == null) {
+                    unsuccessful.add("password cannot be blank");
+                    err = true;
+                }
+
+                if (!Utility.checkPassword(password)) {
+                    unsuccessful.add("invalid password");
+                    err = true;
+                }
+
+                String email = Utility.parseString(arr[3]);
+                if (email == null) {
+                    unsuccessful.add("email cannot be blank");
+                    err = true;
+                }
+                if (!Utility.checkEmail(email)) {
+                    unsuccessful.add("invalid email");
+                    err = true;
+                }
+
+                String g = Utility.parseString(arr[4]);
+                if (g == null) {
+                    unsuccessful.add("gender cannot be blank");
+                    err = true;
+                }
+
+                String gender = g.toLowerCase();
+
+                if (!gender.equals("f") && !gender.equals("m")) {
+                    unsuccessful.add("invalid gender");
+                    err = true;
+                }
+
+                if (!err) {
+                    User user = new User(macAdd, name, password, email, gender);
+                    userList.add(user);
+                    //add to list
+                    //insert into tables
+                    stmt.setString(1, macAdd);
+                    stmt.setString(2, name);
+                    stmt.setString(3, password);
+                    stmt.setString(4, email);
+                    stmt.setString(5, gender);
+                    stmt.addBatch();
+                }  
             }
 
-            if (!Utility.checkHexadecimal(macAdd)) {
-                unsuccessful.add("invalid macAddress");
-                err = true;
+            //closing
+            if (stmt != null) {
+                stmt.executeBatch();
+                conn.commit();
             }
-
-            String name = Utility.parseString(arr[1]);
-
-            if (name == null) {
-                unsuccessful.add("name cannot be blank");
-                err = true;
-            }
-
-            String password = Utility.parseString(arr[2]);
-            if (password == null) {
-                unsuccessful.add("password cannot be blank");
-                err = true;
-            }
-
-            if (!Utility.checkPassword(password)) {
-                unsuccessful.add("invalid password");
-                err = true;
-            }
-
-            String email = Utility.parseString(arr[3]);
-            if (email == null) {
-                unsuccessful.add("email cannot be blank");
-                err = true;
-            }
-            if (!Utility.checkEmail(email)) {
-                unsuccessful.add("invalid email");
-                err = true;
-            }
-
-            String g = Utility.parseString(arr[4]);
-            if (g == null) {
-                unsuccessful.add("gender cannot be blank");
-                err = true;
-            }
-
-            String gender = g.toLowerCase();
-
-            if (!gender.equals("f") && !gender.equals("m")) {
-                unsuccessful.add("invalid gender");
-                err = true;
-            }
-
-            if (!err) {
-                User user = new User(macAdd, name, password, email, gender);
-                userList.add(user);
-                //add to list
-                //insert into tables
-                stmt.setString(1, macAdd);
-                stmt.setString(2, name);
-                stmt.setString(3, password);
-                stmt.setString(4, email);
-                stmt.setString(5, gender);
-                stmt.addBatch();
-            }  
+            reader.close();
+            ConnectionManager.close(conn,stmt);
+        }catch(NullPointerException e){
+            
         }
-        
-        //closing
-        if (stmt != null) {
-            stmt.executeBatch();
-            conn.commit();
-        }
-        if (sc != null) {
-            sc.close();
-        }
-        ConnectionManager.close(conn,stmt);
     }
 	
 	public User retrieve(String username, String password){
