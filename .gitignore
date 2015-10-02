@@ -1,3 +1,4 @@
-/nbproject/private/
+/app/nbproject/
 /app/build/
 /app/dist/
+/app/src/java/dao/connection.properties/
