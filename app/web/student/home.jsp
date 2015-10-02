@@ -17,6 +17,7 @@
     </head>
     <body>
 		<%			User user = (User) session.getAttribute("user");
+					
 		%>	
 		<!--NAVBAR-->
 		<nav class="navbar-static-top navbar-default">
