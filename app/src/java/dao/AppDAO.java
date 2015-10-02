@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.zip.ZipInputStream;
+import com.opencsv.CSVReader;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -28,23 +29,14 @@ public class AppDAO {
         appList = new ArrayList<>();
     }
 
-    public void insert(ZipInputStream zis) throws IOException, SQLException {
+    public void insert(CSVReader reader) throws IOException, SQLException {
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement stmt = null;
-            Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
-            sc.nextLine(); //flush title
-
-            String sql = "insert into app values(?,?,?);";
-            stmt = conn.prepareStatement(sql);
             conn.setAutoCommit(false);
-
-            while (sc.hasNextLine()) {
-                //retrieving per row
-                String currentLine = sc.nextLine();
-
-                String[] arr = currentLine.split(",");
-
+            String sql = "insert into app values(?,?,?);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            String[] arr = null;
+            while ((arr = reader.readNext()) != null) {
                 boolean err = false;
 
                 int appId = Utility.parseInt(arr[0]);
@@ -81,15 +73,13 @@ public class AppDAO {
                     stmt.setString(3, cat);
                     stmt.addBatch();
                 }
-
             }
-
             //closing
             if (stmt != null) {
                 stmt.executeBatch();
                 conn.commit();
             }
-            sc.close();
+            reader.close();
             ConnectionManager.close(conn,stmt);
         } catch (NullPointerException e) {
             e.printStackTrace();

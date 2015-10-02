@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.zip.*;
+import com.opencsv.CSVReader;
 
 public class AppUsageDAO {
 
@@ -18,83 +19,73 @@ public class AppUsageDAO {
     public AppUsageDAO() {
     }
 
-    public void insert(AppDAO aDao, UserDAO uDao, ZipInputStream zis) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
-        PreparedStatement stmt = null;
-        Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
-        String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
-        stmt = conn.prepareStatement(sql);
-        conn.setAutoCommit(false);
+    public void insert(AppDAO aDao, UserDAO uDao, CSVReader reader) throws IOException, SQLException {
+        try{
+            Connection conn = ConnectionManager.getConnection();
+            conn.setAutoCommit(false);
+            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
 
-        sc.nextLine(); //flush title
+            String[] arr = null;
+            while ((arr = reader.readNext()) != null) {
+                //retrieving per row
+                boolean err = false;
 
-        while (sc.hasNextLine()) {
+                //check timestamp
+                java.util.Date format = Utility.parseDate(arr[0]);
 
-            String currLine = sc.nextLine();
-            String[] arr = currLine.split(",");
-            //retrieving per row
-            boolean err = false;
+                if (format == null) {
+                    err = true;
+                    unsuccessful.add("invalid timestamp");
+                }
+                String date = Utility.formatDate(format);
 
-            //check timestamp
-            java.util.Date format = Utility.parseDate(arr[0]);
-            
-            if (format == null) {
-                err = true;
-                unsuccessful.add("invalid timestamp");
+                //check macAdd
+                String macAdd = Utility.parseString(arr[1]);
+                if (macAdd == null) {
+                    unsuccessful.add("mac add cannot be blank");
+                    err = true;
+                }
+                if (!Utility.checkHexadecimal(macAdd)) {
+                    unsuccessful.add("invalid mac address");
+                    err = true;
+                }
+
+                if (!uDao.hasMacAdd(macAdd)) {
+                    unsuccessful.add("no matching mac address");
+                    err = true;
+                }
+
+                //check appid
+                int appId = Utility.parseInt(arr[2]);
+                if (appId <= 0) {
+                    unsuccessful.add("app id cannot be blank");
+                    err = true;
+                }
+
+                if (aDao.hasAppId(appId)) {
+                    unsuccessful.add("invalid app");
+                    err = true;
+                }
+
+                if (!err) {
+                    //add to list
+                    stmt.setString(1, date);
+                    stmt.setString(2, macAdd);
+                    stmt.setInt(3, appId);
+                    stmt.addBatch();
+                    //insert into tables
+                }
             }
-            String date = Utility.formatDate(format);
-
-            //check macAdd
-            String macAdd = Utility.parseString(arr[1]);
-            if (macAdd == null) {
-                unsuccessful.add("mac add cannot be blank");
-                err = true;
+            //closing
+            if (stmt != null) {
+                stmt.executeBatch();
+                conn.commit();
             }
-            if (!Utility.checkHexadecimal(macAdd)) {
-                unsuccessful.add("invalid mac address");
-                err = true;
-            }
-
-            if (!uDao.hasMacAdd(macAdd)) {
-                unsuccessful.add("no matching mac address");
-                err = true;
-            }
-
-            //check appid
-            int appId = Utility.parseInt(arr[2]);
-            if (appId <= 0) {
-                unsuccessful.add("app id cannot be blank");
-                err = true;
-            }
-
-            if (aDao.hasAppId(appId)) {
-                unsuccessful.add("invalid app");
-                err = true;
-            }
-
-            if (!err) {
-                System.out.println(date);
-                //add to list
-                stmt.setString(1, date);
-                stmt.setString(2, macAdd);
-                stmt.setInt(3, appId);
-                stmt.addBatch();
-                //insert into tables
-            }
+            reader.close();
+            ConnectionManager.close(conn,stmt);
+        }catch(NullPointerException e){
         }
-        for(String s: unsuccessful){
-            System.out.println(s);
-        }
-        //closing
-        if (stmt != null) {
-            stmt.executeBatch();
-            conn.commit();
-        }
-        if (sc != null) {
-            sc.close();
-        }
-        ConnectionManager.close(conn,stmt);
-
     }
 
 }
