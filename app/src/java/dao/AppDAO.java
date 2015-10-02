@@ -27,10 +27,9 @@ public class AppDAO {
     public AppDAO() {
         appList = new ArrayList<>();
     }
-
-    public void insert(ZipInputStream zis) throws IOException, SQLException {
-        try {
-            Connection conn = ConnectionManager.getConnection();
+    
+    public void insert(ZipInputStream zis, Connection conn) throws IOException, SQLException {
+        try{
             PreparedStatement stmt = null;
             Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
             sc.nextLine(); //flush title
@@ -39,37 +38,35 @@ public class AppDAO {
             stmt = conn.prepareStatement(sql);
             conn.setAutoCommit(false);
 
-            while (sc.hasNextLine()) {
+            while (sc.hasNext()) {
                 //retrieving per row
-                String currentLine = sc.nextLine();
-
-                String[] arr = currentLine.split(",");
-
                 boolean err = false;
 
-                int appId = Utility.parseInt(arr[0]);
+                int appId = Utility.parseInt(sc.next());
                 if (appId <= 0) {
                     unsuccessful.add("invalid app id");
                     err = true;
                 }
 
-                String name = Utility.parseString(arr[1]);
-                name = name.replace("\"","");
+                String name = Utility.parseString(sc.next());
+
                 if (name == null) {
                     unsuccessful.add("Name cannot be blank.");
                     err = true;
                 }
-                
-                String cat = Utility.parseString(arr[2]);
-                cat = cat.replace("\"","");
+                String cat = Utility.parseString(sc.next());
 
-                if (cat == null) {
+                if (cat== null) {
                     unsuccessful.add("category cannot be blank.");
                     err = true;
 
                 }
+                String category = null;
+                if(cat != null){
+                    category = cat.substring(1, cat.length() - 1);
+                }
 
-                if (Utility.checkCategory(cat)) {
+                if (Utility.checkCategory(category)) {
                     unsuccessful.add("invalid category.");
                     err = true;
                 }
@@ -78,7 +75,7 @@ public class AppDAO {
                     //insert into tables
                     stmt.setInt(1, appId);
                     stmt.setString(2, name);
-                    stmt.setString(3, cat);
+                    stmt.setString(3, category);
                     stmt.addBatch();
                 }
 
@@ -88,10 +85,10 @@ public class AppDAO {
             if (stmt != null) {
                 stmt.executeBatch();
                 conn.commit();
+                stmt.close();
             }
             sc.close();
-            ConnectionManager.close(conn,stmt);
-        } catch (NullPointerException e) {
+        }catch(NullPointerException e) {
             e.printStackTrace();
         }
     }

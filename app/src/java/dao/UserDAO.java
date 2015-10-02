@@ -5,6 +5,8 @@
  */
 package dao;
 
+import entity.Admin;
+import entity.App;
 import entity.User;
 import java.io.IOException;
 import java.sql.Connection;
@@ -14,7 +16,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.zip.ZipInputStream;
-import com.opencsv.CSVReader;
 
 /**
  *
@@ -30,22 +31,22 @@ public class UserDAO {
         userList = new ArrayList<>();
     }
 
-    public void insert(ZipInputStream zis) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
+    public void insert(ZipInputStream zis, Connection conn) throws IOException, SQLException {
         PreparedStatement stmt = null;
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
+        System.out.println("gogo");
         String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
         stmt = conn.prepareStatement(sql);
         conn.setAutoCommit(false);
 
-        while (sc.hasNextLine()) {
-            String currLine = sc.nextLine();
-            String[] arr = currLine.split(",");
+        while (sc.hasNext()) {
+            
             //retrieving per row
+            int locationId = -1;
             boolean err = false;
 
-            String macAdd = Utility.parseString(arr[0]);
+            String macAdd = Utility.parseString(sc.next());
             if (macAdd == null) {
                 unsuccessful.add("mac add cannot be blank");
                 err = true;
@@ -56,14 +57,14 @@ public class UserDAO {
                 err = true;
             }
 
-            String name = Utility.parseString(arr[1]);
+            String name = Utility.parseString(sc.next());
 
             if (name == null) {
                 unsuccessful.add("name cannot be blank");
                 err = true;
             }
 
-            String password = Utility.parseString(arr[2]);
+            String password = Utility.parseString(sc.next());
             if (password == null) {
                 unsuccessful.add("password cannot be blank");
                 err = true;
@@ -74,7 +75,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String email = Utility.parseString(arr[3]);
+            String email = Utility.parseString(sc.next());
             if (email == null) {
                 unsuccessful.add("email cannot be blank");
                 err = true;
@@ -84,7 +85,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String g = Utility.parseString(arr[4]);
+            String g = Utility.parseString(sc.next());
             if (g == null) {
                 unsuccessful.add("gender cannot be blank");
                 err = true;
@@ -111,15 +112,17 @@ public class UserDAO {
             }  
         }
         
+
         //closing
         if (stmt != null) {
             stmt.executeBatch();
             conn.commit();
+            stmt.close();
         }
         if (sc != null) {
             sc.close();
         }
-        ConnectionManager.close(conn,stmt);
+
     }
 	
 	public User retrieve(String username, String password){

@@ -24,32 +24,25 @@ public class LocationUsageDAO {
     private ArrayList<String> unsuccessful = new ArrayList<>();
     private ArrayList<LocationUsage> locationUsageList = new ArrayList<>();
 
-    public void insert(LocationDAO lDao, UserDAO uDao, ZipInputStream zis) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
+    public void insert(LocationDAO lDao, UserDAO uDao, ZipInputStream zis, Connection conn) throws IOException, SQLException {
         PreparedStatement stmt = null;
-        conn.setAutoCommit(false);
         Scanner sc = new Scanner(zis).useDelimiter(",|\r\n");
         sc.nextLine(); //flush title
-        String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
-        stmt = conn.prepareStatement(sql);
 
-        while (sc.hasNextLine()) {
-            String currLine = sc.nextLine();
-            String[] arr = currLine.split(",");
+        while (sc.hasNext()) {
             //retrieving per row
 
             boolean err = false;
 
             //check timestamp
-            java.util.Date dateCheck = Utility.parseDate(arr[0]);
-            String date = Utility.formatDate(dateCheck);
+            Date date = Utility.parseDate(sc.next());
             if (date == null) {
                 err = true;
                 unsuccessful.add("invalid timestamp");
             }
 
             //check macAdd
-            String macAdd = Utility.parseString(arr[1]);
+            String macAdd = Utility.parseString(sc.next());
             if (macAdd == null) {
                 unsuccessful.add("mac add cannot be blank");
                 err = true;
@@ -59,40 +52,52 @@ public class LocationUsageDAO {
                 err = true;
             }
 
+            if (uDao.hasMacAdd(macAdd)) {
+                unsuccessful.add("no matching mac address");
+                err = true;
+            }
+
             //check appid
-            int locationId = Utility.parseInt(arr[2]);
+            int locationId = Utility.parseInt(sc.next());
             if (locationId <= 0) {
                 unsuccessful.add("location id cannot be blank");
                 err = true;
             }
 
-            if (!lDao.hasLocationId(locationId)) {
+            if (lDao.hasLocationId(locationId)) {
                 unsuccessful.add("invalid location");
                 err = true;
             }
 
             if (!err) {
                 //add to list
-                stmt.setString(1, date);
-                stmt.setString(2, macAdd);
-                stmt.setInt(3, locationId);
-                stmt.addBatch();
+                LocationUsage locationU = new LocationUsage(date, macAdd, locationId);
+                locationUsageList.add(locationU);
+
             }
 
         }
         //insert into tables
-        for (String s: unsuccessful) { 
-            System.out.println(s);
+        for (LocationUsage lUsage : locationUsageList) {
+            String sql = "insert into app (timestamp, mac-address, location-id values(?,?,?))";
+            stmt = conn.prepareStatement(sql);
+            stmt.setDate(1, lUsage.getTimestamp());
+            stmt.setString(2, "\"" + lUsage.getMacAddress() + "\"");
+            stmt.setInt(3, lUsage.getLocationId());
         }
+
+        //adding to batch
+        stmt.addBatch();
 
         //closing
         if (stmt != null) {
             stmt.executeBatch();
             conn.commit();
+            stmt.close();
         }
         if (sc != null) {
             sc.close();
         }
-        ConnectionManager.close(conn,stmt);
+
     }
 }
