@@ -64,7 +64,7 @@
 						</div>
 						<div class="form-group">
 							<label for="date">Time</label>
-							<input type="time" class="form-control" id="time" name="time" required>
+							<input type="time" class="form-control" id="time" name="date" required>
 						</div>
 						<div class="form-group">
 							<label for="startdate">Floor</label>
