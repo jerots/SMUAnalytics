@@ -67,6 +67,8 @@ public class AppDAO {
                 }
 
                 if (!err) {
+                    App app = new App(appId, name, cat);
+                    appList.add(app);
                     //insert into tables
                     stmt.setInt(1, appId);
                     stmt.setString(2, name);
