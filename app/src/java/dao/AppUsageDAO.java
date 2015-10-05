@@ -4,42 +4,43 @@ import entity.*;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.zip.*;
 import com.opencsv.CSVReader;
-import java.sql.ResultSet;
+import java.util.HashMap;
 
 public class AppUsageDAO {
-
+    
+    private HashMap<String, String> duplicate;
     private ArrayList<String> unsuccessful = new ArrayList<>();
 
-    public AppUsageDAO() {
+    public AppUsageDAO(){
+        duplicate = new HashMap<>();
     }
 
     public void insert(AppDAO aDao, UserDAO uDao, CSVReader reader) throws IOException, SQLException {
-        try{
+        try {
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
             String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
-                    + "= VALUES(appid);";
+                    + " = VALUES(appid);";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            int counter = 0;
+
             String[] arr = null;
             while ((arr = reader.readNext()) != null) {
                 //retrieving per row
                 boolean err = false;
+
                 //check timestamp
                 java.util.Date format = Utility.parseDate(arr[0]);
-                
+
                 if (format == null) {
                     err = true;
                     unsuccessful.add("invalid timestamp");
                 }
                 String date = Utility.formatDate(format);
+
                 //check macAdd
                 String macAdd = Utility.parseString(arr[1]);
                 if (macAdd == null) {
@@ -69,7 +70,7 @@ public class AppUsageDAO {
                 }
 
                 if (!err) {
-                    counter++;
+                    duplicate.put(date, macAdd);
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -81,10 +82,8 @@ public class AppUsageDAO {
             //closing
             if (stmt != null) {
                 int[] errors = stmt.executeBatch();
-                System.out.println(errors.length);
-                for(int i = 0; i < counter - errors.length; i++){
+                for(int i = 0; i < errors.length - duplicate.size(); i++){
                     unsuccessful.add("duplicate row");
-                    System.out.println(i);
                 }
                 conn.commit();
             }
@@ -93,4 +92,5 @@ public class AppUsageDAO {
         } catch (NullPointerException e) {
         }
     }
+
 }

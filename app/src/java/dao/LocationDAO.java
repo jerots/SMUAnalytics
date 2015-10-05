@@ -6,24 +6,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.zip.ZipInputStream;
 import com.opencsv.CSVReader;
+import java.util.HashMap;
 
 public class LocationDAO {
 
-    private ArrayList<Location> locationList;
+    private HashMap<Integer, Location> locationList;
     private ArrayList<String> unsuccessful = new ArrayList<>();
 
     public LocationDAO() {
-        locationList = new ArrayList<>();
+        locationList = new HashMap<>();
     }
 
     public void insert(CSVReader reader) throws IOException, SQLException {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            String sql = "insert into location (locationid, semanticplace) values(?,?);";
+            String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
+                    + "VALUES(semanticplace);";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             String[] arr = null;
@@ -54,7 +54,7 @@ public class LocationDAO {
                 if (!err) {
                     //add to list
                     Location location = new Location(locationId, semanticPl);
-                    locationList.add(location);
+                    locationList.put(locationId, location);
                     //insert into tables
                     stmt.setInt(1, locationId);
                     stmt.setString(2, semanticPl);
@@ -75,12 +75,7 @@ public class LocationDAO {
     }
 
     public boolean hasLocationId(int lId) {
-        for (Location l : locationList) {
-            if (l.getLocationId() == lId) {
-                return true;
-            }
-        }
-        return false;
+        return locationList.containsKey(lId);
     }
 
 }

@@ -12,9 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.zip.ZipInputStream;
 import com.opencsv.CSVReader;
+import java.util.HashMap;
 
 /**
  *
@@ -22,19 +21,20 @@ import com.opencsv.CSVReader;
  */
 public class UserDAO {
 
-    private ArrayList<User> userList;
+    private HashMap<String, User> userList;
     // private ArrayList<String> categories = new ArrayList<>();
     private ArrayList<String> unsuccessful = new ArrayList<>();
 
     public UserDAO() {
-        userList = new ArrayList<>();
+        userList = new HashMap<>();
     }
 
     public void insert(CSVReader reader) throws IOException, SQLException {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
+            String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?) ON DUPLICATE KEY UPDATE name = "
+                    + "VALUES(name), password = VALUES(password), email = VALUES(email), gender = VALUES(gender);";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             String arr[];
@@ -97,7 +97,7 @@ public class UserDAO {
 
                 if (!err) {
                     User user = new User(macAdd, name, password, email, gender);
-                    userList.add(user);
+                    userList.put(macAdd, user);
                     //add to list
                     //insert into tables
                     stmt.setString(1, macAdd);
@@ -181,11 +181,6 @@ public class UserDAO {
 	
     
     public boolean hasMacAdd(String str){
-        for(User u: userList){
-            if(u.getMacAddress().equals(str)){
-                return true;
-            }
-        }
-        return false;
+        return userList.containsKey(str);
     }
 }

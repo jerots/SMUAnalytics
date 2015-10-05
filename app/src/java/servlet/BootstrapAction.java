@@ -1,11 +1,7 @@
 package servlet;
 
 import java.io.*;
-import java.sql.*;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.zip.ZipInputStream;
 import javax.servlet.*;
 import javax.servlet.annotation.*;
@@ -119,7 +115,6 @@ public class BootstrapAction extends HttpServlet {
             isr = new InputStreamReader(zipInputStream);
             br = new BufferedReader(isr);
             entry = null;
-            System.out.println("hello3");
             try {
                 while ((entry = zipInputStream.getNextEntry()) != null) {
                     String fileName = entry.getName();

@@ -5,16 +5,13 @@
  */
 package dao;
 
-import entity.*;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.zip.ZipInputStream;
 import com.opencsv.CSVReader;
+import java.util.HashMap;
 
 /**
  *
@@ -22,14 +19,18 @@ import com.opencsv.CSVReader;
  */
 public class LocationUsageDAO {
 
-    private ArrayList<String> unsuccessful = new ArrayList<>();
-    private ArrayList<LocationUsage> locationUsageList = new ArrayList<>();
+    private ArrayList<String> unsuccessful;
+    private HashMap<String, String> duplicate;
+    
+    public LocationUsageDAO(){
+        unsuccessful = new ArrayList<>();
+        duplicate = new HashMap<>();
+    }
 
     public void insert(LocationDAO lDao, UserDAO uDao, CSVReader reader) throws IOException, SQLException {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            int counter = 0;
             String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
                     + "VALUES(locationid);";
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -71,7 +72,7 @@ public class LocationUsageDAO {
                 }
 
                 if (!err) {
-                    counter++;
+                    duplicate.put(date, macAdd);
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -85,9 +86,8 @@ public class LocationUsageDAO {
             //closing
             if (stmt != null) {
                 int[] errors = stmt.executeBatch();
-                for(int i = 0; i < counter - errors.length; i++){
+                for(int i = 0; i < errors.length - duplicate.size(); i++){
                     unsuccessful.add("duplicate row");
-                    System.out.println(i);
                 }
                 conn.commit();
             }

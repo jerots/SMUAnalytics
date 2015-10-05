@@ -68,7 +68,7 @@
 						</div>
 						<div class="form-group">
 							<label for="startdate">Floor</label>
-							<select class="form-control">
+							<select class="form-control" name="floor">
 								<option value="B1">B1</option>
 								<%
 								for (int i = 1; i <= 5; i ++){
