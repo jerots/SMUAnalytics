@@ -28,10 +28,9 @@ public final class Utility {
     public static Date parseDate(String date) {
         date = date.replace("\"","");
         if (date != null && date.length() > 0) {
-            try {
+            try {                
                 return df.parse(date);
             } catch (ParseException e) {
-
             }
         }
         return null;
@@ -59,8 +58,8 @@ public final class Utility {
         return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
     }
 
-    public static String parseString(String str) {
-        str.trim();
+    public static String parseString(String input) {
+        String str = input.trim();
         if (str != null && str.length() > 0) {
             return str;
         }
@@ -68,11 +67,15 @@ public final class Utility {
     }
 
     public static boolean checkPassword(String str) {
-        return (str.length() >= 8 && !str.contains("\\s"));
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return str.length() >= 8;
     }
 
     public static boolean checkEmail(String str) {
-        System.out.println(str);
         String[] split = str.split("@");
         String frontEmail = split[0];
         String backEmail = split[1];
@@ -92,7 +95,8 @@ public final class Utility {
         return (schoolList.contains(backEmail.substring(0, position)) && backEmail.substring(position).equals(".smu.edu.sg"));
     }
     
-     public static boolean checkCategory(String str) {
+     public static boolean checkCategory(String string) {
+        String str = string.toLowerCase();
         return categories.contains(str);
      }
 

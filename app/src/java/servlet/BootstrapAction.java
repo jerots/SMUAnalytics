@@ -98,6 +98,7 @@ public class BootstrapAction extends HttpServlet {
             isr = new InputStreamReader(zipInputStream);
             br = new BufferedReader(isr);
             entry = null;
+            System.out.println("hello3");
             try {
                 while ((entry = zipInputStream.getNextEntry()) != null) {
                     String fileName = entry.getName();
@@ -118,12 +119,13 @@ public class BootstrapAction extends HttpServlet {
             isr = new InputStreamReader(zipInputStream);
             br = new BufferedReader(isr);
             entry = null;
-            br.readLine(); //flush title
+            System.out.println("hello3");
             try {
                 while ((entry = zipInputStream.getNextEntry()) != null) {
                     String fileName = entry.getName();
                     if (fileName.equals("location-lookup.csv")) {
                         reader = new CSVReader(br);
+                        reader.readNext();
                         lDao.insert(reader);
                     } else {
                         zipInputStream.closeEntry();
