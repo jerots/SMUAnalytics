@@ -6,12 +6,21 @@
 package servlet;
 
 import dao.AppUsageDAO;
+import dao.LocationDAO;
+import dao.LocationUsageDAO;
 import entity.AppUsage;
+import entity.Location;
+import entity.LocationUsage;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,24 +47,62 @@ public class HeatmapAction extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		try (PrintWriter out = response.getWriter()) {
-			AppUsageDAO auDAO = new AppUsageDAO();
-			
+			LocationUsageDAO luDAO = new LocationUsageDAO();
+
 			String dateStr = request.getParameter("date");
 			String timeStr = request.getParameter("time");
 			out.println(dateStr + ",");
 			out.println(timeStr);
-			out.println(new Date(dateStr + " " + timeStr));
 			String floor = request.getParameter("floor");
-			
-//			SimpleDateFormat dateFormat = new SimpleDateFormat();
-//			Date datetime = dateFormat.parse("", );
+						out.println(floor);
+
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+			Date datetime = dateFormat.parse(dateStr + " " + timeStr, new ParsePosition(0));
 			
 			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
-//			ArrayList<AppUsage> auList = auDAO.retrieve(datetime, floor);
-			
+//			ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, floor);
+
 			//for each location, count unique users
+			HashMap<String, Integer> result = new HashMap<String, Integer>();
+			HashSet<String> peopleSet = new HashSet<String>();
+
+			LocationDAO locDAO = new LocationDAO();
+			ArrayList<String> locationList = locDAO.retrieve(floor);
+			out.println(locationList.size());
+			for (int i = 0; i < locationList.size(); i++) { //for each location in the floor
+				String loc = locationList.get(i);
+				
+				ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, loc);
+				result.put(loc, luList.size());
+				
+//				for (int j = 0; j < luList.size(); j++) {
+//					LocationUsage lu = luList.get(i);
+//					if (lu.getLocationId() == loc.getLocationId()){
+//						
+//					}
+//					String person = lu.getMacAddress();
+//
+//				}
+				// for each location
+
+				//count unique users
+
+			}
+			out.println("<br>");
+			Iterator iter = result.keySet().iterator();
+			while (iter.hasNext()){
+				String key = (String) iter.next();
+				out.println(key + ", ");
+				out.println(result.get(key) + "<br>");
+			}
 			
 			//return HashMap<location,numUsers>
+//			request.setAttribute("heatmap", result);
+//			RequestDispatcher rd = request.getRequestDispatcher("");
+//			rd.forward(request, response);
+
 		}
 	}
 

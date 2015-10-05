@@ -89,34 +89,6 @@ public class AppUsageDAO {
 		}
 	}
 
-	public ArrayList<AppUsage> retrieve(java.util.Date date, String floor) {
-		try {
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT lu.timestamp, lu.macaddress, lu.locationid FROM locationUsage lu, location l"
-							+ "WHERE lu.locationid = l.locationid"
-							+ "AND timestamp < ?"
-							+ "AND semanticplace LIKE '?'");
-			
-			ps.setDate(1, new java.sql.Date(date.getTime()));
-			ps.setString(2, "%" +  floor + "%");
-			
-			ResultSet rs = ps.executeQuery();
-			
-			ArrayList<AppUsage> result = new ArrayList<AppUsage>();
-			while (rs.next()){
-				String timestamp = rs.getString(1);
-				String macAddress = rs.getString(2);
-				String locationId = rs.getString(3);
-				System.out.println(timestamp + macAddress + locationId);
-				
-			}
-			
-		} catch (SQLException e) {
-
-		}
-
-		return null;
-	}
+	
 
 }
