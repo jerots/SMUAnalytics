@@ -29,7 +29,9 @@ public class LocationUsageDAO {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
+            int counter = 0;
+            String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
+                    + "VALUES(locationid);";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             String[] arr = null;
@@ -69,6 +71,7 @@ public class LocationUsageDAO {
                 }
 
                 if (!err) {
+                    counter++;
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -78,13 +81,14 @@ public class LocationUsageDAO {
 
             }
             //insert into tables
-            for (String s: unsuccessful) { 
-                System.out.println(s);
-            }
 
             //closing
             if (stmt != null) {
-                stmt.executeBatch();
+                int[] errors = stmt.executeBatch();
+                for(int i = 0; i < counter - errors.length; i++){
+                    unsuccessful.add("duplicate row");
+                    System.out.println(i);
+                }
                 conn.commit();
             }
             reader.close();

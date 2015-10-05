@@ -23,17 +23,17 @@ public class AppUsageDAO {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
+            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
+                    + "= VALUES(appid);";
             PreparedStatement stmt = conn.prepareStatement(sql);
-
+            int counter = 0;
             String[] arr = null;
             while ((arr = reader.readNext()) != null) {
                 //retrieving per row
                 boolean err = false;
-
                 //check timestamp
                 java.util.Date format = Utility.parseDate(arr[0]);
-
+                
                 if (format == null) {
                     err = true;
                     unsuccessful.add("invalid timestamp");
@@ -69,6 +69,7 @@ public class AppUsageDAO {
                 }
 
                 if (!err) {
+                    counter++;
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -79,7 +80,12 @@ public class AppUsageDAO {
             }
             //closing
             if (stmt != null) {
-                stmt.executeBatch();
+                int[] errors = stmt.executeBatch();
+                System.out.println(errors.length);
+                for(int i = 0; i < counter - errors.length; i++){
+                    unsuccessful.add("duplicate row");
+                    System.out.println(i);
+                }
                 conn.commit();
             }
             reader.close();

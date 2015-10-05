@@ -61,7 +61,7 @@ public class AppDAO {
 
                 }
 
-                if (Utility.checkCategory(cat)) {
+                if (!Utility.checkCategory(cat)) {
                     unsuccessful.add("invalid category.");
                     err = true;
                 }
