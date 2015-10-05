@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.zip.*;
 import com.opencsv.CSVReader;
+import java.sql.ResultSet;
 
 public class AppUsageDAO {
 
-    private ArrayList<String> unsuccessful = new ArrayList<>();
+	private ArrayList<String> unsuccessful = new ArrayList<>();
 
-    public AppUsageDAO() {
-    }
+	public AppUsageDAO() {
+	}
 
     public void insert(AppDAO aDao, UserDAO uDao, CSVReader reader) throws IOException, SQLException {
         try{
@@ -40,33 +41,34 @@ public class AppUsageDAO {
                 }
                 String date = Utility.formatDate(format);
 
-                //check macAdd
-                String macAdd = Utility.parseString(arr[1]);
-                if (macAdd == null) {
-                    unsuccessful.add("mac add cannot be blank");
-                    err = true;
-                }
-                if (!Utility.checkHexadecimal(macAdd)) {
-                    unsuccessful.add("invalid mac address");
-                    err = true;
-                }
+				//check macAdd
+				String macAdd = Utility.parseString(arr[1]);
+				if (macAdd == null) {
+					unsuccessful.add("mac add cannot be blank");
+					err = true;
+				}
+				if (!Utility.checkHexadecimal(macAdd)) {
+					unsuccessful.add("invalid mac address");
+					err = true;
+				}
 
-                if (!uDao.hasMacAdd(macAdd)) {
-                    unsuccessful.add("no matching mac address");
-                    err = true;
-                }
+				if (!uDao.hasMacAdd(macAdd)) {
+					unsuccessful.add("no matching mac address");
+					err = true;
+				}
 
-                //check appid
-                int appId = Utility.parseInt(arr[2]);
-                if (appId <= 0) {
-                    unsuccessful.add("app id cannot be blank");
-                    err = true;
-                }
+				//check appid
+				int appId = Utility.parseInt(arr[2]);
+				if (appId <= 0) {
+					unsuccessful.add("app id cannot be blank");
+					err = true;
+				}
 
-                if (aDao.hasAppId(appId)) {
-                    unsuccessful.add("invalid app");
-                    err = true;
-                }
+				if (aDao.hasAppId(appId)) {
+					unsuccessful.add("invalid app");
+					err = true;
+				}
+
 
                 if (!err) {
                     counter++;
@@ -93,5 +95,6 @@ public class AppUsageDAO {
         }catch(NullPointerException e){
         }
     }
+
 
 }

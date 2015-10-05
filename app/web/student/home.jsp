@@ -17,6 +17,7 @@
     </head>
     <body>
 		<%			User user = (User) session.getAttribute("user");
+					
 		%>	
 		<!--NAVBAR-->
 		<nav class="navbar-static-top navbar-default">
@@ -36,21 +37,12 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 					<ul class="nav navbar-nav">
-						<li><a href="#">Function</a></li>
-						<li class="active"><a href="#">Bootstrap <span class="sr-only">(current)</span></a></li>
-						<li><a href="#">Create</a></li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports <span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="#">Action</a></li>
-								<li><a href="#">Another action</a></li>
-								<li><a href="#">Something else here</a></li>
-								<li role="separator" class="divider"></li>
-								<li><a href="#">Separated link</a></li>
-								<li role="separator" class="divider"></li>
-								<li><a href="#">One more separated link</a></li>
-							</ul>
-						</li>
+						<li class="active"><a href="#">Basic App Usage</a></li>
+						<li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
+						<li><a href="#">Smartphone Overuse</a></li>
+						<li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
+						<li><a href="#">Social Activeness</a></li>
+						
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
@@ -61,7 +53,32 @@
 			</div><!-- /.container-fluid -->
 		</nav>
 		<!--END OF NAV BAR-->
-        <h1>This is home page for student users!</h1>
+        <!--START OF CONTENT-->
+		<div class="theme-container container">
+			<div class="row">
+				<div class="theme-div" style="width:37%">
+					<form>
+					<div class="form-group">
+							<label for="date">Date</label>
+							<input type="date" class="form-control" id="date" name="date" required>
+						</div>
+						<div class="form-group">
+							<label for="startdate">Floor</label>
+							<input type="date" class="form-control" id="startDate" name="startdate" required>
+						</div>
+
+						<input type="submit" class="btn btn-default" value="Generate">
+					</form>
+				</div>
+				<div class="theme-div theme-content" style="width:60%">
+
+					<h1>Result</h1>
+					You have not uploaded any files.
+				</div>
+
+			</div>
+		</div>
+		<!--END OF CONTENT-->
 		
 		<script src="../js/jquery-2.1.4.min.js"></script>
 		<script src="../js/bootstrap.js"></script>
