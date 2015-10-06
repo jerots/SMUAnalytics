@@ -95,18 +95,25 @@ public class LocationUsageDAO {
 		}
 	}
 
-	public ArrayList<LocationUsage> retrieve(java.util.Date date, String floor) {
+	public ArrayList<LocationUsage> retrieve(java.util.Date date, String loc) {
 		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			PreparedStatement ps = conn.prepareStatement(
-					"SELECT lu.timestamp, lu.macaddress, lu.locationid FROM locationUsage lu, location l"
-					+ "WHERE lu.locationid = l.locationid"
-					+ "AND timestamp < ?"
-					+ "AND semanticplace LIKE '?'");
+					"SELECT timestamp, macaddress, lu.locationid FROM locationUsage lu, location l "
+					+ "WHERE timestamp >= ? "
+					+ "AND lu.locationid = l.locationid "
+					+ "AND timestamp < ? "
+					+ "AND semanticplace = ? "
+					+ "GROUP BY macaddress;");
 
-			ps.setDate(1, new java.sql.Date(date.getTime()));
-			ps.setString(2, "%" + floor + "%");
+			Date before = new java.sql.Date(date.getTime() - 900000);
+			Date after = new java.sql.Date(date.getTime());
+//			System.out.println(Utility.formatDate(before));
+//			System.out.println(Utility.formatDate(after));
+			ps.setString(1, Utility.formatDate(before)); //15 minutes before
+			ps.setString(2, Utility.formatDate(after));
+			ps.setString(3, loc);
 
 			ResultSet rs = ps.executeQuery();
 
@@ -114,7 +121,6 @@ public class LocationUsageDAO {
 				Timestamp timestamp = rs.getTimestamp(1);
 				String macAddress = rs.getString(2);
 				String locationId = rs.getString(3);
-				System.out.println(timestamp + macAddress + locationId);
 
 				LocationUsage curr = new LocationUsage(new Date(timestamp.getTime()), macAddress, Integer.parseInt(locationId));
 				result.add(curr);
@@ -124,40 +130,7 @@ public class LocationUsageDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		return result;
-	}
-
-	public ArrayList<LocationUsage> retrieve(java.util.Date date, Location loc) {
-		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
-		try {
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT timestamp,distinct macaddress FROM `locationUsage`"
-					+ "WHERE timestamp >= ? AND timestamp < ?"
-					+ "AND locationid = ?");
-
-			ps.setDate(1, new java.sql.Date(date.getTime() - 900000)); //15 minutes before
-			ps.setDate(2, new java.sql.Date(date.getTime()));
-			ps.setInt(3, loc.getLocationId());
-
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Timestamp timestamp = rs.getTimestamp(1);
-				String macAddress = rs.getString(2);
-				String locationId = rs.getString(3);
-				System.out.println(timestamp + macAddress + locationId);
-
-				LocationUsage curr = new LocationUsage(new Date(timestamp.getTime()), macAddress, Integer.parseInt(locationId));
-				result.add(curr);
-
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
+		System.out.println(result.size());
 		return result;
 	}
 

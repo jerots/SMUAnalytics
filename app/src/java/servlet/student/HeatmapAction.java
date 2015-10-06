@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
+package servlet.student;
 
 import dao.AppUsageDAO;
 import dao.LocationDAO;
@@ -54,8 +54,12 @@ public class HeatmapAction extends HttpServlet {
 			out.println(dateStr + ",");
 			out.println(timeStr);
 			String floor = request.getParameter("floor");
-						out.println(floor);
-
+			request.setAttribute("date", dateStr);
+			request.setAttribute("time", timeStr);
+			request.setAttribute("floor", floor);
+			
+			
+			
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -65,43 +69,32 @@ public class HeatmapAction extends HttpServlet {
 //			ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, floor);
 
 			//for each location, count unique users
-			HashMap<String, Integer> result = new HashMap<String, Integer>();
+			HashMap<String, ArrayList<LocationUsage>> result = new HashMap<String, ArrayList<LocationUsage>>();
 			HashSet<String> peopleSet = new HashSet<String>();
-
+			
 			LocationDAO locDAO = new LocationDAO();
-			ArrayList<String> locationList = locDAO.retrieve(floor);
-			out.println(locationList.size());
-			for (int i = 0; i < locationList.size(); i++) { //for each location in the floor
-				String loc = locationList.get(i);
+			ArrayList<String> floorLocationList = locDAO.retrieve(floor);
+			out.println(floorLocationList.size());
+			for (int i = 0; i < floorLocationList.size(); i++) { //for each location in the floor
+				String loc = floorLocationList.get(i);
 				
 				ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, loc);
-				result.put(loc, luList.size());
+				result.put(loc, luList);
 				
-//				for (int j = 0; j < luList.size(); j++) {
-//					LocationUsage lu = luList.get(i);
-//					if (lu.getLocationId() == loc.getLocationId()){
-//						
-//					}
-//					String person = lu.getMacAddress();
-//
-//				}
-				// for each location
-
-				//count unique users
 
 			}
-			out.println("<br>");
-			Iterator iter = result.keySet().iterator();
-			while (iter.hasNext()){
-				String key = (String) iter.next();
-				out.println(key + ", ");
-				out.println(result.get(key) + "<br>");
-			}
-			
-			//return HashMap<location,numUsers>
-//			request.setAttribute("heatmap", result);
-//			RequestDispatcher rd = request.getRequestDispatcher("");
-//			rd.forward(request, response);
+//			out.println("<br>");
+//			Iterator iter = result.keySet().iterator();
+//			while (iter.hasNext()){
+//				String key = (String) iter.next();
+//				out.println(key + ", ");
+//				out.println(result.get(key).size() + "<br>");
+//			}
+//			
+//			return HashMap<location,userlist>
+			request.setAttribute("heatmap", result);
+			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+			rd.forward(request, response);
 
 		}
 	}

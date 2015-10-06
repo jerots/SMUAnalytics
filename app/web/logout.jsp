@@ -2,6 +2,6 @@
 	session.removeAttribute("user");
 	session.removeAttribute("admin");
 	
-	response.sendRedirect("index.jsp");
+	response.sendRedirect("/app/index.jsp");
 
 %>
