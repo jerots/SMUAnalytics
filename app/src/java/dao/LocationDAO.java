@@ -109,5 +109,27 @@ public class LocationDAO {
 
 		return result;
 	}
+	
+	public ArrayList<String> retrieveAll(){
+		ArrayList<String> result = new ArrayList<String>();
+
+		try {
+			Connection conn = ConnectionManager.getConnection();
+
+			PreparedStatement ps = conn.prepareStatement("SELECT semanticplace FROM location");
+
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String place = rs.getString(1);
+				result.add(place);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
 
 }
