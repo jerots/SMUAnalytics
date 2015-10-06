@@ -76,11 +76,10 @@ public class HeatmapAction extends HttpServlet {
 			ArrayList<String> floorLocationList = locDAO.retrieve(floor);
 			out.println(floorLocationList.size());
 			
-			ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, floor);
 			
 			for (int i = 0; i < floorLocationList.size(); i++) { //for each location in the floor
 				String loc = floorLocationList.get(i);
-//				ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, loc);
+				ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, loc);
 				result.put(loc, luList);
 			}
 //			out.println("<br>");
