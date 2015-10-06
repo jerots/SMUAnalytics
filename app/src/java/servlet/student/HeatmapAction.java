@@ -95,6 +95,7 @@ public class HeatmapAction extends HttpServlet {
 			request.setAttribute("heatmap", result);
 			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
 			rd.forward(request, response);
+			
 
 		}
 	}
