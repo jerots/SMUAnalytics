@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
+import java.sql.ResultSet;
 import java.util.HashMap;
 
 public class LocationDAO {
@@ -74,15 +75,13 @@ public class LocationDAO {
         }
     }
 
-		}
-	}
 
 	public boolean hasLocationId(int lId) {
-		for (Location l : locationList) {
-			if (l.getLocationId() == lId) {
-				return true;
-			}
-		}
+//		for (Location l : locationList) {
+//			if (l.getLocationId() == lId) {
+//				return true;
+//			}
+//		}
 		return false;
 	}
 
