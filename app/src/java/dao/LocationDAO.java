@@ -79,10 +79,10 @@ public class LocationDAO {
 	public boolean hasLocationId(int lId) {
 //		for (Location l : locationList) {
 //			if (l.getLocationId() == lId) {
-//				return true;
+				return true;
 //			}
 //		}
-		return false;
+//		return false;
 	}
 
 	public ArrayList<String> retrieve(String floor) {
