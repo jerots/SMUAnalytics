@@ -5,9 +5,10 @@
  */
 package servlet;
 
+import com.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.util.zip.ZipEntry;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -37,6 +38,11 @@ public class AddBatch extends HttpServlet {
         try {
             Part filePart = request.getPart("zipFile");
             InputStream fileContent = filePart.getInputStream();
+            ZipEntry entry = null;
+
+            CSVReader reader = null;
+            
+            
             
         } catch (Exception e){
             e.printStackTrace();

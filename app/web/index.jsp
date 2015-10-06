@@ -22,7 +22,11 @@
 			<form method='POST' action='LoginAction'>
 				<%
 
-					
+					try {
+                                                InitDAO.createTable();
+                                            } catch (SQLException e) {
+                                                e.printStackTrace();
+                                            }
 
 					String username = (String) request.getAttribute("username");
 					if (username == null) {
@@ -49,7 +53,7 @@
 		</div>
 		<!--END OF LOGIN BOX-->
 
-		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/jquery-2.1.4.min"></script>
 		<script src="js/bootstrap.js"></script>
 	</body>
 </html>
