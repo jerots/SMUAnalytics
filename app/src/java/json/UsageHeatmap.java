@@ -1,33 +1,28 @@
-package json;
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package json;
 
-import dao.AdminDAO;
-import dao.UserDAO;
-import entity.Admin;
-import entity.User;
+import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.servlet.RequestDispatcher;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import net.minidev.json.JSONObject;
 
 /**
  *
  * @author jeremyongts92
  */
-@WebServlet(urlPatterns = {"/authenticate"})
-public class Authenticate extends HttpServlet {
+@WebServlet(name = "UsageHeatmap", urlPatterns = {"/usage-heatmap"})
+public class UsageHeatmap extends HttpServlet {
 
 	/**
 	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,44 +38,50 @@ public class Authenticate extends HttpServlet {
 		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
 			JSONObject result = new JSONObject();
-
-			String username = request.getParameter("username");
-			String password = request.getParameter("password");
+			ArrayList<String> errors = new ArrayList<String>();
 			
-			String token = JWTUtility.sign("nabjemzhdarrensw", username);
-
-			//CHECK WHETHER ADMIN LOGIN SUCCESS
-			AdminDAO adminDAO = new AdminDAO();
-			Admin admin = adminDAO.retrieve(username, password);
-			if (admin != null) {
-				result.put("status", "success");
-				result.put("token", token);
-				out.println(result.toJSONString());
-				return;
-				//redirect to admin page
-
-			}
-//			out.println(admin);
-
-			//IF NOT, CHECK WHETHER STUDENT LOGIN SUCCESS
-			UserDAO userDAO = new UserDAO();
-			User user = userDAO.retrieveByEmailId(username, password);
-			if (user != null) {
-				result.put("status", "success");
-				result.put("token", token);
-				out.println(result.toJSONString());
-				return;
-				//redirect to student page
-
-			}
-
-//			out.println(user);
-			//IF ALL FAIL.
-			result.put("status", "error");
-			result.put("", "invalid username/password");
-			out.println(result.toJSONString());
 			
-
+			String token = request.getParameter("token");
+			String date = request.getParameter("date");
+			String time = request.getParameter("time");
+			String floor = request.getParameter("floor");
+			
+			try {
+				String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+				if (username == null){
+					//failed
+				}
+			} catch (JWTException e){
+				//failed
+				e.printStackTrace();
+			}
+			
+			
+			//FLOOR VALIDATION
+			if (floor == null){
+				errors.add("missing floor");
+			} else {
+				try {
+					int floorInt = Integer.parseInt(floor);
+					if (floorInt < 0 || floorInt > 5){
+						errors.add("invalid floor");
+					}
+				} catch (NumberFormatException e){
+					errors.add("invalid floor");
+				}
+				
+			}
+			
+			//DATE VALIDATION
+			
+			
+			
+			//TIME VALIDATION
+			
+			
+			
+			
+			
 		}
 	}
 
@@ -96,7 +97,7 @@ public class Authenticate extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		//processRequest(request, response);
+		processRequest(request, response);
 	}
 
 	/**
