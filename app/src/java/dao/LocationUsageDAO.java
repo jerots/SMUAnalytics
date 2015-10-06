@@ -100,17 +100,23 @@ public class LocationUsageDAO {
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			PreparedStatement ps = conn.prepareStatement(
-					"SELECT timestamp, macaddress, lu.locationid FROM locationUsage lu, location l "
-					+ "WHERE timestamp >= ? "
-					+ "AND lu.locationid = l.locationid "
-					+ "AND timestamp < ? "
-					+ "AND semanticplace = ? "
-					+ "GROUP BY macaddress;");
-
+			"SELECT timestamp, macaddress " +
+			", lu.locationid FROM ( " +
+			"SELECT MAX(TIMESTAMP " +
+			") as timestamp, macaddress, locationid FROM locationUsage " +
+			"WHERE timestamp >= ? " +
+			"AND timestamp < ? " +
+			"group by macaddress " +
+			") as lu, " +
+			" location l WHERE " +
+			"lu.locationid = l.locationid " +
+			"AND semanticplace = ? " + 
+			";")
+			;
+			
+			
 			Date before = new java.sql.Date(date.getTime() - 900000);
 			Date after = new java.sql.Date(date.getTime());
-//			System.out.println(Utility.formatDate(before));
-//			System.out.println(Utility.formatDate(after));
 			ps.setString(1, Utility.formatDate(before)); //15 minutes before
 			ps.setString(2, Utility.formatDate(after));
 			ps.setString(3, loc);
