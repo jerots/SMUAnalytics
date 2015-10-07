@@ -26,7 +26,7 @@ import net.minidev.json.JSONObject;
  *
  * @author jeremyongts92
  */
-@WebServlet(urlPatterns = {"/authenticate"})
+@WebServlet(urlPatterns = {"/json/authenticate"})
 public class Authenticate extends HttpServlet {
 
 	/**
