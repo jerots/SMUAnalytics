@@ -60,10 +60,16 @@ public class HeatmapAction extends HttpServlet {
 			
 			
 			
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date datetime = dateFormat.parse(dateStr + " " + timeStr, new ParsePosition(0));
+			if (datetime == null){
+				request.setAttribute("error", "You have entered an invalid date!");
+				RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+				rd.forward(request, response);
+				return;
+			}
+				
 			
 			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
 //			ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, floor);

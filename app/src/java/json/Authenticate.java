@@ -47,7 +47,7 @@ public class Authenticate extends HttpServlet {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			
-			String token = JWTUtility.sign("zhihui", username);
+			String token = JWTUtility.sign("nabjemzhdarrensw", username);
 
 			//CHECK WHETHER ADMIN LOGIN SUCCESS
 			AdminDAO adminDAO = new AdminDAO();
@@ -65,7 +65,6 @@ public class Authenticate extends HttpServlet {
 			//IF NOT, CHECK WHETHER STUDENT LOGIN SUCCESS
 			UserDAO userDAO = new UserDAO();
 			User user = userDAO.retrieveByEmailId(username, password);
-			System.out.println(user);
 			if (user != null) {
 				result.put("status", "success");
 				result.put("token", token);
@@ -78,6 +77,7 @@ public class Authenticate extends HttpServlet {
 //			out.println(user);
 			//IF ALL FAIL.
 			result.put("status", "error");
+			result.put("", "invalid username/password");
 			out.println(result.toJSONString());
 			
 
@@ -96,7 +96,7 @@ public class Authenticate extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		processRequest(request, response);
+		//processRequest(request, response);
 	}
 
 	/**

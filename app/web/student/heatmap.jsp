@@ -107,7 +107,7 @@
 						</div>
 						<div class="form-group">
 							<label for="date">Time</label>
-							<input type="time" class="form-control" id="time" name="time" <%=timeCode%> required>
+							<input type="text" class="form-control" id="time" name="time" <%=timeCode%> placeholder="HH:MM:SS (e.g. 13:05:00)" required>
 						</div>
 						<div class="form-group">
 							<label for="startdate">Floor</label>
@@ -140,11 +140,17 @@
 				<div class="theme-div theme-content" style="width:60%">
 					<%
 						HashMap<String, ArrayList<LocationUsage>> heatmap = (HashMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
-						if (heatmap == null) {
+						String error = (String) request.getAttribute("error");
+						if (error != null){
+							
+							out.println("<h1 style='color:red'>Error!</h1>");
+							out.println("<h3 style='color:red'>" + error + "</h3>");
+							
+						} else if (heatmap == null) {
 							out.println("<h1>Result</h1>");
 							out.println("You have not uploaded any files.");
+							
 						} else {
-
 							Iterator<String> iter = heatmap.keySet().iterator();
 							out.println("<table class='table'>");
 							out.println("<tr><th>Place</th><th>Density</th><th>Number of people using smartphone</th></tr>");
