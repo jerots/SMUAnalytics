@@ -68,7 +68,7 @@ public class AddBatch extends HttpServlet {
                         UserDAO uDao = new UserDAO();
                         reader = new CSVReader(br);
                         reader.readNext();
-                        uDao.insert(reader);
+//                        uDao.insert(reader);
                     }
                     if (fileName.equals("location-delete.csv")) {
                         LocationUsageDAO luDao = new LocationUsageDAO();
