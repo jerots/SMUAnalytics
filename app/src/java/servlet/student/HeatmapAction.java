@@ -5,6 +5,7 @@
  */
 package servlet.student;
 
+import controller.HeatmapController;
 import dao.AppUsageDAO;
 import dao.LocationDAO;
 import dao.LocationUsageDAO;
@@ -70,32 +71,9 @@ public class HeatmapAction extends HttpServlet {
 				return;
 			}
 				
+			HeatmapController ctrl = new HeatmapController();
+			HashMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
 			
-			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
-//			ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, floor);
-
-			//for each location, count unique users
-			HashMap<String, ArrayList<LocationUsage>> result = new HashMap<String, ArrayList<LocationUsage>>();
-			HashSet<String> peopleSet = new HashSet<String>();
-			
-			LocationDAO locDAO = new LocationDAO();
-			ArrayList<String> floorLocationList = locDAO.retrieve(floor);
-			out.println(floorLocationList.size());
-			
-			
-			for (int i = 0; i < floorLocationList.size(); i++) { //for each location in the floor
-				String loc = floorLocationList.get(i);
-				ArrayList<LocationUsage> luList = luDAO.retrieve(datetime, loc);
-				result.put(loc, luList);
-			}
-//			out.println("<br>");
-//			Iterator iter = result.keySet().iterator();
-//			while (iter.hasNext()){
-//				String key = (String) iter.next();
-//				out.println(key + ", ");
-//				out.println(result.get(key).size() + "<br>");
-//			}
-//			
 //			return HashMap<location,userlist>
 			request.setAttribute("heatmap", result);
 			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");

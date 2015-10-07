@@ -107,7 +107,7 @@
 						</div>
 						<div class="form-group">
 							<label for="date">Time</label>
-							<input type="text" class="form-control" id="time" name="time" <%=timeCode%> placeholder="HH:MM:SS (e.g. 13:05:00)" required>
+							<input type="text" class="form-control" id="time" name="time" <%=timeCode%> placeholder="HH:MM:SS (24h)" required>
 						</div>
 						<div class="form-group">
 							<label for="startdate">Floor</label>
