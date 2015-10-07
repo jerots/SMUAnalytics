@@ -94,14 +94,13 @@ public class BootstrapAction extends HttpServlet {
             isr = new InputStreamReader(zipInputStream);
             br = new BufferedReader(isr);
             entry = null;
-            System.out.println("hello3");
             try {
                 while ((entry = zipInputStream.getNextEntry()) != null) {
                     String fileName = entry.getName();
                     if (fileName.equals("app.csv")) {
                         reader = new CSVReader(br);
                         reader.readNext();
-                        auDao.insert(appDao, uDao, reader);
+                        auDao.insert(reader);
                     } else {
                         zipInputStream.closeEntry();
                     }
@@ -140,7 +139,26 @@ public class BootstrapAction extends HttpServlet {
                     if (fileName.equals("location.csv")) {
                         reader = new CSVReader(br);
                         reader.readNext();
-                        luDao.insert(lDao, uDao, reader);
+                        luDao.insert(reader);
+                    } else {
+                        zipInputStream.closeEntry();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            fileContent = filePart.getInputStream();
+            zipInputStream = new ZipInputStream(fileContent);
+            isr = new InputStreamReader(zipInputStream);
+            br = new BufferedReader(isr);
+            entry = null;
+            try {
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("location-delete.csv")) {
+                        reader = new CSVReader(br);
+                        reader.readNext();
+                        luDao.insert(reader);
                     } else {
                         zipInputStream.closeEntry();
                     }

@@ -5,6 +5,7 @@
  */
 package servlet;
 
+import dao.LocationUsageDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -31,19 +32,18 @@ public class DeleteLocationAction extends HttpServlet {
 	 */
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
-		try (PrintWriter out = response.getWriter()) {
-			/* TODO output your page here. You may use following sample code. */
-			out.println("<!DOCTYPE html>");
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Servlet DeleteLocationAction</title>");			
-			out.println("</head>");
-			out.println("<body>");
-			out.println("<h1>Servlet DeleteLocationAction at " + request.getContextPath() + "</h1>");
-			out.println("</body>");
-			out.println("</html>");
-		}
+		try {
+                    LocationUsageDAO luDao = new LocationUsageDAO();
+                    
+                    String macAdd = request.getParameter("macadd");
+                    String startDate = request.getParameter("startdate");
+                    String endDate = request.getParameter("enddate");
+                    
+                    luDao.delete(macAdd, startDate, endDate);
+                    
+		}catch(Exception e){
+                    e.printStackTrace();
+                }
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

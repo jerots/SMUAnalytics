@@ -1,6 +1,5 @@
 package dao;
 
-import entity.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,15 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
 import java.sql.ResultSet;
-import java.util.HashMap;
 
 public class LocationDAO {
-
-    private HashMap<Integer, Location> locationList;
-    private ArrayList<String> unsuccessful = new ArrayList<>();
+    private ArrayList<String> unsuccessful;
 
     public LocationDAO() {
-        locationList = new HashMap<>();
+        unsuccessful = new ArrayList<>();
     }
 
     public void insert(CSVReader reader) throws IOException, SQLException {
@@ -53,9 +49,6 @@ public class LocationDAO {
                 }
 
                 if (!err) {
-                    //add to list
-                    Location location = new Location(locationId, semanticPl);
-                    locationList.put(locationId, location);
                     //insert into tables
                     stmt.setInt(1, locationId);
                     stmt.setString(2, semanticPl);
@@ -74,17 +67,6 @@ public class LocationDAO {
     
         }
     }
-
-
-	public boolean hasLocationId(int lId) {
-//		for (Location l : locationList) {
-//			if (l.getLocationId() == lId) {
-				return true;
-//			}
-//		}
-//		return false;
-	}
-
 	public ArrayList<String> retrieve(String floor) {
 
 		ArrayList<String> result = new ArrayList<String>();

@@ -1,20 +1,18 @@
 package entity;
 
-import java.sql.Date;
-
 public class LocationUsage {
 
-    private Date timestamp;
+    private String timestamp;
     private String macAddress;//user obj
     private int locationId;//location obj
 
-    public LocationUsage(Date timestamp, String macAddress, int locationId) {
+    public LocationUsage(String timestamp, String macAddress, int locationId) {
         this.timestamp = timestamp;
         this.macAddress = macAddress;
         this.locationId = locationId;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -26,7 +24,7 @@ public class LocationUsage {
         return locationId;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

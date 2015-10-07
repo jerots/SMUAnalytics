@@ -13,28 +13,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
-import java.util.HashMap;
 
 /**
  *
  * @author ASUS-PC
  */
 public class UserDAO {
-
-    private HashMap<String, User> userList;
-    // private ArrayList<String> categories = new ArrayList<>();
-    private ArrayList<String> unsuccessful = new ArrayList<>();
+    private ArrayList<String> unsuccessful;
 
     public UserDAO() {
-        userList = new HashMap<>();
+        unsuccessful = new ArrayList<>();
     }
 
+    //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
     public void insert(CSVReader reader) throws IOException, SQLException {
         try{
             Connection conn = ConnectionManager.getConnection();
             conn.setAutoCommit(false);
-            String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?) ON DUPLICATE KEY UPDATE name = "
-                    + "VALUES(name), password = VALUES(password), email = VALUES(email), gender = VALUES(gender);";
+            String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             String arr[];
@@ -96,8 +92,6 @@ public class UserDAO {
                 }
 
                 if (!err) {
-                    User user = new User(macAdd, name, password, email, gender);
-                    userList.put(macAdd, user);
                     //add to list
                     //insert into tables
                     stmt.setString(1, macAdd);
@@ -177,10 +171,4 @@ public class UserDAO {
 		
 		return null;
 	}
-	
-	
-    
-    public boolean hasMacAdd(String str){
-        return userList.containsKey(str);
-    }
 }
