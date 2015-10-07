@@ -36,7 +36,7 @@ public class BasicApp extends HttpServlet {
             
             String startDate = request.getParameter("startdate");
             String endDate = request.getParameter("enddate");
-            String request.getParameter("");
+//            String request.getParameter("");
             
             
         }

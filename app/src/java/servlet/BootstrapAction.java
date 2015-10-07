@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import dao.*;
 import com.opencsv.CSVReader;
+import controller.BootstrapController;
+import java.util.HashMap;
 import java.util.zip.ZipEntry;
 
 @WebServlet(urlPatterns = {"/BootstrapAction"})
@@ -29,7 +31,8 @@ public class BootstrapAction extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
 
             try {
                 InitDAO.createTable();
@@ -38,142 +41,35 @@ public class BootstrapAction extends HttpServlet {
             }
 
             Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
-            InputStream fileContent = filePart.getInputStream();
-            ZipEntry entry = null;
+            
+            //ERROR MAPS
+            HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
+            HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
+            HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
+            HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
+            HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
+                                        
 
-            CSVReader reader = null;
+            request.setAttribute("userErrMap", userErrMap);
+            request.setAttribute("appErrMap", appErrMap);
+            request.setAttribute("locErrMap", locErrMap);
+            request.setAttribute("auErrMap", auErrMap);
+            request.setAttribute("luErrMap", luErrMap);
 
-//            while ((entry = zipInputStream.getNextEntry()) != null) {
-//                String fileName = entry.getName();
-//                
-//            }
-            UserDAO uDao = new UserDAO();
-            AppDAO appDao = new AppDAO();
-            LocationDAO lDao = new LocationDAO();
-            AppUsageDAO auDao = new AppUsageDAO();
-            LocationUsageDAO luDao = new LocationUsageDAO();
-
-            ZipInputStream zipInputStream = new ZipInputStream(fileContent);
-            InputStreamReader isr = new InputStreamReader(zipInputStream);
-            BufferedReader br = new BufferedReader(isr);
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("app-lookup.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        appDao.insert(reader);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            fileContent = filePart.getInputStream();
-            zipInputStream = new ZipInputStream(fileContent);
-            isr = new InputStreamReader(zipInputStream);
-            br = new BufferedReader(isr);
-            entry = null;
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("demographics.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        uDao.insert(reader);
-                    } else {
-                        zipInputStream.closeEntry();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            fileContent = filePart.getInputStream();
-            zipInputStream = new ZipInputStream(fileContent);
-            isr = new InputStreamReader(zipInputStream);
-            br = new BufferedReader(isr);
-            entry = null;
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("app.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        auDao.insert(reader);
-                    } else {
-                        zipInputStream.closeEntry();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            fileContent = filePart.getInputStream();
-            zipInputStream = new ZipInputStream(fileContent);
-            isr = new InputStreamReader(zipInputStream);
-            br = new BufferedReader(isr);
-            entry = null;
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("location-lookup.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        lDao.insert(reader);
-                    } else {
-                        zipInputStream.closeEntry();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            fileContent = filePart.getInputStream();
-            zipInputStream = new ZipInputStream(fileContent);
-            isr = new InputStreamReader(zipInputStream);
-            br = new BufferedReader(isr);
-            entry = null;
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("location.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        luDao.insert(reader);
-                    } else {
-                        zipInputStream.closeEntry();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            fileContent = filePart.getInputStream();
-            zipInputStream = new ZipInputStream(fileContent);
-            isr = new InputStreamReader(zipInputStream);
-            br = new BufferedReader(isr);
-            entry = null;
-            try {
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("location-delete.csv")) {
-                        reader = new CSVReader(br);
-                        reader.readNext();
-                        luDao.insert(reader);
-                    } else {
-                        zipInputStream.closeEntry();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            BootstrapController ctrl = new BootstrapController();
+            HashMap<String, Integer> recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap);
+            
+            
+            request.setAttribute("recordMap", recordMap);
+            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
+            rd.forward(request, response);
+            return;
+            
         } catch (Exception e) {
             System.out.println("Exception Caught in bootstrap action.java");
             e.printStackTrace();
-        } finally {
-
-            response.sendRedirect("admin/home.jsp");
-        }
+        } 
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
