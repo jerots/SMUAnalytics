@@ -5,6 +5,9 @@
  */
 package json;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import controller.HeatmapController;
 import entity.LocationUsage;
 import is203.JWTException;
@@ -23,8 +26,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import com.google.gson.JsonArray;
 
 /**
  *
@@ -46,8 +48,9 @@ public class UsageHeatmap extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
-			JSONObject output = new JSONObject();
-			JSONArray errors = new JSONArray();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonObject output = new JsonObject();
+			JsonArray errors = new JsonArray();
 
 			String token = request.getParameter("token");
 			String date = request.getParameter("date");
@@ -142,9 +145,9 @@ public class UsageHeatmap extends HttpServlet {
 			
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0){
-				output.put("status", "error");
-				output.put("errors", errors);
-				out.println(output.toJSONString());
+				output.addProperty("status", "error");
+				output.add("errors", errors);
+				out.println(gson.toJson(errors));
 				return;
 			}
 			
@@ -160,17 +163,17 @@ public class UsageHeatmap extends HttpServlet {
 			
 			
 			
-			output.put("status", "success");
-			JSONArray heatmap = new JSONArray();
+			output.addProperty("status", "success");
+			JsonArray heatmap = new JsonArray();
 			Iterator<String> iter = luMap.keySet().iterator();
 
 			while (iter.hasNext()) {
-				JSONObject currLoc = new JSONObject();
+				JsonObject currLoc = new JsonObject();
 
 				String loc = iter.next();
-				currLoc.put("semanatic-place", loc);
+				currLoc.addProperty("semanatic-place", loc);
 				int numUsers = luMap.get(loc).size();
-				currLoc.put("num-people-using-phone", numUsers);
+				currLoc.addProperty("num-people-using-phone", numUsers);
 
 				int density = 0;
 				if (numUsers == 0) {
@@ -186,12 +189,12 @@ public class UsageHeatmap extends HttpServlet {
 				} else {
 					density = 5;
 				}
-				currLoc.put("crowd-density", density);
+				currLoc.addProperty("crowd-density", density);
 				heatmap.add(currLoc);
 			}
 
-			output.put("heatmap", heatmap);
-			out.println(output.toJSONString());
+			output.add("heatmap", heatmap);
+			out.println(gson.toJson(output));
 			
 		}
 	}
