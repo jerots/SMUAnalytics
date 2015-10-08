@@ -120,9 +120,9 @@ public class BasicUsetimeReport extends HttpServlet {
 			}
 
 			//PASSES ALL VALIDATION, proceed to report generation
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			Date startDate = dateFormat.parse(startdate, new ParsePosition(0));
-			Date endDate = dateFormat.parse(enddate, new ParsePosition(0));
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date startDate = dateFormat.parse(startdate + " " + "00:00:00", new ParsePosition(0));
+			Date endDate = dateFormat.parse(enddate + " " + "23:59:59", new ParsePosition(0));
 			
 			BasicAppController ctrl = new BasicAppController();
 			HashMap<String, String[]> resultMap = ctrl.generateReport(startDate, endDate);
