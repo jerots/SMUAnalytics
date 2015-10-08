@@ -55,15 +55,32 @@ public class UsageHeatmap extends HttpServlet {
 			String floor = request.getParameter("floor");
 			
 			
-			try {
+			//TOKEN VALIDATION
+			
+			if (token == null){
+				errors.add("missing token");
+			} else if (token.length() == 0){
+				errors.add("blank token");
+			} else {
+				try {
 				String username = JWTUtility.verify(token, "nabjemzhdarrensw");
 				if (username == null) {
 					//failed
+					errors.add("invalid token");
 				}
+				
+			
 			} catch (JWTException e) {
 				//failed
-				e.printStackTrace();
+				errors.add("invalid token");
 			}
+			
+				
+			}
+			
+			
+			
+		
 			//FLOOR VALIDATION
 			if (floor == null) {
 				errors.add("missing floor");
@@ -122,6 +139,8 @@ public class UsageHeatmap extends HttpServlet {
 				}
 			}
 			
+			
+			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0){
 				output.put("status", "error");
 				output.put("errors", errors);
