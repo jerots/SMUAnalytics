@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.JsonArray;
+import java.util.Collections;
+import java.util.TreeMap;
 
 /**
  *
@@ -159,14 +160,16 @@ public class UsageHeatmap extends HttpServlet {
 			Date datetime = dateFormat.parse(date + " " + time, new ParsePosition(0));
 
 			HeatmapController ctrl = new HeatmapController();
-			HashMap<String, ArrayList<LocationUsage>> luMap = ctrl.generateHeatmap(datetime, floor);
+			TreeMap<String, ArrayList<LocationUsage>> luMap = ctrl.generateHeatmap(datetime, floor);
 			
 			
 			
 			output.addProperty("status", "success");
 			JsonArray heatmap = new JsonArray();
 			Iterator<String> iter = luMap.keySet().iterator();
+			
 
+			
 			while (iter.hasNext()) {
 				JsonObject currLoc = new JsonObject();
 
