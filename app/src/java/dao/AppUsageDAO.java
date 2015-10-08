@@ -282,7 +282,7 @@ public class AppUsageDAO {
 			
 			while (rs.next()){
 				
-				String timestamp = rs.getDate(1).toString();
+				String timestamp = rs.getString(1);
 				String macaddress = rs.getString(2);
 				int appid = rs.getInt(3);
 				result.add(new AppUsage(timestamp, macaddress, appid));
