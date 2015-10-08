@@ -262,6 +262,35 @@ public class AppUsageDAO {
 		return result;
 	}
 	
+	public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
+
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			
+			Connection conn = ConnectionManager.getConnection();
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				String macAdd = rs.getString(1);
+				result.add(macAdd);
+			}
+			
+			
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return result;
+	}
+	
 	
 	public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
 

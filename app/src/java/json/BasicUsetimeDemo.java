@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author jeremyongts92
  */
-@WebServlet(name = "BasicUsetimeDemo", urlPatterns = {"/BasicUsetimeDemo"})
+@WebServlet(name = "BasicUsetimeDemo", urlPatterns = {"/json/basic-usetime-demographics-report"})
 public class BasicUsetimeDemo extends HttpServlet {
 
 	/**
@@ -131,7 +132,7 @@ public class BasicUsetimeDemo extends HttpServlet {
 					toCheck.add("school");
 
 					for (String s : orderArr) {
-						if (!toCheck.contains(s)){
+						if (!toCheck.contains(s)) {
 							//INVALID
 							errors.add("invalid order");
 						} else {
@@ -148,18 +149,53 @@ public class BasicUsetimeDemo extends HttpServlet {
 				out.println(gson.toJson(output));
 				return;
 			}
-//
-//			//PASSES ALL VALIDATION, proceed to report generation
-//			output.addProperty("status", "success");
-//
-//			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			Date startDate = dateFormat.parse(startdate + " " + "00:00:00", new ParsePosition(0));
-//			Date endDate = dateFormat.parse(enddate + " " + "23:59:59", new ParsePosition(0));
-//			String[] validArr = order.split(",");
-//
-//			BasicAppController ctrl = new BasicAppController();
 
-//			 resultMap = ctrl.generateReport(startDate, endDate);
+			//PASSES ALL VALIDATION, proceed to report generation
+			output.addProperty("status", "success");
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date startDate = dateFormat.parse(startdate + " " + "00:00:00", new ParsePosition(0));
+			Date endDate = dateFormat.parse(enddate + " " + "23:59:59", new ParsePosition(0));
+			String[] validArr = order.split(",");
+//
+			BasicAppController ctrl = new BasicAppController();
+			int numDemo = validArr.length;
+			HashMap<String,HashMap<String,int[]>> resultMap = null;
+			switch (numDemo) {
+				case 1:
+					resultMap = ctrl.generateReportByOneDemo(startDate, endDate, validArr);
+
+					break;
+//				case 2:
+//					resultMap = ctrl.generateReportByTwoDemo(startDate, endDate, validArr);
+//
+//					break;
+//
+//				case 3:
+//					resultMap = ctrl.generateReportByThreeDemo(startDate, endDate, validArr);
+//
+//					break;
+			}
+			
+			Iterator<String> iter = resultMap.keySet().iterator();
+			
+			while (iter.hasNext()){
+				String key = iter.next();
+				HashMap<String,int[]> inner1 = resultMap.get(key);
+				System.out.println("THE YEAR: " + key);
+				Iterator<String> iter2 = inner1.keySet().iterator();
+				while (iter2.hasNext()){
+					String key2 = iter2.next();
+					int[] arr = inner1.get(key2);
+					System.out.println("HERE'S A RESULT");
+					System.out.println(key2 + " " + arr[0]);
+					System.out.println(key2 + " " + arr[1]);
+					
+				}
+				
+			}
+			
+
 //			int intenseCount = resultMap.get("intense-count");
 //			int normalCount = resultMap.get("normal-count");
 //			int mildCount = resultMap.get("mild-count");

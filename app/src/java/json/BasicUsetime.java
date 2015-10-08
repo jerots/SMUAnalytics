@@ -126,25 +126,25 @@ public class BasicUsetime extends HttpServlet {
 
 			BasicAppController ctrl = new BasicAppController();
 
-			HashMap<String, Integer> resultMap = ctrl.generateReport(startDate, endDate);
-			int intenseCount = resultMap.get("intense-count");
-			int normalCount = resultMap.get("normal-count");
-			int mildCount = resultMap.get("mild-count");
+			HashMap<String, int[]> resultMap = ctrl.generateReport(startDate, endDate, null);
+			int[] intenseArr = resultMap.get("intense-count");
+			int[] normalArr = resultMap.get("normal-count");
+			int[] mildArr = resultMap.get("mild-count");
 
+			
 			JsonArray breakdown = new JsonArray();
 
-			double totalCount = intenseCount + normalCount + mildCount;
 			JsonObject intense = new JsonObject();
-			intense.addProperty("intense-count", intenseCount);
-			intense.addProperty("intense-percent", Math.round((intenseCount / totalCount) * 100));
+			intense.addProperty("intense-count", intenseArr[0]);
+			intense.addProperty("intense-percent", intenseArr[1]);
 
 			JsonObject normal = new JsonObject();
-			normal.addProperty("normal-count", normalCount);
-			normal.addProperty("normal-percent", Math.round((normalCount / totalCount) * 100));
+			normal.addProperty("normal-count", normalArr[0]);
+			normal.addProperty("normal-percent", normalArr[1]);
 
 			JsonObject mild = new JsonObject();
-			mild.addProperty("mild-count", mildCount);
-			mild.addProperty("mild-percent", Math.round((mildCount / totalCount) * 100));
+			mild.addProperty("mild-count", mildArr[0]);
+			mild.addProperty("mild-percent", mildArr[1]);
 
 			breakdown.add(intense);
 			breakdown.add(normal);
@@ -153,6 +153,8 @@ public class BasicUsetime extends HttpServlet {
 			output.add("breakdown", breakdown);
 
 			out.println(gson.toJson(output));
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 
