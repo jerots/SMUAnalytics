@@ -23,10 +23,10 @@
 				<%
 
 					try {
-                                                InitDAO.createTable();
-                                            } catch (SQLException e) {
-                                                e.printStackTrace();
-                                            }
+						InitDAO.createTable();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
 
 					String username = (String) request.getAttribute("username");
 					if (username == null) {

@@ -1,19 +1,17 @@
 package entity;
 
-import java.sql.Date;
-
 public class AppUsage {
-    private Date timestamp;
+    private String timestamp;
     private String macAddress;
     private int appId;
 
-    public AppUsage(Date timestamp, String macAddress, int appId) {
+    public AppUsage(String timestamp, String macAddress, int appId) {
         this.timestamp = timestamp;
         this.macAddress = macAddress;
         this.appId = appId;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -25,7 +23,7 @@ public class AppUsage {
         return appId;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

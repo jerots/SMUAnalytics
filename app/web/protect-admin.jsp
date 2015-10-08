@@ -1,6 +1,6 @@
 <%
 	if (session.getAttribute("admin") == null){
-		response.sendRedirect("../index.jsp");
+		response.sendRedirect("/app/index.jsp");
 		return;
 	}
 %>

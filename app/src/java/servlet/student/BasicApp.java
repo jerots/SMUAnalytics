@@ -1,24 +1,24 @@
-package servlet;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package servlet.student;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.util.zip.ZipInputStream;
-import javax.servlet.*;
-import javax.servlet.annotation.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import dao.*;
-import com.opencsv.CSVReader;
-import controller.BootstrapController;
-import java.util.HashMap;
-import java.util.zip.ZipEntry;
 
-@WebServlet(urlPatterns = {"/BootstrapAction"})
-@MultipartConfig
-
-public class BootstrapAction extends HttpServlet {
+/**
+ *
+ * @author Boyofthefuture
+ */
+@WebServlet(name = "BasicApp", urlPatterns = {"/BasicApp"})
+public class BasicApp extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,43 +33,13 @@ public class BootstrapAction extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-
-            try {
-                InitDAO.createTable();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
             
-            //ERROR MAPS
-            HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                                        
-
-            request.setAttribute("userErrMap", userErrMap);
-            request.setAttribute("appErrMap", appErrMap);
-            request.setAttribute("locErrMap", locErrMap);
-            request.setAttribute("auErrMap", auErrMap);
-            request.setAttribute("luErrMap", luErrMap);
-
-            BootstrapController ctrl = new BootstrapController();
-            HashMap<String, Integer> recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap);
+            String startDate = request.getParameter("startdate");
+            String endDate = request.getParameter("enddate");
+//            String request.getParameter("");
             
             
-            request.setAttribute("recordMap", recordMap);
-            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
-            rd.forward(request, response);
-            return;
-            
-        } catch (Exception e) {
-            System.out.println("Exception Caught in bootstrap action.java");
-            e.printStackTrace();
-        } 
-        
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

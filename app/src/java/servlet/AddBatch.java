@@ -6,9 +6,13 @@
 package servlet;
 
 import com.opencsv.CSVReader;
+import dao.*;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,12 +44,46 @@ public class AddBatch extends HttpServlet {
             InputStream fileContent = filePart.getInputStream();
             ZipEntry entry = null;
 
-            CSVReader reader = null;
+            CSVReader reader = null;        
             
-            
-            
-        } catch (Exception e){
+            ZipInputStream zipInputStream = new ZipInputStream(fileContent);
+            InputStreamReader isr = new InputStreamReader(zipInputStream);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("app-lookup.csv")) {
+                        AppUsageDAO appUDao = new AppUsageDAO();
+                        reader = new CSVReader(br);
+                        reader.readNext();
+                        appUDao.add(reader);
+                    }
+                    if (fileName.equals("location-lookup.csv")) {
+                        LocationUsageDAO luDao = new LocationUsageDAO();
+                        reader = new CSVReader(br);
+                        reader.readNext();
+                        luDao.add(reader);
+                    }
+                    if (fileName.equals("demographics.csv")) {
+                        UserDAO uDao = new UserDAO();
+                        reader = new CSVReader(br);
+                        reader.readNext();
+//                        uDao.insert(reader);
+                    }
+                    if (fileName.equals("location-delete.csv")) {
+                        LocationUsageDAO luDao = new LocationUsageDAO();
+                        reader = new CSVReader(br);
+                        reader.readNext();
+                        luDao.add(reader);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }catch(Exception e){
             e.printStackTrace();
+        }finally{
+            response.sendRedirect("admin/home.jsp");
         }
     }
 

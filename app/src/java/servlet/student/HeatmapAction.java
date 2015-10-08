@@ -3,15 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
+package servlet.student;
 
+import controller.HeatmapController;
 import dao.AppUsageDAO;
+import dao.LocationDAO;
+import dao.LocationUsageDAO;
 import entity.AppUsage;
+import entity.Location;
+import entity.LocationUsage;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,24 +48,38 @@ public class HeatmapAction extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		try (PrintWriter out = response.getWriter()) {
-			AppUsageDAO auDAO = new AppUsageDAO();
-			
+			LocationUsageDAO luDAO = new LocationUsageDAO();
+
 			String dateStr = request.getParameter("date");
 			String timeStr = request.getParameter("time");
 			out.println(dateStr + ",");
 			out.println(timeStr);
-			out.println(new Date(dateStr + " " + timeStr));
 			String floor = request.getParameter("floor");
+			request.setAttribute("date", dateStr);
+			request.setAttribute("time", timeStr);
+			request.setAttribute("floor", floor);
 			
-//			SimpleDateFormat dateFormat = new SimpleDateFormat();
-//			Date datetime = dateFormat.parse("", );
 			
-			//This list has all the usage of the floor (up to 15 mins prior given datetime, excluding datetime)
-//			ArrayList<AppUsage> auList = auDAO.retrieve(datetime, floor);
 			
-			//for each location, count unique users
 			
-			//return HashMap<location,numUsers>
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date datetime = dateFormat.parse(dateStr + " " + timeStr, new ParsePosition(0));
+			if (datetime == null){
+				request.setAttribute("error", "You have entered an invalid date!");
+				RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+				rd.forward(request, response);
+				return;
+			}
+				
+			HeatmapController ctrl = new HeatmapController();
+			HashMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
+			
+//			return HashMap<location,userlist>
+			request.setAttribute("heatmap", result);
+			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+			rd.forward(request, response);
+			
+
 		}
 	}
 
