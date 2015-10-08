@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author jeremyongts92
  */
 @WebServlet(name = "BasicUsetimeReport", urlPatterns = {"/json/basic-usetime-report"})
-public class BasicUsetimeReport extends HttpServlet {
+public class BasicUsetime extends HttpServlet {
 
 	/**
 	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
