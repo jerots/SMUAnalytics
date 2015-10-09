@@ -4,6 +4,7 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="java.util.TreeMap"%>
 <%@page import="java.util.TreeSet"%>
 <%@page import="dao.LocationDAO"%>
 <%@page import="java.util.Iterator"%>
@@ -13,7 +14,7 @@
 <%@page import="entity.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="../protect-user.jsp" %>
+<%@include file="protect-user.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -53,7 +54,7 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						<li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
-						<li><a href="../logout.jsp">Logout</a></li>
+						<li><a href="/app/logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
@@ -139,7 +140,7 @@
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
 					<%
-						HashMap<String, ArrayList<LocationUsage>> heatmap = (HashMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
+						TreeMap<String, ArrayList<LocationUsage>> heatmap = (TreeMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
 						String error = (String) request.getAttribute("error");
 						if (error != null){
 							

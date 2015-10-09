@@ -9,7 +9,7 @@
 <%@page import="entity.Admin"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="/protect-admin.jsp" %>
+<%@include file="protect-admin.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -38,14 +38,14 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
-                        <li><a href="delete-location.jsp">Delete Location data</a></li>
+                        <li class="active"><a href="/app/admin/home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
+                        <li><a href="/app/admin/delete-location.jsp">Delete Location data</a></li>
 
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
                         <li><a>Welcome, <%=admin.getUsername() + " (admin)"%></a></li>
-                        <li><a href="../logout.jsp">Logout</a></li>
+                        <li><a href="/app/logout.jsp">Logout</a></li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->

@@ -7,13 +7,13 @@
 <%@page import="entity.Admin"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="/protect-admin.jsp" %>
+<%@include file="protect-admin.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-		<link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="../css/style.css">
+		<link rel="stylesheet" type="text/css" href="/app/css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="/app/css/style.css">
     </head>
     <body>
 		<%			Admin admin = (Admin) session.getAttribute("admin");
@@ -43,7 +43,7 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						<li><a>Welcome, <%=admin.getUsername() + " (admin)"%></a></li>
-						<li><a href="../logout.jsp">Logout</a></li>
+						<li><a href="/app/logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
@@ -56,7 +56,7 @@
 			<div class="row">
 				<div class="theme-div" style="width:37%">
 
-					<form action="../DeleteLocationAction" method="post" enctype="multipart/form-data">
+					<form action="/app/DeleteLocationAction" method="post" enctype="multipart/form-data">
 						<br/>
 
 						<div class="form-group">
@@ -87,8 +87,8 @@
 			</div>
 		</div>
 		<!--END OF CONTENT-->
-		<script src="../js/jquery-2.1.4.min.js"></script>
-		<script src="../js/bootstrap.js"></script>
+		<script src="/app/js/jquery-2.1.4.min.js"></script>
+		<script src="/app/js/bootstrap.js"></script>
     </body>
 </html>
 
