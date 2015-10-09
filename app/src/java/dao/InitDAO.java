@@ -15,29 +15,50 @@ import java.sql.Statement;
  */
 public class InitDAO {
 
-	public static void initAdmin() {
-		try {
+    public static void createTable() throws SQLException {
+        Connection conn = ConnectionManager.getConnection();
+        Statement stmt = conn.createStatement();
+        conn.setAutoCommit(false);
+        
+        stmt.addBatch("DROP SCHEMA IF EXISTS g3t3;");
+        stmt.addBatch("CREATE SCHEMA g3t3;");
+        stmt.addBatch("USE g3t3;");
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
+                + "  username varchar(128) NOT NULL,\n"
+                + "  password varchar(128) NOT NULL, \n"
+                + "   CONSTRAINT admin_pk PRIMARY KEY(username)\n"
+                + "   \n"
+                + ");");
 
-			Connection conn = ConnectionManager.getConnection();
-			Statement stmt = conn.createStatement();
-			conn.setAutoCommit(false);
+        stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
 
-			stmt.addBatch("CREATE SCHEMA g3t3 IF NOT EXISTS;");
-			stmt.addBatch("USE g3t3;");
-			stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
-					+ "  username varchar(128) NOT NULL,\n"
-					+ "  password varchar(128) NOT NULL, \n"
-					+ "   CONSTRAINT admin_pk PRIMARY KEY(username)\n"
-					+ "   \n"
-					+ ");");
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS `user` (\n"
+                + "  macaddress varchar(40) NOT NULL,\n"
+                + "  name varchar(128) NOT NULL, \n"
+                + "  password varchar(128) NOT NULL, \n"
+                + "  email varchar(128) NOT NULL, \n"
+                + "  gender char(1) NOT NULL, \n"
+                + "  CONSTRAINT user_pk PRIMARY KEY (macaddress)\n"
+                + ");");
 
-			stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
+        stmt.addBatch("INSERT INTO user VALUES ('macadd','jeremy','321','jeremyong.2014@sis.smu.edu.sg','M')");
+        stmt.addBatch("INSERT INTO user VALUES ('macadd2','zhihui','321','zhtan.2014@business.smu.edu.sg','F')");
 
-		} catch (SQLException e) {
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS app (\n"
+                + "  appid int NOT NULL,\n"
+                + "  appname varchar(128) NOT NULL, \n"
+                + "  appcategory varchar(20) NOT NULL, \n"
+                + "   CONSTRAINT app_pk PRIMARY KEY(appid)\n"
+                + "   \n"
+                + ");");
 
-		}
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS location (\n"
+                + "  locationid int(40) NOT NULL,\n"
+                + "  semanticplace varchar(128) NOT NULL, \n"
+                + "  CONSTRAINT location_pk PRIMARY KEY (locationid)\n"
+                + ");");
 
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS appusage (\n"
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS appUsage (\n"
                 + "  timestamp datetime NOT NULL,\n"
                 + "  macaddress varchar(40) NOT NULL, \n"
                 + "  appid int(8) NOT NULL  , \n"
@@ -46,7 +67,7 @@ public class InitDAO {
                 + "   CONSTRAINT appUsageID_fk2 FOREIGN KEY (appid) REFERENCES app(appid) \n"
                 + ");");
 
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS locationusage (\n"
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS locationUsage (\n"
                 + "  timestamp datetime NOT NULL,\n"
                 + "  macaddress varchar(40) REFERENCES user(macaddress), \n"
                 + "  locationid int(40) NOT NULL, \n"
@@ -55,11 +76,11 @@ public class InitDAO {
                 + ");");
 
         //int[] recordsAffected;
-		//recordsAffected = stmt.executeBatch();
-		//conn.commit();
-		stmt.executeBatch();
-		conn.commit();
+        //recordsAffected = stmt.executeBatch();
+        //conn.commit();
+        stmt.executeBatch();
+        conn.commit();
 
-		ConnectionManager.close(conn, stmt);
-	}
+        ConnectionManager.close(conn, stmt);
+    }
 }
