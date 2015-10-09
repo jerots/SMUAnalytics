@@ -160,6 +160,8 @@ public class UserDAO {
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
+				
+				System.out.println(name);
                 stmt.setString(2, name);
                 stmt.setString(3, password);
                 stmt.setString(4, email);
