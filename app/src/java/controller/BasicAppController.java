@@ -159,7 +159,7 @@ public class BasicAppController {
 			ArrayList<String> years = userDAO.getYears();
 			//2011 to 2015 (inclusive)
 			for (String year : years) {
-				String sql = "SELECT au.macaddress from appUsage au,user u where\n"
+				String sql = "SELECT au.macaddress from appusage au,user u where\n"
 						+ " au.macaddress = u.macaddress\n"
 						+ " AND timestamp >= ? AND timestamp <= ?\n"
 						+ " AND email like '%."+ year +"@%'\n"
@@ -176,7 +176,7 @@ public class BasicAppController {
 			ArrayList<String> schools = userDAO.getSchools();
 			
 			for (String school : schools ){
-				String sql = "SELECT au.macaddress from appUsage au,user u where\n"
+				String sql = "SELECT au.macaddress from appusage au,user u where\n"
 						+ " au.macaddress = u.macaddress\n"
 						+ " AND timestamp >= ? AND timestamp <= ?\n"
 						+ " AND email like '%@"+ school +".%'\n"
@@ -195,7 +195,7 @@ public class BasicAppController {
 			String[] genders = {"M","F"};
 			
 			for (String gender : genders ){
-				String sql = "SELECT au.macaddress from appUsage au,user u where\n"
+				String sql = "SELECT au.macaddress from appusage au,user u where\n"
 						+ " au.macaddress = u.macaddress\n"
 						+ " AND timestamp >= ? AND timestamp <= ?\n"
 						+ " AND gender = '" + gender + "'"

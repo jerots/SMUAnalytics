@@ -82,7 +82,7 @@ public class InitDAO {
 				+ "  CONSTRAINT location_pk PRIMARY KEY (locationid)\n"
 				+ ");");
 
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS appUsage (\n"
+		stmt.addBatch("CREATE TABLE IF NOT EXISTS appusage (\n"
 				+ "  timestamp datetime NOT NULL,\n"
 				+ "  macaddress varchar(40) NOT NULL, \n"
 				+ "  appid int(8) NOT NULL  , \n"
@@ -91,7 +91,7 @@ public class InitDAO {
 				+ "   CONSTRAINT appUsageID_fk2 FOREIGN KEY (appid) REFERENCES app(appid) \n"
 				+ ");");
 
-		stmt.addBatch("CREATE TABLE IF NOT EXISTS locationUsage (\n"
+		stmt.addBatch("CREATE TABLE IF NOT EXISTS locationusage (\n"
 				+ "  timestamp datetime NOT NULL,\n"
 				+ "  macaddress varchar(40) REFERENCES user(macaddress), \n"
 				+ "  locationid int(40) NOT NULL, \n"

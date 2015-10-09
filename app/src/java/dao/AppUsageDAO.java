@@ -362,7 +362,7 @@ public class AppUsageDAO {
 			
 			Connection conn = ConnectionManager.getConnection();
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT * from appUsage where "
+			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
 					+ "timestamp >= ? AND timestamp <= ? "
 					+ "AND macaddress = ?");
 			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
