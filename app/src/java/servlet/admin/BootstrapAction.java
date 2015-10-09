@@ -37,6 +37,8 @@ public class BootstrapAction extends HttpServlet {
         String option = request.getParameter("option");
         Part filePart = request.getPart("zipFile");
         if(option.equals("bootstrap")){
+            
+            //BOOTSTRAP
             try {
 
                 try {
@@ -74,6 +76,8 @@ public class BootstrapAction extends HttpServlet {
                 e.printStackTrace();
             }
         } else {
+            
+            //ADD BATCH
             try {
                 if(filePart != null && filePart.getSize() > 0){
                     HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
@@ -97,7 +101,7 @@ public class BootstrapAction extends HttpServlet {
         }
         
         request.setAttribute("recordMap", recordMap);
-
+        System.out.println(recordMap);
         RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
         rd.forward(request, response);
         

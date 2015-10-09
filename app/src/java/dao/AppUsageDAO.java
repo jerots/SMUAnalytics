@@ -162,7 +162,6 @@ public class AppUsageDAO {
             while ((arr = reader.readNext()) != null) {
                 //retrieving per row
                 boolean err = false;
-                boolean pass = false;
 
                 //check timestamp
                 String date = Utility.parseString(arr[0]);
@@ -251,7 +250,7 @@ public class AppUsageDAO {
                     duplicate.put(date + macAdd, index);
                     appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
                 }
-                ArrayList<AppUsage> appArray = (ArrayList<AppUsage>) appList.values();
+                ArrayList<AppUsage> appArray = new ArrayList<AppUsage> (appList.values());
                 try {
                     for (AppUsage app : appArray) {
                         stmt.setString(1, app.getTimestamp());

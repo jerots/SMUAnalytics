@@ -69,7 +69,7 @@ public class LocationUsageDAO {
 				}
 				err = true;
 			}
-			if (!Utility.checkHexadecimal(macAdd)) {
+			if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
 				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
 					errMap.put(index, "invalid mac address");
@@ -89,22 +89,23 @@ public class LocationUsageDAO {
 					errMap.put(index, errorMsg + "," + "location id cannot be blank");
 				}
 				err = true;
-			}
+			} else {
 
-			String query = "select locationid from location where locationid = ?;";
-			PreparedStatement pStmt = conn.prepareStatement(query);
-			pStmt.setInt(1, locationId);
-			ResultSet rs = pStmt.executeQuery();
-			if (!rs.next()) {
-				String errorMsg = errMap.get(index);
-				if (errorMsg == null) {
-					errMap.put(index, "invalid location");
-				} else {
-					errMap.put(index, errorMsg + "," + "invalid location");
-				}
-				err = true;
-			}
-			pStmt.close();
+                            String query = "select locationid from location where locationid = ?;";
+                            PreparedStatement pStmt = conn.prepareStatement(query);
+                            pStmt.setInt(1, locationId);
+                            ResultSet rs = pStmt.executeQuery();
+                            if (!rs.next()) {
+                                    String errorMsg = errMap.get(index);
+                                    if (errorMsg == null) {
+                                            errMap.put(index, "invalid location");
+                                    } else {
+                                            errMap.put(index, errorMsg + "," + "invalid location");
+                                    }
+                                    err = true;
+                            }
+                            pStmt.close();
+                        }
 
 			if (!err) {
 				if (duplicate.containsKey(date + macAdd)) {
@@ -173,7 +174,7 @@ public class LocationUsageDAO {
 					}
 					err = true;
 				}
-				if (!Utility.checkHexadecimal(macAdd)) {
+				if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
 					String errorMsg = errMap.get(index);
 					if (errorMsg == null) {
 						errMap.put(index, "invalid mac address");
@@ -193,23 +194,23 @@ public class LocationUsageDAO {
 						errMap.put(index, errorMsg + "," + "location id cannot be blank");
 					}
 					err = true;
-				}
+				}else{
 
-				String query = "select locationid from location where locationid = ?;";
-				PreparedStatement pStmt = conn.prepareStatement(query);
-				pStmt.setInt(1, locationId);
-				ResultSet rs = pStmt.executeQuery();
-				if (!rs.next()) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "invalid location");
-					} else {
-						errMap.put(index, errorMsg + "," + "invalid location");
-					}
-					err = true;
-				}
-				pStmt.close();
-
+                                    String query = "select locationid from location where locationid = ?;";
+                                    PreparedStatement pStmt = conn.prepareStatement(query);
+                                    pStmt.setInt(1, locationId);
+                                    ResultSet rs = pStmt.executeQuery();
+                                    if (!rs.next()) {
+                                            String errorMsg = errMap.get(index);
+                                            if (errorMsg == null) {
+                                                    errMap.put(index, "invalid location");
+                                            } else {
+                                                    errMap.put(index, errorMsg + "," + "invalid location");
+                                            }
+                                            err = true;
+                                    }
+                                    pStmt.close();
+                                }
 				if (!err) {
 					if (duplicate.containsKey(date + macAdd)) {
 						String errorMsg = errMap.get(index);
@@ -302,7 +303,7 @@ public class LocationUsageDAO {
 					}
 					err = true;
 				}
-				if (!Utility.checkHexadecimal(macAdd)) {
+				if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
 					String errorMsg = errMap.get(index);
 					if (errorMsg == null) {
 						errMap.put(index, "invalid mac address");

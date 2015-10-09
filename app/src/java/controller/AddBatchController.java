@@ -58,7 +58,7 @@ public class AddBatchController {
                     AppUsageDAO auDao = new AppUsageDAO();
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = auDao.insert(reader, auErrMap);
+                    int[] updatedRecords = auDao.add(reader, auErrMap);
 
                     //count how many 1 = success
                     for (int i : updatedRecords) {
@@ -69,7 +69,7 @@ public class AddBatchController {
 
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = luDao.insert(reader, luErrMap);
+                    int[] updatedRecords = luDao.add(reader, luErrMap);
 
                     //count how many 1 = success
                     for (int i : updatedRecords) {
@@ -102,10 +102,10 @@ public class AddBatchController {
             e.printStackTrace();
         }
         //
-        result.put("userUpdated", userUpdated);
-        result.put("delUpdated", delUpdated);
-        result.put("auUpdated", auUpdated);
-        result.put("luUpdated", luUpdated);
+        result.put("demographics.csv", userUpdated);
+        result.put("app.csv", auUpdated);
+        result.put("location.csv", luUpdated);
+        result.put("location-delete.csv", delUpdated);
 
         return result;
     }
