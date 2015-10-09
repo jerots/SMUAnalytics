@@ -17,6 +17,13 @@
     </head>
     <body>
 		<%			Admin admin = (Admin) session.getAttribute("admin");
+		String macAdd = (String) request.getAttribute("macadd");
+		String startdate = (String) request.getAttribute("startdate");
+		String enddate = (String) request.getAttribute("enddate");
+		if (macAdd == null) macAdd = "";
+		if (startdate == null) startdate = "";
+		if (enddate == null) enddate = "";
+
 		%>	
 		<!--NAVBAR-->
 		<nav class="navbar-static-top navbar-default">
@@ -36,8 +43,8 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 					<ul class="nav navbar-nav">
-						<li><a href="home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
-						<li class="active"><a href="delete-location.jsp">Delete Location data</a></li>
+						<li><a href="/app/admin/home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
+						<li class="active"><a href="/app/admin/delete-location.jsp">Delete Location data</a></li>
 
 					</ul>
 
@@ -56,20 +63,20 @@
 			<div class="row">
 				<div class="theme-div" style="width:37%">
 
-					<form action="/app/DeleteLocationAction" method="post" enctype="multipart/form-data">
+					<form action="/app/DeleteLocationAction" method="post">
 						<br/>
 
 						<div class="form-group">
 							<label for="macadd">MAC Address</label>
-							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" required>
+							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>" required>
 						</div>
 						<div class="form-group">
 							<label for="startDate">Start Date</label>
-							<input type="date" class="form-control" id="startDate" name="startdate" required>
+							<input type="date" class="form-control" id="startDate" name="startdate" value="<%=startdate%>" required>
 						</div>
 						<div class="form-group">
 							<label for="endDate">End Date</label>
-							<input type="date" class="form-control" id="endDate" name="enddate" required>
+							<input type="date" class="form-control" id="endDate" name="enddate" value="<%=enddate%>" required>
 						</div>
 
 						<input type="submit" class="btn btn-default" value="Delete location data">
@@ -79,9 +86,18 @@
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
+					<%
+						String rowsDel = (String) request.getAttribute("rowsDeleted");
+						String notDel = (String) request.getAttribute("notDeleted");
+						out.println("<h1>Result</h1>");
 
-					<h1>Result</h1>
-					You have not chosen anything to delete.
+						if (rowsDel == null) {
+							out.println("You have not chosen anything to delete");
+						} else {
+							out.println(rowsDel + " location usage records deleted.<br>");
+
+						}
+					%>
 				</div>
 
 			</div>

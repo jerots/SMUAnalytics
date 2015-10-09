@@ -9,6 +9,7 @@ import controller.DeleteController;
 import dao.LocationUsageDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,21 +35,27 @@ public class DeleteLocationAction extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-                    LocationUsageDAO luDao = new LocationUsageDAO();
-                    
-                    String macAdd = request.getParameter("macadd");
-                    String startDate = request.getParameter("startdate");
-                    String endDate = request.getParameter("enddate");
-                    
-                    DeleteController cntrl = new DeleteController();
-                    cntrl.delete(macAdd, startDate, endDate);
-                    
-                    //your app should show how many records are valid and actually deleted, 
-                    //and how many records are valid but not found in the database
-                    
-		}catch(Exception e){
-                    e.printStackTrace();
-                }
+			LocationUsageDAO luDao = new LocationUsageDAO();
+
+			String macAdd = request.getParameter("macadd");
+			String startDate = request.getParameter("startdate");
+			String endDate = request.getParameter("enddate");
+
+			DeleteController cntrl = new DeleteController();
+			int deleted = cntrl.delete(macAdd, startDate, endDate);
+			
+			request.setAttribute("macadd", macAdd);
+			request.setAttribute("startdate", startDate);
+			request.setAttribute("enddate", endDate);
+			
+			
+			request.setAttribute("rowsDeleted", "" + deleted);
+			RequestDispatcher rd = request.getRequestDispatcher("/admin/delete-location.jsp");
+			rd.forward(request, response);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

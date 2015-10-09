@@ -62,7 +62,7 @@
                         Choose File to upload:<br/>
                         <div class="form-group">
                             <label for="exampleInputFile">File input</label>
-                            <input type="file" name="zipFile" required>
+                            <input type="file" name="zipFile" accept="application/zip" required>
                         </div>
                         <input type="radio" value="bootstrap" name="option" checked> Bootstrap<br>
                         <input type="radio" value="add-data" name="option"> Add additional data<br><br>
