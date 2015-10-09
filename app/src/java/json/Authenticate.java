@@ -6,6 +6,9 @@ package json;
  * and open the template in the editor.
  */
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import dao.AdminDAO;
 import dao.UserDAO;
 import entity.Admin;
@@ -20,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import net.minidev.json.JSONObject;
 
 /**
  *
@@ -42,8 +44,9 @@ public class Authenticate extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
-			JSONObject result = new JSONObject();
-
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonObject result = new JsonObject();
+			
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			
@@ -53,9 +56,9 @@ public class Authenticate extends HttpServlet {
 			AdminDAO adminDAO = new AdminDAO();
 			Admin admin = adminDAO.retrieve(username, password);
 			if (admin != null) {
-				result.put("status", "success");
-				result.put("token", token);
-				out.println(result.toJSONString());
+				result.addProperty("status", "success");
+				result.addProperty("token", token);
+				out.println(gson.toJson(result));
 				return;
 				//redirect to admin page
 
@@ -66,9 +69,9 @@ public class Authenticate extends HttpServlet {
 			UserDAO userDAO = new UserDAO();
 			User user = userDAO.retrieveByEmailId(username, password);
 			if (user != null) {
-				result.put("status", "success");
-				result.put("token", token);
-				out.println(result.toJSONString());
+				result.addProperty("status", "success");
+				result.addProperty("token", token);
+				out.println(gson.toJson(result));
 				return;
 				//redirect to student page
 
@@ -76,9 +79,9 @@ public class Authenticate extends HttpServlet {
 
 //			out.println(user);
 			//IF ALL FAIL.
-			result.put("status", "error");
-			result.put("", "invalid username/password");
-			out.println(result.toJSONString());
+			result.addProperty("status", "error");
+			result.addProperty("", "invalid username/password");
+			out.println(gson.toJson(result));
 			
 
 		}

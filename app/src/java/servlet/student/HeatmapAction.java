@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.TreeMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -72,7 +73,7 @@ public class HeatmapAction extends HttpServlet {
 			}
 				
 			HeatmapController ctrl = new HeatmapController();
-			HashMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
+			TreeMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
 			
 //			return HashMap<location,userlist>
 			request.setAttribute("heatmap", result);

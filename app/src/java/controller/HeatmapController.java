@@ -9,9 +9,11 @@ import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import entity.LocationUsage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
 
 /**
  *
@@ -19,17 +21,18 @@ import java.util.HashSet;
  */
 public class HeatmapController {
 
-	public HashMap<String, ArrayList<LocationUsage>> generateHeatmap(Date datetime, String floor) {
+	public TreeMap<String, ArrayList<LocationUsage>> generateHeatmap(Date datetime, String floor) {
 		
 		LocationUsageDAO luDAO = new LocationUsageDAO();
 		
 		//for each location, count unique users
-		HashMap<String, ArrayList<LocationUsage>> result = new HashMap<String, ArrayList<LocationUsage>>();
+		TreeMap<String, ArrayList<LocationUsage>> result = new TreeMap<String, ArrayList<LocationUsage>>();
 
 		LocationDAO locDAO = new LocationDAO();
 		
 		//retrieve all the floors
 		ArrayList<String> floorLocationList = locDAO.retrieve(floor);
+		
 		
 		//for each location in the floor
 		for (int i = 0; i < floorLocationList.size(); i++) { 

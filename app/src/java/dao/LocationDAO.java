@@ -87,8 +87,9 @@ public class LocationDAO {
         try {
             Connection conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT distinct semanticplace FROM location"
-                    + " where semanticplace like ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT distinct semanticplace FROM location "
+                    + " where semanticplace like ? "
+					+ " ORDER BY semanticplace");
 
             ps.setString(1, "SMUSIS" + floor + "%");
 

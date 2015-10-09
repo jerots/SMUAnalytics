@@ -5,6 +5,9 @@
  */
 package json;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import controller.HeatmapController;
 import entity.LocationUsage;
 import is203.JWTException;
@@ -17,14 +20,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import com.google.gson.JsonArray;
+import java.util.Collections;
+import java.util.TreeMap;
 
 /**
  *
@@ -46,23 +49,42 @@ public class UsageHeatmap extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
-			JSONObject output = new JSONObject();
-			JSONArray errors = new JSONArray();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonObject output = new JsonObject();
+			JsonArray errors = new JsonArray();
 
 			String token = request.getParameter("token");
 			String date = request.getParameter("date");
 			String time = request.getParameter("time");
 			String floor = request.getParameter("floor");
 			
-			try {
+			
+			//TOKEN VALIDATION
+			
+			if (token == null){
+				errors.add("missing token");
+			} else if (token.length() == 0){
+				errors.add("blank token");
+			} else {
+				try {
 				String username = JWTUtility.verify(token, "nabjemzhdarrensw");
 				if (username == null) {
 					//failed
+					errors.add("invalid token");
 				}
+				
+			
 			} catch (JWTException e) {
 				//failed
-				e.printStackTrace();
+				errors.add("invalid token");
 			}
+			
+				
+			}
+			
+			
+			
+		
 			//FLOOR VALIDATION
 			if (floor == null) {
 				errors.add("missing floor");
@@ -94,12 +116,12 @@ public class UsageHeatmap extends HttpServlet {
 				errors.add("blank date");
 			} else {
 				if (date.length() != 10) {
-					errors.add("Invalid date");
+					errors.add("invalid date");
 				} else {
 					SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 					Date dateFormatted = sdf.parse(date, new ParsePosition(0));
 					if (dateFormatted == null) {
-						errors.add("Invalid date");
+						errors.add("invalid date");
 					}
 				}
 			}
@@ -111,20 +133,22 @@ public class UsageHeatmap extends HttpServlet {
 				errors.add("blank time");
 			} else {
 				if (time.length() != 8) {
-					errors.add("Invalid time");
+					errors.add("invalid time");
 				} else {
 					SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 					Date dateFormatted = sdf.parse(time, new ParsePosition(0));
 					if (dateFormatted == null) {
-						errors.add("Invalid time");
+						errors.add("invalid time");
 					}
 				}
 			}
 			
+			
+			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0){
-				output.put("status", "error");
-				output.put("errors", errors);
-				out.println(output.toJSONString());
+				output.addProperty("status", "error");
+				output.add("errors", errors);
+				out.println(gson.toJson(errors));
 				return;
 			}
 			
@@ -136,21 +160,23 @@ public class UsageHeatmap extends HttpServlet {
 			Date datetime = dateFormat.parse(date + " " + time, new ParsePosition(0));
 
 			HeatmapController ctrl = new HeatmapController();
-			HashMap<String, ArrayList<LocationUsage>> luMap = ctrl.generateHeatmap(datetime, floor);
+			TreeMap<String, ArrayList<LocationUsage>> luMap = ctrl.generateHeatmap(datetime, floor);
 			
 			
 			
-			output.put("status", "success");
-			JSONArray heatmap = new JSONArray();
+			output.addProperty("status", "success");
+			JsonArray heatmap = new JsonArray();
 			Iterator<String> iter = luMap.keySet().iterator();
+			
 
+			
 			while (iter.hasNext()) {
-				JSONObject currLoc = new JSONObject();
+				JsonObject currLoc = new JsonObject();
 
 				String loc = iter.next();
-				currLoc.put("semanatic-place", loc);
+				currLoc.addProperty("semanatic-place", loc);
 				int numUsers = luMap.get(loc).size();
-				currLoc.put("num-people-using-phone", numUsers);
+				currLoc.addProperty("num-people-using-phone", numUsers);
 
 				int density = 0;
 				if (numUsers == 0) {
@@ -166,12 +192,12 @@ public class UsageHeatmap extends HttpServlet {
 				} else {
 					density = 5;
 				}
-				currLoc.put("crowd-density", density);
+				currLoc.addProperty("crowd-density", density);
 				heatmap.add(currLoc);
 			}
 
-			output.put("heatmap", heatmap);
-			out.println(output.toJSONString());
+			output.add("heatmap", heatmap);
+			out.println(gson.toJson(output));
 			
 		}
 	}

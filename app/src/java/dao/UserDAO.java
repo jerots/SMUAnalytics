@@ -21,8 +21,38 @@ import java.util.HashMap;
  */
 public class UserDAO {
 
+    private ArrayList<String> unsuccessful;
+
+	private ArrayList<String> schools;
+	private ArrayList<String> years;
+	
     public UserDAO() {
+		schools = new ArrayList<String>();
+		schools.add("business");
+		schools.add("accountancy");
+		schools.add("sis");
+		schools.add("economics");
+		schools.add("law");
+		schools.add("socsc");
+				
+		years = new ArrayList<String>();
+		years.add("2011");
+		years.add("2012");
+		years.add("2013");
+		years.add("2014");
+		years.add("2015");
+        unsuccessful = new ArrayList<>();
     }
+
+	public ArrayList<String> getSchools() {
+		return schools;
+	}
+
+	public ArrayList<String> getYears() {
+		return years;
+	}
+	
+	
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
     public int[] insert(CSVReader reader, HashMap<Integer, String> userMap) throws IOException, SQLException {
