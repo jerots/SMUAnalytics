@@ -45,7 +45,7 @@ public class InitDAO {
 		conn.setAutoCommit(false);
 
 		stmt.addBatch("DROP SCHEMA IF EXISTS g3t3;");
-		stmt.addBatch("CREATE SCHEMA g3t3;");
+		stmt.addBatch("CREATE SCHEMA g3t3 CHARACTER SET utf8 COLLATE utf8_bin;");
 		stmt.addBatch("USE g3t3;");
 		stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
 				+ "  username varchar(128) NOT NULL,\n"

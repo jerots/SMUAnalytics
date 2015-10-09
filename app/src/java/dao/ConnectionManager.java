@@ -43,7 +43,7 @@ public class ConnectionManager {
     dbUser = System.getenv("OPENSHIFT_MYSQL_DB_USERNAME");
     dbPassword = System.getenv("OPENSHIFT_MYSQL_DB_PASSWORD");
 
-    dbURL = "jdbc:mysql://" + host + ":" + port + "/" + dbName;
+    dbURL = "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useUnicode=yes&characterEncoding=UTF-8";
     return true;
   }
 
@@ -62,7 +62,7 @@ public class ConnectionManager {
       dbUser = props.getProperty("db.user");
       dbPassword = props.getProperty("db.password");
 
-      dbURL = "jdbc:mysql://" + host + ":" + port + "/" + dbName;
+      dbURL = "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useUnicode=yes&characterEncoding=UTF-8";
     } catch (Exception ex) {
       // unable to load properties file
       String message = "Unable to load '" + PROPS_FILENAME + "'.";
