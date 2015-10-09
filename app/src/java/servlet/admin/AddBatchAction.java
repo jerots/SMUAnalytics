@@ -27,8 +27,8 @@ import javax.servlet.http.Part;
  *
  * @author Boyofthefuture
  */
-@WebServlet(name = "AddBatch", urlPatterns = {"/AddBatch"})
-public class AddBatch extends HttpServlet {
+@WebServlet(name = "AddBatchAction", urlPatterns = {"/AddBatchAction"})
+public class AddBatchAction extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
