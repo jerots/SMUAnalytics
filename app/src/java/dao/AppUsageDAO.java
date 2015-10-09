@@ -31,7 +31,9 @@ public class AppUsageDAO {
         String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
                 + " = VALUES(appid);";
         PreparedStatement stmt = conn.prepareStatement(sql);
-
+        String query = null;
+        PreparedStatement pStmt = null;
+        ResultSet rs = null;
         String[] arr = null;
         while ((arr = reader.readNext()) != null) {
             //retrieving per row
@@ -60,7 +62,8 @@ public class AppUsageDAO {
                 }
                 err = true;
             }
-            if (!Utility.checkHexadecimal(macAdd)) {
+            
+            if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
                 String errorMsg = errMap.get(index);
                 if (errorMsg == null) {
                     errMap.put(index, "invalid mac add");
@@ -68,23 +71,23 @@ public class AppUsageDAO {
                     errMap.put(index, errorMsg + "," + "invalid mac add");
                 }
                 err = true;
-            }
+            } else {
+                query = "select macaddress from user where macaddress = ?;";
+                pStmt = conn.prepareStatement(query);
+                pStmt.setString(1, macAdd);
 
-            String query = "select macaddress from user where macaddress = ?;";
-            PreparedStatement pStmt = conn.prepareStatement(query);
-            pStmt.setString(1, macAdd);
-
-            ResultSet rs = pStmt.executeQuery();
-            if (!rs.next()) {
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "no matching mac address");
-                } else {
-                    errMap.put(index, errorMsg + "," + "no matching mac address");
+                rs = pStmt.executeQuery();
+                if (!rs.next()) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "no matching mac address");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "no matching mac address");
+                    }
+                    err = true;
                 }
-                err = true;
+                pStmt.close();
             }
-            pStmt.close();
 
             //check appid
             int appId = Utility.parseInt(arr[2]);
@@ -96,23 +99,23 @@ public class AppUsageDAO {
                     errMap.put(index, errorMsg + "," + "app id cannot be blank");
                 }
                 err = true;
-            }
-
-            query = "select appid from app where appid = ?;";
-            pStmt = conn.prepareStatement(query);
-            pStmt.setInt(1, appId);
-            rs = pStmt.executeQuery();
-            if(!rs.next()){
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "invalid app");
-                } else {
-                    errMap.put(index, errorMsg + "," + "invalid app");
+            } else {
+                query = "select appid from app where appid = ?;";
+                pStmt = conn.prepareStatement(query);
+                pStmt.setInt(1, appId);
+                rs = pStmt.executeQuery();
+                if(!rs.next()){
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "invalid app");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "invalid app");
+                    }
+                    err = true;
                 }
-                err = true;
+                pStmt.close();
             }
-            pStmt.close();
-
+            
             if (!err) {
 
                 if (duplicate.containsKey(date + macAdd)) {
@@ -151,6 +154,9 @@ public class AppUsageDAO {
             int index = 2;
             String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
+            String query = null;
+            PreparedStatement pStmt = null;
+            ResultSet rs = null;
 
             String[] arr = null;
             while ((arr = reader.readNext()) != null) {
@@ -181,7 +187,7 @@ public class AppUsageDAO {
                     }
                     err = true;
                 }
-                if (!Utility.checkHexadecimal(macAdd)) {
+                if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {
                         errMap.put(index, "invalid mac add");
@@ -189,24 +195,23 @@ public class AppUsageDAO {
                         errMap.put(index, errorMsg + "," + "invalid mac add");
                     }
                     err = true;
-                }
+                }else{
+                    query = "select macaddress from user where macaddress = ?;";
+                    pStmt = conn.prepareStatement(query);
+                    pStmt.setString(1, macAdd);
 
-                String query = "select macaddress from user where macaddress = ?;";
-                PreparedStatement pStmt = conn.prepareStatement(query);
-                pStmt.setString(1, macAdd);
-
-                ResultSet rs = pStmt.executeQuery();
-                if (!rs.next()) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "no matching mac address");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "no matching mac address");
+                    rs = pStmt.executeQuery();
+                    if (!rs.next()) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "no matching mac address");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "no matching mac address");
+                        }
+                        err = true;
                     }
-                    err = true;
+                    pStmt.close();
                 }
-                pStmt.close();
-
                 //check appid
                 int appId = Utility.parseInt(arr[2]);
                 if (appId <= 0) {
@@ -217,22 +222,22 @@ public class AppUsageDAO {
                         errMap.put(index, errorMsg + "," + "app id cannot be blank");
                     }
                     err = true;
-                }
-
-                query = "select appid from app where appid = ?;";
-                pStmt = conn.prepareStatement(query);
-                pStmt.setInt(1, appId);
-                rs = pStmt.executeQuery();
-                if (!rs.next()) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid app");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid app");
+                }else{
+                    query = "select appid from app where appid = ?;";
+                    pStmt = conn.prepareStatement(query);
+                    pStmt.setInt(1, appId);
+                    rs = pStmt.executeQuery();
+                    if (!rs.next()) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "invalid app");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "invalid app");
+                        }
+                        err = true;
                     }
-                    err = true;
+                    pStmt.close();
                 }
-                pStmt.close();
 
                 if (!err) {
                     if (duplicate.containsKey(date + macAdd)) {

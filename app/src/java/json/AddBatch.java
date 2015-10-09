@@ -10,7 +10,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.AddBatchController;
-import controller.BootstrapController;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
