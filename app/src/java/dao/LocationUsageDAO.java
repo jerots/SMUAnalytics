@@ -95,16 +95,14 @@ public class LocationUsageDAO {
             PreparedStatement pStmt = conn.prepareStatement(query);
             pStmt.setInt(1, locationId);
             ResultSet rs = pStmt.executeQuery();
-            while (rs.next()) {
-                if (rs.getInt("locationid") <= 0) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid location");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid location");
-                    }
-                    err = true;
+            if(!rs.next()) {
+                String errorMsg = errMap.get(index);
+                if (errorMsg == null) {
+                    errMap.put(index, "invalid location");
+                } else {
+                    errMap.put(index, errorMsg + "," + "invalid location");
                 }
+                err = true;
             }
             pStmt.close();
 
@@ -201,16 +199,14 @@ public class LocationUsageDAO {
                 PreparedStatement pStmt = conn.prepareStatement(query);
                 pStmt.setInt(1, locationId);
                 ResultSet rs = pStmt.executeQuery();
-                while (rs.next()) {
-                    if (rs.getInt("locationid") <= 0) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "invalid location");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "invalid location");
-                        }
-                        err = true;
+                if (!rs.next()) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "invalid location");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "invalid location");
                     }
+                    err = true;
                 }
                 pStmt.close();
 
@@ -248,11 +244,12 @@ public class LocationUsageDAO {
                 for (int i = 0; i < updateCounts.length; i++) {
                     if (updateCounts[i] == Statement.EXECUTE_FAILED) {
                         // This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate HashMap to find the offending row.
-                        String errorMsg = errMap.get(index);
+                        int row = duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress());
+                        String errorMsg = errMap.get(row);
                         if (errorMsg == null) {
-                            errMap.put(index, "duplicate row " + duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress()));
+                            errMap.put(row, "duplicate row ");
                         } else {
-                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress()));
+                            errMap.put(row, errorMsg + "," + "duplicate row ");
                         }
                     }
                 }
@@ -328,7 +325,9 @@ public class LocationUsageDAO {
                         }
                     }
                 }
+                index++;
             }
+            
             reader.close();
             ConnectionManager.close(conn, stmt);
           

@@ -27,8 +27,8 @@ import javax.servlet.http.Part;
  *
  * @author Boyofthefuture
  */
-@WebServlet(name = "AddBatch", urlPatterns = {"/AddBatch"})
-public class AddBatch extends HttpServlet {
+@WebServlet(name = "AddBatchAction", urlPatterns = {"/AddBatchAction"})
+public class AddBatchAction extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,24 +42,24 @@ public class AddBatch extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        HashMap<String, Integer> recordMap = null;
         try {
-            Part filePart = request.getPart("zipFile");       
-            
-            HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
-            
-            request.setAttribute("userErrMap", userErrMap);
-            request.setAttribute("auErrMap", auErrMap);
-            request.setAttribute("luErrMap", luErrMap);
-            request.setAttribute("delErrMap", delErrMap);
-            
-            HashMap<String, Integer> recordMap = null;
-            
-            AddBatchController cntrl = new AddBatchController();
-            recordMap = cntrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
-            
+            Part filePart = request.getPart("zipFile"); 
+            if(filePart != null && filePart.getSize() > 0){
+                HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
+                HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
+                HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
+                HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+
+                request.setAttribute("userErrMap", userErrMap);
+                request.setAttribute("auErrMap", auErrMap);
+                request.setAttribute("luErrMap", luErrMap);
+                request.setAttribute("delErrMap", delErrMap);
+
+                AddBatchController cntrl = new AddBatchController();
+                recordMap = cntrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
+            }
+            request.setAttribute("recordMap", recordMap);
             RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
             rd.forward(request, response);
             

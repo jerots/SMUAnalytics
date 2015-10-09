@@ -166,6 +166,7 @@ public class UserDAO {
                 stmt.setString(5, gender);
                 stmt.addBatch();
             }
+            index++;
         }
 
         int[] updateCounts = stmt.executeBatch();
