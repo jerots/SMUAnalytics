@@ -11,6 +11,7 @@ import com.opencsv.CSVReader;
 import java.sql.BatchUpdateException;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.HashMap;
 
 public class AppUsageDAO {
@@ -291,4 +292,102 @@ public class AppUsageDAO {
         }
         return updateCounts;
     }
+	
+	public ArrayList<String> retrieveUsers(Date startDate, Date endDate) {
+
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			
+			Connection conn = ConnectionManager.getConnection();
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT macaddress from appUsage where "
+					+ "timestamp >= ? AND timestamp <= ? "
+					+ "GROUP BY macaddress");
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				String macAdd = rs.getString(1);
+				result.add(macAdd);
+			}
+			
+			
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return result;
+	}
+	
+	public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
+
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			
+			Connection conn = ConnectionManager.getConnection();
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				String macAdd = rs.getString(1);
+				result.add(macAdd);
+			}
+			
+			
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return result;
+	}
+	
+	
+	public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
+
+		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
+		
+		try {
+			
+			Connection conn = ConnectionManager.getConnection();
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT * from appUsage where "
+					+ "timestamp >= ? AND timestamp <= ? "
+					+ "AND macaddress = ?");
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			ps.setString(3, macAdd);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				
+				String timestamp = rs.getString(1);
+				String macaddress = rs.getString(2);
+				int appid = rs.getInt(3);
+				result.add(new AppUsage(timestamp, macaddress, appid));
+				
+			}
+			
+			
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return result;
+	}
+	
 }
