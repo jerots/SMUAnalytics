@@ -58,55 +58,55 @@ public class Bootstrap extends HttpServlet {
             String time = request.getParameter("time");
             String floor = request.getParameter("floor");
             
-            try {
-                String username = JWTUtility.verify(token, "nabjemzhdarrensw");
-                if (username == null) {
-                    //failed
-                }
-            } catch (JWTException e) {
-                //failed
-                e.printStackTrace();
-            }
-
-            try {
-                InitDAO.createTable();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            HashMap<String, Integer> recordMap = null;
-            String option = request.getParameter("option");
-            Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
-            if(filePart != null && filePart.getSize() > 0){
-
-                //Create ERROR MAPS - and pass to boostrapController to generate
-                HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
-
-                //SET FOR UI TO GET THE ATTRIBUTES.
-                request.setAttribute("userErrMap", userErrMap);
-                request.setAttribute("appErrMap", appErrMap);
-                request.setAttribute("locErrMap", locErrMap);
-                request.setAttribute("auErrMap", auErrMap);
-                request.setAttribute("luErrMap", luErrMap);
-                request.setAttribute("delErrMap", delErrMap);
-                
-                try{
-                    BootstrapController ctrl = new BootstrapController();
-                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
-                }catch(SQLException e){
-                    
-                }
-            }
-            request.setAttribute("recordMap", recordMap);
-
-            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
-            rd.forward(request, response);
-
-        } 
+//            try {
+//                String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+//                if (username == null) {
+//                    //failed
+//                }
+//            } catch (JWTException e) {
+//                //failed
+//                e.printStackTrace();
+//            }
+//
+//            try {
+//                InitDAO.createTable();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//            HashMap<String, Integer> recordMap = null;
+//            String option = request.getParameter("option");
+//            Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
+//            if(filePart != null && filePart.getSize() > 0){
+//
+//                //Create ERROR MAPS - and pass to boostrapController to generate
+//                HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
+//                HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
+//                HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
+//                HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
+//                HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
+//                HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+//
+//                //SET FOR UI TO GET THE ATTRIBUTES.
+//                request.setAttribute("userErrMap", userErrMap);
+//                request.setAttribute("appErrMap", appErrMap);
+//                request.setAttribute("locErrMap", locErrMap);
+//                request.setAttribute("auErrMap", auErrMap);
+//                request.setAttribute("luErrMap", luErrMap);
+//                request.setAttribute("delErrMap", delErrMap);
+//                
+//                try{
+//                    BootstrapController ctrl = new BootstrapController();
+//                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
+//                }catch(SQLException e){
+//                    
+//                }
+//            }
+//            request.setAttribute("recordMap", recordMap);
+//
+//            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
+//            rd.forward(request, response);
+//
+//        } 
     }
 }
 
