@@ -35,25 +35,19 @@ public class BootstrapAction extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
 
-            try {
-                InitDAO.createTable();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
             HashMap<String, Integer> recordMap = null;
-            String option = request.getParameter("option");
+
             Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
             if(filePart != null && filePart.getSize() > 0){
 
                 //Create ERROR MAPS - and pass to boostrapController to generate
-                HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
-
-                String noOption = "No option selected";
+                HashMap<Integer, String> userErrMap = new HashMap<>();
+                HashMap<Integer, String> appErrMap = new HashMap<>();
+                HashMap<Integer, String> locErrMap = new HashMap<>();
+                HashMap<Integer, String> auErrMap = new HashMap<>();
+                HashMap<Integer, String> luErrMap = new HashMap<>();
+                HashMap<Integer, String> delErrMap = new HashMap<>();
+                
                 //SET FOR UI TO GET THE ATTRIBUTES.
                 request.setAttribute("userErrMap", userErrMap);
                 request.setAttribute("appErrMap", appErrMap);
@@ -63,12 +57,8 @@ public class BootstrapAction extends HttpServlet {
                 request.setAttribute("delErrMap", delErrMap);
 
                 BootstrapController ctrl = new BootstrapController();
-
-                if ("bootstrap".equals(option)) {
-                    //returns a combination of error
-                    System.out.println("YO BOOTSTRAP");
-                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
-                }
+                
+                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
             }
             request.setAttribute("recordMap", recordMap);
 

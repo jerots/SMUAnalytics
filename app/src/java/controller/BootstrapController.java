@@ -8,6 +8,7 @@ package controller;
 import com.opencsv.CSVReader;
 import dao.AppDAO;
 import dao.AppUsageDAO;
+import dao.InitDAO;
 import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import dao.UserDAO;
@@ -42,6 +43,13 @@ public class BootstrapController {
         ZipEntry entry = null;
 
         CSVReader reader = null;
+        
+        //Clears the tables before loading.
+        try {
+            InitDAO.createTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         // initialise the number of rows updated
         int userUpdated = 0;
@@ -208,12 +216,12 @@ public class BootstrapController {
             e.printStackTrace();
         }
 
-        result.put("userUpdated", userUpdated);
-        result.put("appUpdated", appUpdated);
-        result.put("locUpdated", locUpdated);
-        result.put("auUpdated", auUpdated);
-        result.put("luUpdated", luUpdated);
-        result.put("delUpdated", delUpdated);
+        result.put("demographics.csv", userUpdated);
+        result.put("app-lookup.csv", appUpdated);
+        result.put("location-lookup.csv", locUpdated);
+        result.put("app.csv", auUpdated);
+        result.put("location.csv", luUpdated);
+        result.put("location-delete.csv", delUpdated);
 
         return result;
     }

@@ -95,16 +95,14 @@ public class LocationUsageDAO {
             PreparedStatement pStmt = conn.prepareStatement(query);
             pStmt.setInt(1, locationId);
             ResultSet rs = pStmt.executeQuery();
-            while (rs.next()) {
-                if (rs.getInt("locationid") <= 0) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid location");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid location");
-                    }
-                    err = true;
+            if(!rs.next()) {
+                String errorMsg = errMap.get(index);
+                if (errorMsg == null) {
+                    errMap.put(index, "invalid location");
+                } else {
+                    errMap.put(index, errorMsg + "," + "invalid location");
                 }
+                err = true;
             }
             pStmt.close();
 
@@ -201,16 +199,14 @@ public class LocationUsageDAO {
                 PreparedStatement pStmt = conn.prepareStatement(query);
                 pStmt.setInt(1, locationId);
                 ResultSet rs = pStmt.executeQuery();
-                while (rs.next()) {
-                    if (rs.getInt("locationid") <= 0) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "invalid location");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "invalid location");
-                        }
-                        err = true;
+                if (!rs.next()) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "invalid location");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "invalid location");
                     }
+                    err = true;
                 }
                 pStmt.close();
 

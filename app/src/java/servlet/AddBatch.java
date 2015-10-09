@@ -45,6 +45,7 @@ public class AddBatch extends HttpServlet {
         try {
             Part filePart = request.getPart("zipFile");       
             
+            
             HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
             HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
             HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();

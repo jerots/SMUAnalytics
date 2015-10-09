@@ -21,13 +21,6 @@
 			<h1>SMUA Login</h1>
 			<form method='POST' action='LoginAction'>
 				<%
-
-					try {
-						InitDAO.createTable();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-
 					String username = (String) request.getAttribute("username");
 					if (username == null) {
 						username = "";

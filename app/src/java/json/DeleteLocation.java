@@ -5,6 +5,10 @@
  */
 package json;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -34,6 +38,10 @@ public class DeleteLocation extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject output = new JsonObject();
+            JsonArray arrayErr = new JsonArray();
+            
             
         }
     }
