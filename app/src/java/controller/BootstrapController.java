@@ -92,7 +92,7 @@ public class BootstrapController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         //demographics.csv
@@ -117,7 +117,7 @@ public class BootstrapController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         //app.csv
@@ -142,7 +142,7 @@ public class BootstrapController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         //location
@@ -167,8 +167,10 @@ public class BootstrapController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
+		
+		//locationUsage
         fileContent = filePart.getInputStream();
         zipInputStream = new ZipInputStream(fileContent);
         isr = new InputStreamReader(zipInputStream);
@@ -191,8 +193,10 @@ public class BootstrapController {
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
+		
+		//location-delete.csv
         fileContent = filePart.getInputStream();
         zipInputStream = new ZipInputStream(fileContent);
         isr = new InputStreamReader(zipInputStream);
@@ -205,15 +209,19 @@ public class BootstrapController {
                     reader = new CSVReader(br);
                     reader.readNext();
                     int[] updatedRecords = luDao.delete(reader, delErrMap);
-                    for (int i : updatedRecords) {
-                        delUpdated+= i;
-                    }
+					System.out.println("LOOK BELOW");
+//                    for (int i : updatedRecords) {
+//						System.out.println(i);
+//                        delUpdated+= i;
+//                    }
+					delUpdated = updatedRecords[0];
+					System.out.println("LOOK ABOVE");
                 } else {
                     zipInputStream.closeEntry();
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         result.put("demographics.csv", userUpdated);
