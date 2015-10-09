@@ -5,6 +5,7 @@
  */
 package servlet;
 
+import controller.DeleteController;
 import dao.LocationUsageDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,7 +40,11 @@ public class DeleteLocationAction extends HttpServlet {
                     String startDate = request.getParameter("startdate");
                     String endDate = request.getParameter("enddate");
                     
-                    luDao.delete(macAdd, startDate, endDate);
+                    DeleteController cntrl = new DeleteController();
+                    cntrl.delete(macAdd, startDate, endDate);
+                    
+                    //your app should show how many records are valid and actually deleted, 
+                    //and how many records are valid but not found in the database
                     
 		}catch(Exception e){
                     e.printStackTrace();

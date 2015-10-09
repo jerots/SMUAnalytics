@@ -29,7 +29,7 @@ public class AppDAO {
         String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
         PreparedStatement stmt = conn.prepareStatement(sql);
         String[] arr = null;
-        //*
+        //index starts at 2 because the headers count as a row.
         int index = 2;
         while ((arr = reader.readNext()) != null) {
             boolean err = false;

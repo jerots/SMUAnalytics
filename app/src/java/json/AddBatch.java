@@ -3,25 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlet;
+package json;
 
-import com.opencsv.CSVReader;
-import controller.AddBatchController;
-import dao.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 /**
  *
@@ -42,30 +34,11 @@ public class AddBatch extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try {
-            Part filePart = request.getPart("zipFile");       
+        try (PrintWriter out = response.getWriter()) {
+            JSONObject output = new JSONObject();
+            JSONArray errors = new JSONArray();
             
-            HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-            HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
             
-            request.setAttribute("userErrMap", userErrMap);
-            request.setAttribute("auErrMap", auErrMap);
-            request.setAttribute("luErrMap", luErrMap);
-            request.setAttribute("delErrMap", delErrMap);
-            
-            HashMap<String, Integer> recordMap = null;
-            
-            AddBatchController cntrl = new AddBatchController();
-            recordMap = cntrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
-            
-            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
-            rd.forward(request, response);
-            
-        }catch (Exception e) {
-            System.out.println("Exception Caught in bootstrap action.java");
-            e.printStackTrace();
         }
     }
 

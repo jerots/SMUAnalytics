@@ -42,6 +42,10 @@ public final class Utility {
         }
         return null;
     }
+    
+    public static boolean checkDate(String str){
+        return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
+    }
 
     public static int parseInt(String str) {
         int num = -1;
@@ -60,6 +64,7 @@ public final class Utility {
 
     public static String parseString(String input) {
         String str = input.trim();
+        str = str.replace("\"","");
         if (str != null && str.length() > 0) {
             return str;
         }

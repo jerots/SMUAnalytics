@@ -75,23 +75,162 @@
                 <div class="theme-div theme-content" style="width:60%">
 
                     <h1>Result</h1>
-                    
+
+
                     <%
-                        HashMap<String,Integer> recordMap = (HashMap<String, Integer>) request.getAttribute("recordMap");
+
+                        HashMap<String, Integer> recordMap = (HashMap<String, Integer>) request.getAttribute("recordMap");
                         if (recordMap != null) {
-                            
-                            out.println("apps updated: " + recordMap.get("appUpdated"));
-                            
-                            HashMap<Integer,String> appErrMap = (HashMap<Integer,String>) request.getAttribute("appErrMap");
-                            Iterator<Integer> iter = appErrMap.keySet().iterator();
-                            out.println(appErrMap.size());
-                            while(iter.hasNext()){
-                                int rowWithErr = iter.next();
+                    %>
+                    <%---app---%>
+                    <h4><b> App</b> </h4>
+                    <hr>
+                    <%
+                        out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>App</b>" + "</td></tr><tr><td>");
+                        out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("appUpdated"));
+                        out.println("</td></tr><tr><td>");
+                        HashMap<Integer, String> appErrMap = (HashMap<Integer, String>) request.getAttribute("appErrMap");
+                        Iterator<Integer> appiter = appErrMap.keySet().iterator();
+
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + appErrMap.size() + "</td></tr>");
+                        if (appErrMap != null && appErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (appiter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = appiter.next();
                                 String errAtThatRow = appErrMap.get(rowWithErr);
                                 out.println(rowWithErr);
+                                out.println("</td><td>");
                                 out.println(errAtThatRow);
+                                out.println("</td></tr>");
                             }
-                            
+                        }
+                        out.println("</table>");
+                    %>
+
+                    <p>
+                    <P><p>
+                        <%---user---%>
+                    <h4><b> User</b> </h4>
+                    <hr>
+
+
+                    <%
+                        out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>User</b>" + "</td></tr><tr><td>");
+                        out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("userUpdated"));
+                        out.println("</td></tr><tr><td>");
+                        HashMap<Integer, String> userErrMap = (HashMap<Integer, String>) request.getAttribute("userErrMap");
+                        Iterator<Integer> useriter = userErrMap.keySet().iterator();
+
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + userErrMap.size() + "</td></tr>");
+                        if (userErrMap != null && userErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (useriter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = useriter.next();
+                                String errAtThatRow = userErrMap.get(rowWithErr);
+                                out.println(rowWithErr);
+                                out.println("</td><td>");
+                                out.println(errAtThatRow);
+                                out.println("</td></tr>");
+                            }
+                        }
+                        out.println("</table>");
+                    %>
+
+                    <P>
+                        <%---location---%>
+                    <h4><b> Location</b> </h4>
+                    <hr>
+                    <%
+                        out.println("<table border=1px  class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>Location</b>" + "</td></tr><tr><td>");
+                        out.println("<b>Location updated </b> " + "</td><td>" + recordMap.get("locUpdated"));
+                        out.println("</td></tr><tr><td>");
+                        HashMap<Integer, String> locErrMap = (HashMap<Integer, String>) request.getAttribute("locErrMap");
+                        Iterator<Integer> lociter = locErrMap.keySet().iterator();
+
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + locErrMap.size() + "</td></tr>");
+                        if (locErrMap != null && locErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (lociter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = lociter.next();
+                                String errAtThatRow = locErrMap.get(rowWithErr);
+                                out.println(rowWithErr);
+                                out.println("</td><td>");
+                                out.println(errAtThatRow);
+                                out.println("</td></tr>");
+                            }
+                        }
+                        out.println("</table>");
+                    %>
+                    <P>
+                        <%---appUsage---%>
+                    <h4><b> AppUsage</b> </h4>
+                    <hr>
+                    <%
+                        out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + recordMap.get("auUpdated"));
+                        out.println("</td></tr><tr><td>");
+                        HashMap<Integer, String> auErrMap = (HashMap<Integer, String>) request.getAttribute("auErrMap");
+                        Iterator<Integer> auiter = auErrMap.keySet().iterator();
+
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrMap.size() + "</td></tr>");
+                        if (auErrMap != null && auErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (auiter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = auiter.next();
+                                String errAtThatRow = auErrMap.get(rowWithErr);
+                                out.println(rowWithErr);
+                                out.println("</td><td>");
+                                out.println(errAtThatRow);
+                                out.println("</td></tr>");
+                            }
+                        }
+                        out.println("</table>");
+                    %>
+                    <P>
+                        <%---locationUsage---%>
+                    <h4><b> LocationUsage</b> </h4>
+                    <hr>
+                    <%
+                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                            out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
+                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("luUpdated"));
+                            out.println("</td></tr><tr><td>");
+                            HashMap<Integer, String> luErrMap = (HashMap<Integer, String>) request.getAttribute("luErrMap");
+                            Iterator<Integer> luiter = luErrMap.keySet().iterator();
+
+                            out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
+                            if (luErrMap != null && luErrMap.size() != 0) {
+                                out.println("<tr><td><b>" + "Row");
+                                out.println("</b></td><td><b>" + "Error Messages");
+                                out.println("</b></td></tr>");
+                                while (luiter.hasNext()) {
+                                    out.println("<tr><td>");
+                                    int rowWithErr = luiter.next();
+                                    String errAtThatRow = luErrMap.get(rowWithErr);
+                                    out.println(rowWithErr);
+                                    out.println("</td><td>");
+                                    out.println(errAtThatRow);
+                                    out.println("</td></tr>");
+                                }
+                            }
+                            out.println("</table>");
+
                         } else {
                             out.println("You have not uploaded any files.");
                         }

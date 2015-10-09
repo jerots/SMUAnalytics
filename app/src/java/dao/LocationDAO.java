@@ -11,13 +11,11 @@ import java.util.HashMap;
 
 public class LocationDAO {
 
-    private ArrayList<String> unsuccessful;
 
     public LocationDAO() {
-        unsuccessful = new ArrayList<>();
     }
 
-    public void insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+    public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
         String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
@@ -73,12 +71,13 @@ public class LocationDAO {
             }
 
         }
-        stmt.executeBatch();
+        int[] updateCounts = stmt.executeBatch();
         conn.commit();
 
         //closing
         reader.close();
         ConnectionManager.close(conn, stmt);
+        return updateCounts;
     }
 
     public ArrayList<String> retrieve(String floor) {

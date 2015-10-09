@@ -21,21 +21,18 @@ import java.util.HashMap;
  */
 public class UserDAO {
 
-    private ArrayList<String> unsuccessful;
-
     public UserDAO() {
-        unsuccessful = new ArrayList<>();
     }
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
-    public void insert(CSVReader reader, HashMap<Integer, String> userMap) throws IOException, SQLException {
+    public int[] insert(CSVReader reader, HashMap<Integer, String> userMap) throws IOException, SQLException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
         String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
         PreparedStatement stmt = conn.prepareStatement(sql);
 
         String arr[];
-        int index = 1;
+        int index = 2;
         while ((arr = reader.readNext()) != null) {
             //retrieving per row
             boolean err = false;
@@ -141,12 +138,13 @@ public class UserDAO {
             }
         }
 
-        stmt.executeBatch();
+        int[] updateCounts = stmt.executeBatch();
         conn.commit();
 
         //closing
         reader.close();
         ConnectionManager.close(conn, stmt);
+        return updateCounts;
     }
 
     public User retrieve(String username, String password) {

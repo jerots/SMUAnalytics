@@ -1,24 +1,41 @@
-package servlet;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package json;
 
-import java.io.*;
+import controller.BootstrapController;
+import controller.HeatmapController;
+import dao.InitDAO;
+import entity.LocationUsage;
+import is203.JWTException;
+import is203.JWTUtility;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.zip.ZipInputStream;
-import javax.servlet.*;
-import javax.servlet.annotation.*;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import dao.*;
-import com.opencsv.CSVReader;
-import controller.BootstrapController;
-import java.util.HashMap;
-import java.util.zip.ZipEntry;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
-@WebServlet(urlPatterns = {"/BootstrapAction"})
-@MultipartConfig
-
-public class BootstrapAction extends HttpServlet {
+/**
+ *
+ * @author Boyofthefuture
+ */
+@WebServlet(name = "Bootstrap", urlPatterns = {"/Bootstrap"})
+public class Bootstrap extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,9 +48,25 @@ public class BootstrapAction extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
+            JSONObject output = new JSONObject();
+            JSONArray errors = new JSONArray();
+            
+            String token = request.getParameter("token");
+            String date = request.getParameter("date");
+            String time = request.getParameter("time");
+            String floor = request.getParameter("floor");
+            
+            try {
+                String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                if (username == null) {
+                    //failed
+                }
+            } catch (JWTException e) {
+                //failed
+                e.printStackTrace();
+            }
 
             try {
                 InitDAO.createTable();
@@ -53,7 +86,6 @@ public class BootstrapAction extends HttpServlet {
                 HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
                 HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
 
-                String noOption = "No option selected";
                 //SET FOR UI TO GET THE ATTRIBUTES.
                 request.setAttribute("userErrMap", userErrMap);
                 request.setAttribute("appErrMap", appErrMap);
@@ -61,13 +93,12 @@ public class BootstrapAction extends HttpServlet {
                 request.setAttribute("auErrMap", auErrMap);
                 request.setAttribute("luErrMap", luErrMap);
                 request.setAttribute("delErrMap", delErrMap);
-
-                BootstrapController ctrl = new BootstrapController();
-
-                if ("bootstrap".equals(option)) {
-                    //returns a combination of error
-                    System.out.println("YO BOOTSTRAP");
+                
+                try{
+                    BootstrapController ctrl = new BootstrapController();
                     recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
+                }catch(SQLException e){
+                    
                 }
             }
             request.setAttribute("recordMap", recordMap);
@@ -75,11 +106,10 @@ public class BootstrapAction extends HttpServlet {
             RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
             rd.forward(request, response);
 
-        } catch (Exception e) {
-            System.out.println("Exception Caught in bootstrap action.java");
-            e.printStackTrace();
-        }
+        } 
     }
+}
+
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

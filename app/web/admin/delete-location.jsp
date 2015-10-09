@@ -91,3 +91,13 @@
 		<script src="../js/bootstrap.js"></script>
     </body>
 </html>
+
+<!--macAdd = Utility.parseString(macAdd);
+            if (macAdd == null) {
+                unsuccessful.add("mac add cannot be blank");
+                err = true;
+            }
+            if (!Utility.checkHexadecimal(macAdd)) {
+                unsuccessful.add("invalid mac address");
+                err = true;
+            }-->

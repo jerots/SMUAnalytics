@@ -54,7 +54,6 @@ public class UsageHeatmap extends HttpServlet {
 			String time = request.getParameter("time");
 			String floor = request.getParameter("floor");
 			
-			
 			try {
 				String username = JWTUtility.verify(token, "nabjemzhdarrensw");
 				if (username == null) {
