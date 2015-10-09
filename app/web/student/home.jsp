@@ -7,13 +7,13 @@
 <%@page import="entity.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@include file="../protect-user.jsp" %>
+<%@include file="protect-user.jsp" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-		<link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="../css/style.css">
+		<link rel="stylesheet" type="text/css" href="/app/css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="/app/css/style.css">
     </head>
     <body>
 		<%			User user = (User) session.getAttribute("user");
@@ -47,7 +47,7 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						<li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
-						<li><a href="../logout.jsp">Logout</a></li>
+						<li><a href="/app/logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
@@ -80,7 +80,7 @@
 		</div>
 		<!--END OF CONTENT-->
 		
-		<script src="../js/jquery-2.1.4.min.js"></script>
-		<script src="../js/bootstrap.js"></script>
+		<script src="app/js/jquery-2.1.4.min.js"></script>
+		<script src="app/js/bootstrap.js"></script>
     </body>
 </html>

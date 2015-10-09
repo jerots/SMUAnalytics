@@ -1,4 +1,4 @@
-package servlet;
+package servlet.admin;
 
 import java.io.*;
 import java.sql.SQLException;
