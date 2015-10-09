@@ -15,29 +15,29 @@ import java.sql.Statement;
  */
 public class InitDAO {
 
-	public static void initAdmin() {
-		try {
-
-			Connection conn = ConnectionManager.getConnection();
-			Statement stmt = conn.createStatement();
-			conn.setAutoCommit(false);
-
-			stmt.addBatch("CREATE SCHEMA g3t3 IF NOT EXISTS;");
-			stmt.addBatch("USE g3t3;");
-			stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
-					+ "  username varchar(128) NOT NULL,\n"
-					+ "  password varchar(128) NOT NULL, \n"
-					+ "   CONSTRAINT admin_pk PRIMARY KEY(username)\n"
-					+ "   \n"
-					+ ");");
-
-			stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
-
-		} catch (SQLException e) {
-
-		}
-
-	}
+//	public static void initAdmin() {
+//		try {
+//
+//			Connection conn = ConnectionManager.getConnection();
+//			Statement stmt = conn.createStatement();
+//			conn.setAutoCommit(false);
+//
+//			stmt.addBatch("CREATE SCHEMA g3t3 IF NOT EXISTS;");
+//			stmt.addBatch("USE g3t3;");
+//			stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
+//					+ "  username varchar(128) NOT NULL,\n"
+//					+ "  password varchar(128) NOT NULL, \n"
+//					+ "   CONSTRAINT admin_pk PRIMARY KEY(username)\n"
+//					+ "   \n"
+//					+ ");");
+//
+//			stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
+//
+//		} catch (SQLException e) {
+//
+//		}
+//
+//	}
 
 	public static void createTable() throws SQLException {
 		Connection conn = ConnectionManager.getConnection();
