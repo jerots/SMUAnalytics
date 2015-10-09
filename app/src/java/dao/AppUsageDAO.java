@@ -16,363 +16,370 @@ import java.util.HashMap;
 
 public class AppUsageDAO {
 
-    private HashMap<String, Integer> duplicate;
-    private HashMap<String, AppUsage> appList;
+	private HashMap<String, Integer> duplicate;
+	private HashMap<String, AppUsage> appList;
 
-    public AppUsageDAO() {
-        appList = new HashMap<>();
-        duplicate = new HashMap<>();
-    }
+	public AppUsageDAO() {
+		appList = new HashMap<>();
+		duplicate = new HashMap<>();
+	}
 
-    public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
-        conn.setAutoCommit(false);
-        int index = 2;
-        String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
-                + " = VALUES(appid);";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        String query = null;
-        PreparedStatement pStmt = null;
-        ResultSet rs = null;
-        String[] arr = null;
-        while ((arr = reader.readNext()) != null) {
-            //retrieving per row
-            boolean err = false;
+	public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+		Connection conn = ConnectionManager.getConnection();
+		conn.setAutoCommit(false);
+		int index = 2;
+		String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
+				+ " = VALUES(appid);";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		String query = null;
+		PreparedStatement pStmt = null;
+		ResultSet rs = null;
+		String[] arr = null;
+		while ((arr = reader.readNext()) != null) {
+			//retrieving per row
+			boolean err = false;
 
-            //check timestamp
-            String date = Utility.parseString(arr[0]);
-            if (date == null || !Utility.checkDate(date)) {
-                err = true;
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "invalid timestamp");
-                } else {
-                    errMap.put(index, errorMsg + "," + "invalid timestamp");
-                }
-            }
+			//check timestamp
+			String date = Utility.parseString(arr[0]);
+			if (date == null || !Utility.checkDate(date)) {
+				err = true;
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "invalid timestamp");
+				} else {
+					errMap.put(index, errorMsg + "," + "invalid timestamp");
+				}
+			}
 
-            //check macAdd
-            String macAdd = Utility.parseString(arr[1]);
-            if (macAdd == null) {
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "mac add cannot be blank");
-                } else {
-                    errMap.put(index, errorMsg + "," + "mac add cannot be blank");
-                }
-                err = true;
-            }
-            
-            if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "invalid mac add");
-                } else {
-                    errMap.put(index, errorMsg + "," + "invalid mac add");
-                }
-                err = true;
-            } else {
-                query = "select macaddress from user where macaddress = ?;";
-                pStmt = conn.prepareStatement(query);
-                pStmt.setString(1, macAdd);
+			//check macAdd
+			String macAdd = Utility.parseString(arr[1]);
+			if (macAdd == null) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "mac add cannot be blank");
+				} else {
+					errMap.put(index, errorMsg + "," + "mac add cannot be blank");
+				}
+				err = true;
+			}
 
-                rs = pStmt.executeQuery();
-                if (!rs.next()) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "no matching mac address");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "no matching mac address");
-                    }
-                    err = true;
-                }
-                pStmt.close();
-            }
+			if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "invalid mac add");
+				} else {
+					errMap.put(index, errorMsg + "," + "invalid mac add");
+				}
+				err = true;
+			} else {
+				query = "select macaddress from user where macaddress = ?;";
+				pStmt = conn.prepareStatement(query);
+				pStmt.setString(1, macAdd);
 
-            //check appid
-            int appId = Utility.parseInt(arr[2]);
-            if (appId <= 0) {
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "app id cannot be blank");
-                } else {
-                    errMap.put(index, errorMsg + "," + "app id cannot be blank");
-                }
-                err = true;
-            } else {
-                query = "select appid from app where appid = ?;";
-                pStmt = conn.prepareStatement(query);
-                pStmt.setInt(1, appId);
-                rs = pStmt.executeQuery();
-                if(!rs.next()){
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid app");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid app");
-                    }
-                    err = true;
-                }
-                pStmt.close();
-            }
-            
-            if (!err) {
+				rs = pStmt.executeQuery();
+				if (!rs.next()) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "no matching mac address");
+					} else {
+						errMap.put(index, errorMsg + "," + "no matching mac address");
+					}
+					err = true;
+				}
+				pStmt.close();
+			}
 
-                if (duplicate.containsKey(date + macAdd)) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
-                    } else {
-                        errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
-                    }
-                }
-                duplicate.put(date + macAdd, index);
-                //add to list
-                stmt.setString(1, date);
-                stmt.setString(2, macAdd);
-                stmt.setInt(3, appId);
-                stmt.addBatch();
-                //insert into tables
-            }
-            index++;
-        }
+			//check appid
+			int appId = Utility.parseInt(arr[2]);
+			if (appId <= 0) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "app id cannot be blank");
+				} else {
+					errMap.put(index, errorMsg + "," + "app id cannot be blank");
+				}
+				err = true;
+			} else {
+				query = "select appid from app where appid = ?;";
+				pStmt = conn.prepareStatement(query);
+				pStmt.setInt(1, appId);
+				rs = pStmt.executeQuery();
+				if (!rs.next()) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "invalid app");
+					} else {
+						errMap.put(index, errorMsg + "," + "invalid app");
+					}
+					err = true;
+				}
+				pStmt.close();
+			}
 
-        int[] updatedRecords = stmt.executeBatch();
-        conn.commit();
+			if (!err) {
 
-        //closing
-        reader.close();
-        ConnectionManager.close(conn, stmt);
-        return updatedRecords;
-    }
+				if (duplicate.containsKey(date + macAdd)) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+					} else {
+						errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
+					}
+				}
+				duplicate.put(date + macAdd, index);
+				//add to list
+				stmt.setString(1, date);
+				stmt.setString(2, macAdd);
+				stmt.setInt(3, appId);
+				stmt.addBatch();
+				//insert into tables
+			}
+			index++;
+		}
 
-    public int[] add(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
-        int[] updateCounts = null;
-        try {
-            Connection conn = ConnectionManager.getConnection();
-            conn.setAutoCommit(false);
-            int index = 2;
-            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            String query = null;
-            PreparedStatement pStmt = null;
-            ResultSet rs = null;
+		int[] updatedRecords = stmt.executeBatch();
+		conn.commit();
 
-            String[] arr = null;
-            while ((arr = reader.readNext()) != null) {
-                //retrieving per row
-                boolean err = false;
+		//closing
+		reader.close();
+		ConnectionManager.close(conn, stmt);
+		return updatedRecords;
+	}
 
-                //check timestamp
-                String date = Utility.parseString(arr[0]);
-                if (date == null || !Utility.checkDate(date)) {
-                    err = true;
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid timestamp");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid timestamp");
-                    }
-                }
+	public int add(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+		int updateCounts = 0;
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			conn.setAutoCommit(false);
+			int index = 2;
+			String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			String query = null;
+			PreparedStatement pStmt = null;
+			ResultSet rs = null;
 
-                //check macAdd
-                String macAdd = Utility.parseString(arr[1]);
-                if (macAdd == null) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "mac add cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "mac add cannot be blank");
-                    }
-                    err = true;
-                }
-                if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid mac add");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid mac add");
-                    }
-                    err = true;
-                }else{
-                    query = "select macaddress from user where macaddress = ?;";
-                    pStmt = conn.prepareStatement(query);
-                    pStmt.setString(1, macAdd);
+			String[] arr = null;
+			while ((arr = reader.readNext()) != null) {
+				//retrieving per row
+				boolean err = false;
 
-                    rs = pStmt.executeQuery();
-                    if (!rs.next()) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "no matching mac address");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "no matching mac address");
-                        }
-                        err = true;
-                    }
-                    pStmt.close();
-                }
-                //check appid
-                int appId = Utility.parseInt(arr[2]);
-                if (appId <= 0) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "app id cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "app id cannot be blank");
-                    }
-                    err = true;
-                }else{
-                    query = "select appid from app where appid = ?;";
-                    pStmt = conn.prepareStatement(query);
-                    pStmt.setInt(1, appId);
-                    rs = pStmt.executeQuery();
-                    if (!rs.next()) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "invalid app");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "invalid app");
-                        }
-                        err = true;
-                    }
-                    pStmt.close();
-                }
+				//check timestamp
+				String date = Utility.parseString(arr[0]);
+				if (date == null || !Utility.checkDate(date)) {
+					err = true;
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "invalid timestamp");
+					} else {
+						errMap.put(index, errorMsg + "," + "invalid timestamp");
+					}
+				}
 
-                if (!err) {
-                    if (duplicate.containsKey(date + macAdd)) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
-                        } else {
-                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
-                        }
-                    }
-                    duplicate.put(date + macAdd, index);
-                    appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
-                }
-                ArrayList<AppUsage> appArray = new ArrayList<AppUsage> (appList.values());
-                try {
-                    for (AppUsage app : appArray) {
-                        stmt.setString(1, app.getTimestamp());
-                        stmt.setString(2, app.getMacAddress());
-                        stmt.setInt(3, app.getAppId());
-                        stmt.addBatch();
-                    }
-                    //closing
-                    if (stmt != null) {
-                        stmt.executeBatch();
-                        conn.commit();
-                    }
-                } catch (BatchUpdateException e) {
-                    updateCounts = e.getUpdateCounts();
-                    for (int i = 0; i < updateCounts.length; i++) {
-                        if (updateCounts[i] == Statement.EXECUTE_FAILED) {
-                            // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate HashMap to find the offending row.
-                            String errorMsg = errMap.get(index);
-                            if (errorMsg == null) {
-                                errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
-                            } else {
-                                errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
-                            }
-                        }
-                    }
-                }
-                index++;
-            }
-            reader.close();
-            ConnectionManager.close(conn, stmt);
+				//check macAdd
+				String macAdd = Utility.parseString(arr[1]);
+				if (macAdd == null) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "mac add cannot be blank");
+					} else {
+						errMap.put(index, errorMsg + "," + "mac add cannot be blank");
+					}
+					err = true;
+				} else if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "invalid mac add");
+					} else {
+						errMap.put(index, errorMsg + "," + "invalid mac add");
+					}
+					err = true;
+				} else {
+					query = "select macaddress from user where macaddress = ?;";
+					pStmt = conn.prepareStatement(query);
+					pStmt.setString(1, macAdd);
 
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        return updateCounts;
-    }
+					rs = pStmt.executeQuery();
+					if (!rs.next()) {
+						String errorMsg = errMap.get(index);
+						if (errorMsg == null) {
+							errMap.put(index, "no matching mac address");
+						} else {
+							errMap.put(index, errorMsg + "," + "no matching mac address");
+						}
+						err = true;
+					}
+					pStmt.close();
+				}
+				//check appid
+				int appId = Utility.parseInt(arr[2]);
+				if (appId <= 0) {
+					String errorMsg = errMap.get(index);
+					if (errorMsg == null) {
+						errMap.put(index, "app id cannot be blank");
+					} else {
+						errMap.put(index, errorMsg + "," + "app id cannot be blank");
+					}
+					err = true;
+				} else {
+					query = "select appid from app where appid = ?;";
+					pStmt = conn.prepareStatement(query);
+					pStmt.setInt(1, appId);
+					rs = pStmt.executeQuery();
+					if (!rs.next()) {
+						String errorMsg = errMap.get(index);
+						if (errorMsg == null) {
+							errMap.put(index, "invalid app");
+						} else {
+							errMap.put(index, errorMsg + "," + "invalid app");
+						}
+						err = true;
+					}
+					pStmt.close();
+				}
 
-    public ArrayList<String> retrieveUsers(Date startDate, Date endDate) {
+				if (!err) {
+					if (duplicate.containsKey(date + macAdd)) {
+						String errorMsg = errMap.get(index);
+						if (errorMsg == null) {
+							errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+						} else {
+							errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
+						}
+					}
+					duplicate.put(date + macAdd, index);
+					appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
+				}
+				index++;
+			}
+				ArrayList<AppUsage> appArray = new ArrayList<AppUsage>(appList.values());
+				try {
+					for (AppUsage app : appArray) {
+						stmt.setString(1, app.getTimestamp());
+						stmt.setString(2, app.getMacAddress());
+						stmt.setInt(3, app.getAppId());
+						stmt.addBatch();
+					}
+					//closing
+					int[] updatedArr = stmt.executeBatch();
+					for (int i : updatedArr){
+						updateCounts += i;
+					}
+					
+					conn.commit();
 
-        ArrayList<String> result = new ArrayList<String>();
+				} catch (BatchUpdateException e) {
+					int [] updateArr = e.getUpdateCounts();
+					for (int i = 0; i < updateArr.length; i++) {
+						if (updateArr[i] == Statement.EXECUTE_FAILED) {
+							// This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate HashMap to find the offending row.
+							String errorMsg = errMap.get(index);
+							if (errorMsg == null) {
+								errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
+							} else {
+								errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
+							}
+						}
+						
+						if (updateArr[i] >= 0){
+							updateCounts += updateArr[i];
+						}
+					}
+				}
+			
+			reader.close();
+			ConnectionManager.close(conn, stmt);
 
-        try {
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		return updateCounts;
+	}
 
-            Connection conn = ConnectionManager.getConnection();
+	public ArrayList<String> retrieveUsers(Date startDate, Date endDate) {
 
-            PreparedStatement ps = conn.prepareStatement("SELECT macaddress from appusage where "
-                    + "timestamp >= ? AND timestamp <= ? "
-                    + "GROUP BY macaddress");
-            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+		ArrayList<String> result = new ArrayList<String>();
 
-            ResultSet rs = ps.executeQuery();
+		try {
 
-            while (rs.next()) {
-                String macAdd = rs.getString(1);
-                result.add(macAdd);
-            }
+			Connection conn = ConnectionManager.getConnection();
 
-        } catch (SQLException e) {
+			PreparedStatement ps = conn.prepareStatement("SELECT macaddress from appusage where "
+					+ "timestamp >= ? AND timestamp <= ? "
+					+ "GROUP BY macaddress");
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
-        }
+			ResultSet rs = ps.executeQuery();
 
-        return result;
-    }
+			while (rs.next()) {
+				String macAdd = rs.getString(1);
+				result.add(macAdd);
+			}
 
-    public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
+		} catch (SQLException e) {
 
-        ArrayList<String> result = new ArrayList<String>();
+		}
 
-        try {
+		return result;
+	}
 
-            Connection conn = ConnectionManager.getConnection();
+	public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+		ArrayList<String> result = new ArrayList<String>();
 
-            ResultSet rs = ps.executeQuery();
+		try {
 
-            while (rs.next()) {
-                String macAdd = rs.getString(1);
-                result.add(macAdd);
-            }
+			Connection conn = ConnectionManager.getConnection();
 
-        } catch (SQLException e) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
-        }
+			ResultSet rs = ps.executeQuery();
 
-        return result;
-    }
+			while (rs.next()) {
+				String macAdd = rs.getString(1);
+				result.add(macAdd);
+			}
 
-    public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
+		} catch (SQLException e) {
 
-        ArrayList<AppUsage> result = new ArrayList<AppUsage>();
+		}
 
-        try {
+		return result;
+	}
 
-            Connection conn = ConnectionManager.getConnection();
+	public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
-                    + "timestamp >= ? AND timestamp <= ? "
-                    + "AND macaddress = ?");
-            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
-            ps.setString(3, macAdd);
+		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
 
-            ResultSet rs = ps.executeQuery();
+		try {
 
-            while (rs.next()) {
+			Connection conn = ConnectionManager.getConnection();
 
-                String timestamp = rs.getString(1);
-                String macaddress = rs.getString(2);
-                int appid = rs.getInt(3);
-                result.add(new AppUsage(timestamp, macaddress, appid));
+			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
+					+ "timestamp >= ? AND timestamp <= ? "
+					+ "AND macaddress = ?");
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			ps.setString(3, macAdd);
 
-            }
+			ResultSet rs = ps.executeQuery();
 
-        } catch (SQLException e) {
+			while (rs.next()) {
 
-        }
+				String timestamp = rs.getString(1);
+				String macaddress = rs.getString(2);
+				int appid = rs.getInt(3);
+				result.add(new AppUsage(timestamp, macaddress, appid));
 
-        return result;
-    }
+			}
+
+		} catch (SQLException e) {
+
+		}
+
+		return result;
+	}
 
 }

@@ -85,11 +85,8 @@ public class AddBatchController {
 				if (fileName.equals("app.csv")) {
 					reader = new CSVReader(br);
 					reader.readNext();
-					int[] updatedRecords = auDao.add(reader, auErrMap);
+					auUpdated = auDao.add(reader, auErrMap);
 
-					for (int i : updatedRecords) {
-						auUpdated++;
-					}
 				} else {
 					zipInputStream.closeEntry();
 				}
