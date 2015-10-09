@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import dao.*;
 import com.opencsv.CSVReader;
+import controller.AddBatchController;
 import controller.BootstrapController;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
@@ -33,46 +34,73 @@ public class BootstrapAction extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HashMap<String, Integer> recordMap = null;
-        try {
-
+        String option = request.getParameter("option");
+        Part filePart = request.getPart("zipFile");
+        if(option.equals("bootstrap")){
             try {
-                InitDAO.createTable();
-            } catch (SQLException e) {
+
+                try {
+                    InitDAO.createTable();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+             // Retrieves <input type="file" name="zipFile">
+                if (filePart != null && filePart.getSize() > 0) {
+
+                    //Create ERROR MAPS - and pass to boostrapController to generate
+                    HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+
+                    //SET FOR UI TO GET THE ATTRIBUTES.
+                    request.setAttribute("userErrMap", userErrMap);
+                    request.setAttribute("appErrMap", appErrMap);
+                    request.setAttribute("locErrMap", locErrMap);
+                    request.setAttribute("auErrMap", auErrMap);
+                    request.setAttribute("luErrMap", luErrMap);
+                    request.setAttribute("delErrMap", delErrMap);
+
+                    BootstrapController ctrl = new BootstrapController();
+
+                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
+                }
+
+            } catch (Exception e) {
+                System.out.println("Exception Caught in bootstrap action.java");
                 e.printStackTrace();
             }
-            
-            Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
-            if(filePart != null && filePart.getSize() > 0){
+        } else {
+            try {
+                if(filePart != null && filePart.getSize() > 0){
+                    HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
+                    HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
 
-                //Create ERROR MAPS - and pass to boostrapController to generate
-                HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+                    request.setAttribute("userErrMap", userErrMap);
+                    request.setAttribute("auErrMap", auErrMap);
+                    request.setAttribute("luErrMap", luErrMap);
+                    request.setAttribute("delErrMap", delErrMap);
 
-                //SET FOR UI TO GET THE ATTRIBUTES.
-                request.setAttribute("userErrMap", userErrMap);
-                request.setAttribute("appErrMap", appErrMap);
-                request.setAttribute("locErrMap", locErrMap);
-                request.setAttribute("auErrMap", auErrMap);
-                request.setAttribute("luErrMap", luErrMap);
-                request.setAttribute("delErrMap", delErrMap);
+                    AddBatchController cntrl = new AddBatchController();
+                    recordMap = cntrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
+                }
 
-                BootstrapController ctrl = new BootstrapController();
-
-                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
+            }catch (Exception e) {
+                System.out.println("Exception Caught in bootstrap action.java");
+                e.printStackTrace();
             }
-            request.setAttribute("recordMap", recordMap);
-
-            RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
-            rd.forward(request, response);
-
-        } catch (Exception e) {
-            System.out.println("Exception Caught in bootstrap action.java");
-            e.printStackTrace();
         }
+        
+        request.setAttribute("recordMap", recordMap);
+
+        RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
+        rd.forward(request, response);
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
