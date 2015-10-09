@@ -4,6 +4,7 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="java.util.TreeMap"%>
 <%@page import="java.util.TreeSet"%>
 <%@page import="dao.LocationDAO"%>
 <%@page import="java.util.Iterator"%>
@@ -139,7 +140,7 @@
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
 					<%
-						HashMap<String, ArrayList<LocationUsage>> heatmap = (HashMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
+						TreeMap<String, ArrayList<LocationUsage>> heatmap = (TreeMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
 						String error = (String) request.getAttribute("error");
 						if (error != null){
 							

@@ -75,12 +75,15 @@ public class HeatmapAction extends HttpServlet {
 			HeatmapController ctrl = new HeatmapController();
 			TreeMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
 			
+			
 //			return HashMap<location,userlist>
 			request.setAttribute("heatmap", result);
 			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
 			rd.forward(request, response);
 			
 
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 
