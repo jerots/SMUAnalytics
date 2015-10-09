@@ -374,7 +374,7 @@ public class LocationUsageDAO {
         try {
             String sql = "SELECT timestamp, macaddress, lu.locationid \n"
                     + "FROM (\n"
-                    + "SELECT MAX(TIMESTAMP) as timestamp, macaddress, locationid FROM locationUsage\n"
+                    + "SELECT MAX(TIMESTAMP) as timestamp, macaddress, locationid FROM locationusage\n"
                     + "WHERE timestamp >= STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') \n"
                     + "AND timestamp < STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') \n"
                     + "group by macaddress\n"
