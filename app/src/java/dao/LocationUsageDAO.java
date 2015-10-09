@@ -244,11 +244,12 @@ public class LocationUsageDAO {
                 for (int i = 0; i < updateCounts.length; i++) {
                     if (updateCounts[i] == Statement.EXECUTE_FAILED) {
                         // This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate HashMap to find the offending row.
-                        String errorMsg = errMap.get(index);
+                        int row = duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress());
+                        String errorMsg = errMap.get(row);
                         if (errorMsg == null) {
-                            errMap.put(index, "duplicate row " + duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress()));
+                            errMap.put(row, "duplicate row ");
                         } else {
-                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress()));
+                            errMap.put(row, errorMsg + "," + "duplicate row ");
                         }
                     }
                 }
@@ -324,7 +325,9 @@ public class LocationUsageDAO {
                         }
                     }
                 }
+                index++;
             }
+            
             reader.close();
             ConnectionManager.close(conn, stmt);
           

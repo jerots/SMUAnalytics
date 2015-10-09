@@ -21,7 +21,7 @@ public class LocationDAO {
         String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
                 + "VALUES(semanticplace);";
         PreparedStatement stmt = conn.prepareStatement(sql);
-        int index = 1;
+        int index = 2;
 
         String[] arr = null;
         while ((arr = reader.readNext()) != null) {
@@ -64,13 +64,16 @@ public class LocationDAO {
             }
 
             if (!err) {
+                
                 //insert into tables
                 stmt.setInt(1, locationId);
                 stmt.setString(2, semanticPl);
                 stmt.addBatch();
             }
+            index++;
 
         }
+        
         int[] updateCounts = stmt.executeBatch();
         conn.commit();
 

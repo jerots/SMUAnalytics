@@ -88,7 +88,7 @@
                     <%
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>App</b>" + "</td></tr><tr><td>");
-                        out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("appUpdated"));
+                        out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("app-lookup.csv"));
                         out.println("</td></tr><tr><td>");
                         HashMap<Integer, String> appErrMap = (HashMap<Integer, String>) request.getAttribute("appErrMap");
                         Iterator<Integer> appiter = appErrMap.keySet().iterator();
@@ -121,7 +121,7 @@
                     <%
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>User</b>" + "</td></tr><tr><td>");
-                        out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("userUpdated"));
+                        out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("demographics.csv"));
                         out.println("</td></tr><tr><td>");
                         HashMap<Integer, String> userErrMap = (HashMap<Integer, String>) request.getAttribute("userErrMap");
                         Iterator<Integer> useriter = userErrMap.keySet().iterator();
@@ -151,7 +151,7 @@
                     <%
                         out.println("<table border=1px  class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>Location</b>" + "</td></tr><tr><td>");
-                        out.println("<b>Location updated </b> " + "</td><td>" + recordMap.get("locUpdated"));
+                        out.println("<b>Location updated </b> " + "</td><td>" + recordMap.get("location-lookup.csv"));
                         out.println("</td></tr><tr><td>");
                         HashMap<Integer, String> locErrMap = (HashMap<Integer, String>) request.getAttribute("locErrMap");
                         Iterator<Integer> lociter = locErrMap.keySet().iterator();
@@ -180,7 +180,7 @@
                     <%
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-                        out.println("<b>AppUsage updated </b> " + "</td><td>" + recordMap.get("auUpdated"));
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + recordMap.get("app.csv"));
                         out.println("</td></tr><tr><td>");
                         HashMap<Integer, String> auErrMap = (HashMap<Integer, String>) request.getAttribute("auErrMap");
                         Iterator<Integer> auiter = auErrMap.keySet().iterator();
@@ -209,7 +209,7 @@
                     <%
                             out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                             out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
-                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("luUpdated"));
+                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("location.csv"));
                             out.println("</td></tr><tr><td>");
                             HashMap<Integer, String> luErrMap = (HashMap<Integer, String>) request.getAttribute("luErrMap");
                             Iterator<Integer> luiter = luErrMap.keySet().iterator();
@@ -223,6 +223,36 @@
                                     out.println("<tr><td>");
                                     int rowWithErr = luiter.next();
                                     String errAtThatRow = luErrMap.get(rowWithErr);
+                                    out.println(rowWithErr);
+                                    out.println("</td><td>");
+                                    out.println(errAtThatRow);
+                                    out.println("</td></tr>");
+                                }
+                            }
+                            out.println("</table>");
+
+                    %>
+                    <P>
+                        <%---locationUsageDelete---%>
+                    <h4><b> LocationUsageDelete</b> </h4>
+                    <hr>
+                    <%
+                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                            out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
+                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("location-delete.csv"));
+                            out.println("</td></tr><tr><td>");
+                            HashMap<Integer, String> delErrMap = (HashMap<Integer, String>) request.getAttribute("delErrMap");
+                            Iterator<Integer> deliter = delErrMap.keySet().iterator();
+
+                            out.println("<b>Number of rows with error </b> " + "</td><td>" + delErrMap.size() + "</td></tr>");
+                            if (delErrMap != null && delErrMap.size() != 0) {
+                                out.println("<tr><td><b>" + "Row");
+                                out.println("</b></td><td><b>" + "Error Messages");
+                                out.println("</b></td></tr>");
+                                while (deliter.hasNext()) {
+                                    out.println("<tr><td>");
+                                    int rowWithErr = deliter.next();
+                                    String errAtThatRow = delErrMap.get(rowWithErr);
                                     out.println(rowWithErr);
                                     out.println("</td><td>");
                                     out.println(errAtThatRow);

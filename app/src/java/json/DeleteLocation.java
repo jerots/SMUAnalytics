@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import is203.JWTException;
+import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -41,6 +43,26 @@ public class DeleteLocation extends HttpServlet {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonObject output = new JsonObject();
             JsonArray arrayErr = new JsonArray();
+            
+            String token = request.getParameter("token");
+            
+            if (token == null){
+                arrayErr.add("missing token");
+            } else if (token.length() == 0) {
+                arrayErr.add("blank token");
+            } else {
+                try {
+                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    if (username == null) {
+                        //failed
+                        arrayErr.add("invalid token");
+                    }
+
+                } catch (JWTException e) {
+                    //failed
+                    arrayErr.add("invalid token");
+                }
+            }
             
             
         }

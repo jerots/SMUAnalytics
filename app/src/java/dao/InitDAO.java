@@ -30,9 +30,11 @@ public class InitDAO {
                     + "   \n"
                     + ");");
 
-            stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
+            stmt.addBatch("INSERT INTO admin (admin) VALUES ('admin','123') ON DUPLICATE KEY UPDATE admin=admin");
             stmt.executeBatch();
             conn.commit();
+            
+            ConnectionManager.close(conn, stmt);
         } catch (SQLException e) {
 
         }
@@ -82,7 +84,7 @@ public class InitDAO {
                 + "  CONSTRAINT location_pk PRIMARY KEY (locationid)\n"
                 + ");");
 
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS appUsage (\n"
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS appusage (\n"
                 + "  timestamp datetime NOT NULL,\n"
                 + "  macaddress varchar(40) NOT NULL, \n"
                 + "  appid int(8) NOT NULL  , \n"
@@ -91,7 +93,7 @@ public class InitDAO {
                 + "   CONSTRAINT appUsageID_fk2 FOREIGN KEY (appid) REFERENCES app(appid) \n"
                 + ");");
 
-        stmt.addBatch("CREATE TABLE IF NOT EXISTS locationUsage (\n"
+        stmt.addBatch("CREATE TABLE IF NOT EXISTS locationusage (\n"
                 + "  timestamp datetime NOT NULL,\n"
                 + "  macaddress varchar(40) REFERENCES user(macaddress), \n"
                 + "  locationid int(40) NOT NULL, \n"

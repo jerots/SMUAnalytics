@@ -32,16 +32,15 @@ public class BootstrapAction extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        try (PrintWriter out = response.getWriter()) {
+        HashMap<String, Integer> recordMap = null;
+        try {
 
             try {
                 InitDAO.createTable();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            HashMap<String, Integer> recordMap = null;
-            String option = request.getParameter("option");
+            
             Part filePart = request.getPart("zipFile"); // Retrieves <input type="file" name="zipFile">
             if(filePart != null && filePart.getSize() > 0){
 
@@ -53,7 +52,6 @@ public class BootstrapAction extends HttpServlet {
                 HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
                 HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
 
-                String noOption = "No option selected";
                 //SET FOR UI TO GET THE ATTRIBUTES.
                 request.setAttribute("userErrMap", userErrMap);
                 request.setAttribute("appErrMap", appErrMap);
@@ -64,11 +62,7 @@ public class BootstrapAction extends HttpServlet {
 
                 BootstrapController ctrl = new BootstrapController();
 
-                if ("bootstrap".equals(option)) {
-                    //returns a combination of error
-                    System.out.println("YO BOOTSTRAP");
-                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
-                }
+                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
             }
             request.setAttribute("recordMap", recordMap);
 
