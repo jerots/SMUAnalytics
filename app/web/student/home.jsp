@@ -39,7 +39,7 @@
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="#">Basic App Usage</a></li>
 						<li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
-						<li><a href="#">Smartphone Overuse</a></li>
+						<li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
 						<li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
 						<li><a href="#">Social Activeness</a></li>
 						
