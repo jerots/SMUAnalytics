@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
+import entity.Admin;
+import entity.App;
+import java.sql.ResultSet;
 import java.util.HashMap;
 
 /*
@@ -18,7 +21,6 @@ import java.util.HashMap;
  * @author ASUS-PC
  */
 public class AppDAO {
-
 
     public AppDAO() {
     }
@@ -36,24 +38,23 @@ public class AppDAO {
 
             int appId = Utility.parseInt(arr[0]);
             if (appId <= 0) {
-                
+
                 String errorMsg = errMap.get(index);
-                if (errorMsg == null){
+                if (errorMsg == null) {
                     errMap.put(index, "invalid app id");
                 } else {
                     errMap.put(index, errorMsg + "," + "invalid app id");
                 }
-                
-                
+
                 err = true;
             }
 
             String name = Utility.parseString(arr[1]);
             name = name.replace("\"", "");
             if (name == null) {
-                
+
                 String errorMsg = errMap.get(index);
-                if (errorMsg == null){
+                if (errorMsg == null) {
                     errMap.put(index, "name cannot be blank");
                 } else {
                     errMap.put(index, errorMsg + "," + "name cannot be blank");
@@ -65,22 +66,22 @@ public class AppDAO {
             cat = cat.replace("\"", "");
 
             if (cat == null) {
-                
+
                 String errorMsg = errMap.get(index);
-                if (errorMsg == null){
+                if (errorMsg == null) {
                     errMap.put(index, "category cannot be blank");
                 } else {
                     errMap.put(index, errorMsg + "," + "category cannot be blank");
                 }
-                
+
                 err = true;
 
             }
 
             if (!Utility.checkCategory(cat)) {
-                
+
                 String errorMsg = errMap.get(index);
-                if (errorMsg == null){
+                if (errorMsg == null) {
                     errMap.put(index, "invalid category");
                 } else {
                     errMap.put(index, errorMsg + "," + "invalid category");
@@ -97,15 +98,47 @@ public class AppDAO {
             }
             index++;
         }
-            //closing
+        //closing
 
         int[] updatedRecords = stmt.executeBatch();
         conn.commit();
 
         reader.close();
         ConnectionManager.close(conn, stmt);
-        
-        
+
         return updatedRecords;
+    }
+
+    public App retrieveAppbyId(int appId) {
+
+        String sql = "SELECT * FROM app WHERE app-id=? ";
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            
+           
+
+            ps.setInt(1,appId);
+         
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+               
+                int appid = rs.getInt(1);
+                String appname = rs.getString(2);
+                String category = rs.getString(3);
+               
+                return new App(appid,appname,category);
+                
+
+            }
+
+        } catch (SQLException e) {
+
+        }
+
+        return null;
     }
 }

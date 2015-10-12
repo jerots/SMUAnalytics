@@ -29,6 +29,7 @@ public class App {
     public String getAppName() {
         return appName;
     }
+    
 
     public String getAppCategory() {
         return appCategory;
