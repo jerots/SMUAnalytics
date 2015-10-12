@@ -79,9 +79,58 @@ public class SmartphoneOveruseController {
                     generalMap.put(date, generalList);
                 }
             }
-            int dailySmartphoneUsage = calculateAverage(generalMap);
-            int dailyGamingDuration = calculateAverage(gameMap);
         }
+        int dailySmartphoneUsage = calculateAverage(generalMap);
+        int dailyGamingDuration = calculateAverage(gameMap);
+        HashMap<String, Integer> overuseIndexMap = new HashMap<String, Integer>();
+        String dailyUsageIndex = "";
+        if (dailySmartphoneUsage >= 5) {
+            dailyUsageIndex = "Severe";
+            
+            int count = overuseIndexMap.get(dailyUsageIndex);
+            overuseIndexMap.put(dailyUsageIndex, count + 1);
+            result.put("usage", "" + dailyUsageIndex + "," + dailySmartphoneUsage);
+        } else if (dailySmartphoneUsage < 3) {
+            dailyUsageIndex = "Light";
+            int count = overuseIndexMap.get(dailyUsageIndex);
+            overuseIndexMap.put(dailyUsageIndex, count + 1);
+            result.put("usage", "" + dailyUsageIndex + "," + dailySmartphoneUsage);
+        } else {
+            dailyUsageIndex = "Moderate";
+            int count = overuseIndexMap.get(dailyUsageIndex);
+            overuseIndexMap.put(dailyUsageIndex, count + 1);
+            result.put("usage", "" + dailyUsageIndex + "," + dailySmartphoneUsage);
+        }
+        String gamingUsageIndex = "";
+        if (dailyGamingDuration >= 2) {
+            gamingUsageIndex = "Severe";
+            int count = overuseIndexMap.get(gamingUsageIndex);           
+            overuseIndexMap.put(gamingUsageIndex, count + 1);
+            result.put("gaming", "" + gamingUsageIndex + "," + dailyGamingDuration);
+        } else if (dailyGamingDuration < 1) {
+            gamingUsageIndex = "Light";
+            int count = overuseIndexMap.get(gamingUsageIndex);
+            overuseIndexMap.put(gamingUsageIndex, count + 1);
+            result.put("gaming", "" + gamingUsageIndex + "," + dailyGamingDuration);
+        } else {
+            gamingUsageIndex = "Moderate";
+            int count = overuseIndexMap.get(gamingUsageIndex);
+            overuseIndexMap.put(gamingUsageIndex, count + 1);
+            result.put("gaming", "" + gamingUsageIndex + "," + dailyGamingDuration);
+        }
+
+        //3rd one here
+        //combination
+        String overallIndex = "";
+        if (overuseIndexMap.get("Severe") >= 1) {
+            overallIndex = "Overusing";
+        } else if (overuseIndexMap.get("Light") == 3) {
+            overallIndex = "Normal";
+        } else {
+            overallIndex = "ToBeCautious";
+        }
+        result.put("overuseindex", overallIndex);
+        
         return result;
     }
 

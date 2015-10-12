@@ -57,7 +57,7 @@ public class SmartphoneOveruse extends HttpServlet {
             
 
             SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
-            ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
+            result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
 
         }
 
