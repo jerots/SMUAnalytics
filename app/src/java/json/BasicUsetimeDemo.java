@@ -18,7 +18,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -160,7 +160,7 @@ public class BasicUsetimeDemo extends HttpServlet {
 //
 			BasicAppController ctrl = new BasicAppController();
 			int numDemo = validArr.length;
-			HashMap<String,HashMap<String,int[]>> resultMap = null;
+			TreeMap<String,TreeMap<String,int[]>> resultMap = null;
 			switch (numDemo) {
 				case 1:
 					resultMap = ctrl.generateReportByOneDemo(startDate, endDate, validArr);
@@ -181,7 +181,7 @@ public class BasicUsetimeDemo extends HttpServlet {
 			
 			while (iter.hasNext()){
 				String key = iter.next();
-				HashMap<String,int[]> inner1 = resultMap.get(key);
+				TreeMap<String,int[]> inner1 = resultMap.get(key);
 				System.out.println("THE YEAR: " + key);
 				Iterator<String> iter2 = inner1.keySet().iterator();
 				while (iter2.hasNext()){

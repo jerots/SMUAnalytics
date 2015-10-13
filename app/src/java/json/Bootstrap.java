@@ -15,7 +15,7 @@ import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -132,14 +132,14 @@ public class Bootstrap extends HttpServlet {
 			Part filePart = null;
 			
 			//Create ERROR MAPS - and pass to boostrapController to generate
-			HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-			HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-			HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-			HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-			HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-			HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+			TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> appErrMap = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+			TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
 
-			HashMap<String, Integer> recordMap = null;
+			TreeMap<String, Integer> recordMap = null;
 
 			try {
 				BootstrapController ctrl = new BootstrapController();
@@ -153,7 +153,7 @@ public class Bootstrap extends HttpServlet {
 					output.addProperty("status", "error");
 				}
 
-				//Iterates through the main HashMap to consolidate the number of rows that were updated.
+				//Iterates through the main TreeMap to consolidate the number of rows that were updated.
 				Iterator<String> iter = recordMap.keySet().iterator();
 				JsonArray arr = new JsonArray();
 				JsonObject list = new JsonObject();

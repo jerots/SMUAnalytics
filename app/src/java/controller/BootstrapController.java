@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -35,8 +35,8 @@ public class BootstrapController {
     //handles the number of rows updated 
     //and the error message of the different files - pass to DAO to handle
     //RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
-    public HashMap<String, Integer> bootstrap(Part filePart, HashMap<Integer, String> userErrMap, HashMap<Integer, String> appErrMap,
-            HashMap<Integer, String> locErrMap, HashMap<Integer, String> auErrMap, HashMap<Integer, String> luErrMap, HashMap<Integer, String> delErrMap) 
+    public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
+            TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, TreeMap<Integer, String> delErrMap) 
             throws SQLException, IOException {
 
         InputStream fileContent = filePart.getInputStream();
@@ -59,7 +59,7 @@ public class BootstrapController {
         int luUpdated = 0;
         int delUpdated = 0;
         //put the results into aa hashmap to return to bootstrap action
-        HashMap<String, Integer> result = new HashMap<String, Integer>();
+        TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
         //initialised dao
         UserDAO uDao = new UserDAO();

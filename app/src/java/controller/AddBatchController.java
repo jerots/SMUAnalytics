@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.servlet.http.Part;
@@ -27,8 +27,8 @@ import javax.servlet.http.Part;
  */
 public class AddBatchController {
 
-	public HashMap<String, Integer> addBatch(Part filePart, HashMap<Integer, String> userErrMap, HashMap<Integer, String> delErrMap,
-			HashMap<Integer, String> auErrMap, HashMap<Integer, String> luErrMap) throws SQLException, IOException {
+	public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
+			TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
 
 		InputStream fileContent = filePart.getInputStream();
 		ZipEntry entry = null;
@@ -41,7 +41,7 @@ public class AddBatchController {
 		int auUpdated = 0;
 		int luUpdated = 0;
 		//put the results into aa hashmap to return to bootstrap action
-		HashMap<String, Integer> result = new HashMap<String, Integer>();
+		TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
 		//initialised dao
 		LocationUsageDAO luDao = new LocationUsageDAO();

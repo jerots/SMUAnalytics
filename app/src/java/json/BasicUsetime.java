@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -126,7 +126,7 @@ public class BasicUsetime extends HttpServlet {
 
 			BasicAppController ctrl = new BasicAppController();
 
-			HashMap<String, int[]> resultMap = ctrl.generateReport(startDate, endDate, null);
+			TreeMap<String, int[]> resultMap = ctrl.generateReport(startDate, endDate, null);
 			int[] intenseArr = resultMap.get("intense-count");
 			int[] normalArr = resultMap.get("normal-count");
 			int[] mildArr = resultMap.get("mild-count");

@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -47,7 +47,7 @@ public class SmartphoneOveruse extends HttpServlet {
             String endDateStr = request.getParameter("endDate");
             String endTimeStr = request.getParameter("endTime");
             System.out.println("AAAAAAAAAAAAA");
-            HashMap<String, String> result = new HashMap<String, String>();
+            TreeMap<String, String> result = new TreeMap<String, String>();
         System.out.println("BBBBBBBB");
             HttpSession session = request.getSession();
             User loggedInUser = (User) session.getAttribute("user");

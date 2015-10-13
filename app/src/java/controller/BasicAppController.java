@@ -11,7 +11,7 @@ import entity.AppUsage;
 import entity.User;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  *
@@ -19,8 +19,8 @@ import java.util.HashMap;
  */
 public class BasicAppController {
 
-	public HashMap<String, int[]> generateReport(Date startDate, Date endDate, String sql) {
-		HashMap<String, int[]> result = new HashMap<String, int[]>();
+	public TreeMap<String, int[]> generateReport(Date startDate, Date endDate, String sql) {
+		TreeMap<String, int[]> result = new TreeMap<String, int[]>();
 
 		result.put("intense-count", new int[2]);
 		result.put("normal-count", new int[2]);
@@ -146,10 +146,10 @@ public class BasicAppController {
 		return result;
 	}
 
-	public HashMap<String, HashMap<String, int[]>> generateReportByOneDemo(Date startDate, Date endDate, String[] demoArr) {
+	public TreeMap<String, TreeMap<String, int[]>> generateReportByOneDemo(Date startDate, Date endDate, String[] demoArr) {
 
 		String demo = demoArr[0];
-		HashMap<String,HashMap<String,int[]>> result = new HashMap<String,HashMap<String,int[]>>();
+		TreeMap<String,TreeMap<String,int[]>> result = new TreeMap<String,TreeMap<String,int[]>>();
 
 		UserDAO userDAO = new UserDAO();
 		
@@ -164,7 +164,7 @@ public class BasicAppController {
 						+ " AND timestamp >= ? AND timestamp <= ?\n"
 						+ " AND email like '%."+ year +"@%'\n"
 						+ " GROUP BY macaddress;";
-				HashMap<String, int[]> breakdown = generateReport(startDate,endDate, sql);
+				TreeMap<String, int[]> breakdown = generateReport(startDate,endDate, sql);
 				result.put(year, breakdown);
 				//year
 				//count
@@ -182,7 +182,7 @@ public class BasicAppController {
 						+ " AND email like '%@"+ school +".%'\n"
 						+ " GROUP BY macaddress;";
 				
-				HashMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
+				TreeMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
 				result.put(school, breakdown);
 				
 				
@@ -201,7 +201,7 @@ public class BasicAppController {
 						+ " AND gender = '" + gender + "'"
 						+ " GROUP BY macaddress;";
 				
-				HashMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
+				TreeMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
 				result.put(gender, breakdown);
 				
 				

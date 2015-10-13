@@ -12,7 +12,7 @@ import entity.AppUsage;
 import entity.User;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class SmartphoneOveruseController {
 
-    public HashMap<String, String> generateReport(User user, Date startDate, Date endDate) {
-        HashMap<String, String> result = new HashMap<String, String>();
+    public TreeMap<String, String> generateReport(User user, Date startDate, Date endDate) {
+        TreeMap<String, String> result = new TreeMap<String, String>();
 
         //to store the overuse index value
-        HashMap<String, Integer> overuseIndex = new HashMap<String, Integer>();
+        TreeMap<String, Integer> overuseIndex = new TreeMap<String, Integer>();
 
         //add the different indexes
         overuseIndex.put("severeUsage", 5);
@@ -46,8 +46,8 @@ public class SmartphoneOveruseController {
 System.out.println("1111111111111111111111111111111");
         ArrayList<AppUsage> gameList = new ArrayList<AppUsage>();
         ArrayList<AppUsage> generalList = new ArrayList<AppUsage>();
-        HashMap<Date, ArrayList<AppUsage>> generalMap = new HashMap<Date, ArrayList<AppUsage>>();
-        HashMap<Date, ArrayList<AppUsage>> gameMap = new HashMap<Date, ArrayList<AppUsage>>();
+        TreeMap<Date, ArrayList<AppUsage>> generalMap = new TreeMap<Date, ArrayList<AppUsage>>();
+        TreeMap<Date, ArrayList<AppUsage>> gameMap = new TreeMap<Date, ArrayList<AppUsage>>();
         App app = null;
         for (int i = 0; i < appUsageList.size(); i++) {
             System.out.println("22222222222222222222222222");
@@ -94,7 +94,7 @@ System.out.println("1111111111111111111111111111111");
         System.out.println("66666666666666666666666666");
         int dailySmartphoneUsage = calculateAverage(generalMap);
         int dailyGamingDuration = calculateAverage(gameMap);
-        HashMap<String, Integer> overuseIndexMap = new HashMap<String, Integer>();
+        TreeMap<String, Integer> overuseIndexMap = new TreeMap<String, Integer>();
         String dailyUsageIndex = "";
         if (dailySmartphoneUsage >= 5) {
             System.out.println("77777777777777777777777777777");
@@ -147,7 +147,7 @@ System.out.println("888888888888888888888888888");
         return result;
     }
 
-    public int calculateAverage(HashMap<Date, ArrayList<AppUsage>> dayMap) {
+    public int calculateAverage(TreeMap<Date, ArrayList<AppUsage>> dayMap) {
         ArrayList<AppUsage> dayList = new ArrayList<AppUsage>();
 
         Iterator<ArrayList<AppUsage>> dayIter = dayMap.values().iterator();

@@ -9,7 +9,7 @@ import com.opencsv.CSVReader;
 import entity.Admin;
 import entity.App;
 import java.sql.ResultSet;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,7 +25,7 @@ public class AppDAO {
     public AppDAO() {
     }
 
-    public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
         String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";

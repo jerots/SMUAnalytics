@@ -17,7 +17,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeMap;
 
 /**
  *
@@ -25,15 +26,15 @@ import java.util.HashMap;
  */
 public class LocationUsageDAO {
 
-	private HashMap<String, LocationUsage> locationList;
-	private HashMap<String, Integer> duplicate;
+	private TreeMap<String, LocationUsage> locationList;
+	private TreeMap<String, Integer> duplicate;
 
 	public LocationUsageDAO() {
-		duplicate = new HashMap<>();
-		locationList = new HashMap<>();
+		duplicate = new TreeMap<>();
+		locationList = new TreeMap<>();
 	}
 
-	public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		Connection conn = ConnectionManager.getConnection();
 		conn.setAutoCommit(false);
 		int index = 2;
@@ -137,7 +138,7 @@ public class LocationUsageDAO {
 		return updateCounts;
 	}
 
-	public int add(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+	public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int updateCounts = 0;
 
 		Connection conn = ConnectionManager.getConnection();
@@ -254,7 +255,7 @@ public class LocationUsageDAO {
 			
 			for (int i = 0; i < updatedArr.length; i++) {
 				if (updatedArr[i] == Statement.EXECUTE_FAILED) {
-					// This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate HashMap to find the offending row.
+					// This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
 					int row = duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress());
 					String errorMsg = errMap.get(row);
 					if (errorMsg == null) {
@@ -275,7 +276,7 @@ public class LocationUsageDAO {
 		return updateCounts;
 	}
 
-	public int[] delete(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+	public int[] delete(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int[] toReturn = new int[2];
 		int index = 2; //counts the row of the record.
 		int notFound = 0;

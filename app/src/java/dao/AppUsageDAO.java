@@ -12,19 +12,19 @@ import java.sql.BatchUpdateException;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 public class AppUsageDAO {
 
-    private HashMap<String, Integer> duplicate;
-    private HashMap<String, AppUsage> appList;
+    private TreeMap<String, Integer> duplicate;
+    private TreeMap<String, AppUsage> appList;
 
     public AppUsageDAO() {
-        appList = new HashMap<>();
-        duplicate = new HashMap<>();
+        appList = new TreeMap<>();
+        duplicate = new TreeMap<>();
     }
 
-    public int[] insert(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
         int index = 2;
@@ -146,7 +146,7 @@ public class AppUsageDAO {
         return updatedRecords;
     }
 
-    public int add(CSVReader reader, HashMap<Integer, String> errMap) throws IOException, SQLException {
+    public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
         int updateCounts = 0;
         try {
             Connection conn = ConnectionManager.getConnection();
@@ -271,7 +271,7 @@ public class AppUsageDAO {
                 int[] updateArr = e.getUpdateCounts();
                 for (int i = 0; i < updateArr.length; i++) {
                     if (updateArr[i] == Statement.EXECUTE_FAILED) {
-                        // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate HashMap to find the offending row.
+                        // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate TreeMap to find the offending row.
                         String errorMsg = errMap.get(index);
                         if (errorMsg == null) {
                             errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));

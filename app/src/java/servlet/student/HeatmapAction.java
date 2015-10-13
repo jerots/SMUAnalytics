@@ -18,7 +18,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -76,7 +76,7 @@ public class HeatmapAction extends HttpServlet {
 			TreeMap<String, ArrayList<LocationUsage>> result = ctrl.generateHeatmap(datetime, floor);
 			
 			
-//			return HashMap<location,userlist>
+//			return TreeMap<location,userlist>
 			request.setAttribute("heatmap", result);
 			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
 			rd.forward(request, response);

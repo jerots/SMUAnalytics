@@ -13,7 +13,7 @@ import dao.*;
 import com.opencsv.CSVReader;
 import controller.AddBatchController;
 import controller.BootstrapController;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 
 @WebServlet(urlPatterns = {"/BootstrapAction"})
@@ -33,7 +33,7 @@ public class BootstrapAction extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        HashMap<String, Integer> recordMap = null;
+        TreeMap<String, Integer> recordMap = null;
         String option = request.getParameter("option");
         Part filePart = request.getPart("zipFile");
         if(option.equals("bootstrap")){
@@ -51,12 +51,12 @@ public class BootstrapAction extends HttpServlet {
                 if (filePart != null && filePart.getSize() > 0) {
 
                     //Create ERROR MAPS - and pass to boostrapController to generate
-                    HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> appErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> locErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+                    TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> appErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
 
                     //SET FOR UI TO GET THE ATTRIBUTES.
                     request.setAttribute("userErrMap", userErrMap);
@@ -80,10 +80,10 @@ public class BootstrapAction extends HttpServlet {
             //ADD BATCH
             try {
                 if(filePart != null && filePart.getSize() > 0){
-                    HashMap<Integer, String> userErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> auErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> luErrMap = new HashMap<Integer, String>();
-                    HashMap<Integer, String> delErrMap = new HashMap<Integer, String>();
+                    TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+                    TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
 
                     request.setAttribute("userErrMap", userErrMap);
                     request.setAttribute("auErrMap", auErrMap);

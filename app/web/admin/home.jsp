@@ -5,7 +5,7 @@
 --%>
 
 <%@page import="java.util.Iterator"%>
-<%@page import="java.util.HashMap"%>
+<%@page import="java.util.TreeMap"%>
 <%@page import="entity.Admin"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -79,7 +79,7 @@
 
                     <%
 
-                        HashMap<String, Integer> recordMap = (HashMap<String, Integer>) request.getAttribute("recordMap");
+                        TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
                         if (recordMap != null) {
                              if(recordMap.containsKey("app-lookup.csv")){
                     %>
@@ -92,7 +92,7 @@
                             out.println("<b>App</b>" + "</td></tr><tr><td>");
                             out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("app-lookup.csv"));
                             out.println("</td></tr><tr><td>");
-                            HashMap<Integer, String> appErrMap = (HashMap<Integer, String>) request.getAttribute("appErrMap");
+                            TreeMap<Integer, String> appErrMap = (TreeMap<Integer, String>) request.getAttribute("appErrMap");
                             Iterator<Integer> appiter = appErrMap.keySet().iterator();
 
                             out.println("<b>Number of rows with error </b> " + "</td><td>" + appErrMap.size() + "</td></tr>");
@@ -126,7 +126,7 @@
                         out.println("<b>User</b>" + "</td></tr><tr><td>");
                         out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("demographics.csv"));
                         out.println("</td></tr><tr><td>");
-                        HashMap<Integer, String> userErrMap = (HashMap<Integer, String>) request.getAttribute("userErrMap");
+                        TreeMap<Integer, String> userErrMap = (TreeMap<Integer, String>) request.getAttribute("userErrMap");
                         Iterator<Integer> useriter = userErrMap.keySet().iterator();
 
                         out.println("<b>Number of rows with error </b> " + "</td><td>" + userErrMap.size() + "</td></tr>");
@@ -158,7 +158,7 @@
                             out.println("<b>Location</b>" + "</td></tr><tr><td>");
                             out.println("<b>Location updated </b> " + "</td><td>" + recordMap.get("location-lookup.csv"));
                             out.println("</td></tr><tr><td>");
-                            HashMap<Integer, String> locErrMap = (HashMap<Integer, String>) request.getAttribute("locErrMap");
+                            TreeMap<Integer, String> locErrMap = (TreeMap<Integer, String>) request.getAttribute("locErrMap");
                             Iterator<Integer> lociter = locErrMap.keySet().iterator();
 
                             out.println("<b>Number of rows with error </b> " + "</td><td>" + locErrMap.size() + "</td></tr>");
@@ -188,7 +188,7 @@
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
                         out.println("<b>AppUsage updated </b> " + "</td><td>" + recordMap.get("app.csv"));
                         out.println("</td></tr><tr><td>");
-                        HashMap<Integer, String> auErrMap = (HashMap<Integer, String>) request.getAttribute("auErrMap");
+                        TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
                         Iterator<Integer> auiter = auErrMap.keySet().iterator();
 
                         out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrMap.size() + "</td></tr>");
@@ -217,7 +217,7 @@
                             out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
                             out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("location.csv"));
                             out.println("</td></tr><tr><td>");
-                            HashMap<Integer, String> luErrMap = (HashMap<Integer, String>) request.getAttribute("luErrMap");
+                            TreeMap<Integer, String> luErrMap = (TreeMap<Integer, String>) request.getAttribute("luErrMap");
                             Iterator<Integer> luiter = luErrMap.keySet().iterator();
 
                             out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
@@ -247,7 +247,7 @@
                             out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
                             out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("location-delete.csv"));
                             out.println("</td></tr><tr><td>");
-                            HashMap<Integer, String> delErrMap = (HashMap<Integer, String>) request.getAttribute("delErrMap");
+                            TreeMap<Integer, String> delErrMap = (TreeMap<Integer, String>) request.getAttribute("delErrMap");
                             Iterator<Integer> deliter = delErrMap.keySet().iterator();
 
                             out.println("<b>Number of rows with error </b> " + "</td><td>" + delErrMap.size() + "</td></tr>");
