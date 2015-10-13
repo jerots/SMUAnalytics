@@ -22,8 +22,8 @@ public class InitDAO {
 //			Statement stmt = conn.createStatement();
 //			conn.setAutoCommit(false);
 //
-//			stmt.addBatch("CREATE SCHEMA g3t3 IF NOT EXISTS;");
-//			stmt.addBatch("USE g3t3;");
+//			stmt.addBatch("CREATE SCHEMA se IF NOT EXISTS;");
+//			stmt.addBatch("USE se;");
 //			stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
 //					+ "  username varchar(128) NOT NULL,\n"
 //					+ "  password varchar(128) NOT NULL, \n"
@@ -44,9 +44,9 @@ public class InitDAO {
 		Statement stmt = conn.createStatement();
 		conn.setAutoCommit(false);
 
-		stmt.addBatch("DROP SCHEMA IF EXISTS g3t3;");
-		stmt.addBatch("CREATE SCHEMA g3t3 CHARACTER SET utf8 COLLATE utf8_bin;");
-		stmt.addBatch("USE g3t3;");
+		stmt.addBatch("DROP SCHEMA IF EXISTS se;");
+		stmt.addBatch("CREATE SCHEMA se CHARACTER SET utf8 COLLATE utf8_bin;");
+		stmt.addBatch("USE se;");
 		stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
 				+ "  username varchar(128) NOT NULL,\n"
 				+ "  password varchar(128) NOT NULL, \n"
