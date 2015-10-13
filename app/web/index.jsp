@@ -22,7 +22,7 @@
 			<form method='POST' action='LoginAction'>
 				<%
 
-					//InitDAO.createTable();
+					InitDAO.createTable();
 
 					String username = (String) request.getAttribute("username");
 					if (username == null) {
