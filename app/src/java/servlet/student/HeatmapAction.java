@@ -49,7 +49,6 @@ public class HeatmapAction extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		try (PrintWriter out = response.getWriter()) {
-			LocationUsageDAO luDAO = new LocationUsageDAO();
 
 			String dateStr = request.getParameter("date");
 			String timeStr = request.getParameter("time");
