@@ -14,6 +14,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -45,19 +46,23 @@ public class SmartphoneOveruse extends HttpServlet {
             String startTimeStr = request.getParameter("startTime");
             String endDateStr = request.getParameter("endDate");
             String endTimeStr = request.getParameter("endTime");
-
+            System.out.println("AAAAAAAAAAAAA");
             HashMap<String, String> result = new HashMap<String, String>();
-
+        System.out.println("BBBBBBBB");
             HttpSession session = request.getSession();
             User loggedInUser = (User) session.getAttribute("user");
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDatetime = dateFormat.parse(startDateStr + " " + startTimeStr, new ParsePosition(0));
             Date endDatetime = dateFormat.parse(endDateStr + " " + endTimeStr, new ParsePosition(0));
-            
-
+        System.out.println("CCCCCCCCCCC");
             SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
+             System.out.println("hhhhhhh");
             result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
+                    System.out.println("DDDDDDD");
+            request.setAttribute("result", result);
+            RequestDispatcher view = request.getRequestDispatcher("smartphoneOveruse.jsp");
+            view.forward(request, response);
 
         }
 

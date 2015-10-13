@@ -43,23 +43,29 @@ public class SmartphoneOveruseController {
 
         ArrayList<AppUsage> appUsageList = auDAO.retrieveByUser(user.getMacAddress(), startDate, endDate);
         AppDAO aDao = new AppDAO();
-
+System.out.println("1111111111111111111111111111111");
         ArrayList<AppUsage> gameList = new ArrayList<AppUsage>();
         ArrayList<AppUsage> generalList = new ArrayList<AppUsage>();
         HashMap<Date, ArrayList<AppUsage>> generalMap = new HashMap<Date, ArrayList<AppUsage>>();
         HashMap<Date, ArrayList<AppUsage>> gameMap = new HashMap<Date, ArrayList<AppUsage>>();
         App app = null;
         for (int i = 0; i < appUsageList.size(); i++) {
+            System.out.println("22222222222222222222222222");
             int appId = appUsageList.get(i).getAppId();
+            
             app = aDao.retrieveAppbyId(appId);
+              System.out.println(appId);
             AppUsage au = appUsageList.get(i);
+              
             //if games
-            String category = app.getAppCategory().toLowerCase();
-            if (category.equals("games")) {
+            String category = app.getAppCategory();   
+            System.out.println("bloooooooooooooop");
+            if (category.equals("games")) {       
                 Date date = appUsageList.get(i).getDate();
 
                 //sort by day
                 if (gameMap.containsKey(date)) {
+                    System.out.println("444444444444444444444");
                     gameList = gameMap.get(date);
                     gameList.add(appUsageList.get(i));
                 } else {
@@ -68,23 +74,30 @@ public class SmartphoneOveruseController {
                 }
             } else {
                 //
+                
+                System.out.println("555555MUAHAHAHAH555555555555");
                 Date date = appUsageList.get(i).getDate();
 
                 //sort by day
                 if (generalMap.containsKey(date)) {
                     generalList = generalMap.get(date);
                     generalList.add(appUsageList.get(i));
+                    System.out.println("GGGGGGGGGGGGGGGEEEEEEEEEEEEEEEZZZZZZZ");
                 } else {
                     generalList.add(appUsageList.get(i));
                     generalMap.put(date, generalList);
+                    System.out.println("HHHHHHHHHHHHHHEEEEEEEEEEEEEEERRRRRRRREEEEE");
                 }
             }
         }
+        
+        System.out.println("66666666666666666666666666");
         int dailySmartphoneUsage = calculateAverage(generalMap);
         int dailyGamingDuration = calculateAverage(gameMap);
         HashMap<String, Integer> overuseIndexMap = new HashMap<String, Integer>();
         String dailyUsageIndex = "";
         if (dailySmartphoneUsage >= 5) {
+            System.out.println("77777777777777777777777777777");
             dailyUsageIndex = "Severe";
             
             int count = overuseIndexMap.get(dailyUsageIndex);
@@ -118,7 +131,7 @@ public class SmartphoneOveruseController {
             overuseIndexMap.put(gamingUsageIndex, count + 1);
             result.put("gaming", "" + gamingUsageIndex + "," + dailyGamingDuration);
         }
-
+System.out.println("888888888888888888888888888");
         //3rd one here
         //combination
         String overallIndex = "";
@@ -130,7 +143,7 @@ public class SmartphoneOveruseController {
             overallIndex = "ToBeCautious";
         }
         result.put("overuseindex", overallIndex);
-        
+        System.out.println("999999999999999999999999999999999999");
         return result;
     }
 

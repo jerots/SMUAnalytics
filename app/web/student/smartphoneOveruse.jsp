@@ -97,14 +97,27 @@
                             <label for="date">End Time</label>
                             <input type="text" class="form-control" id="time" name="endTime" <%=timeCode%> placeholder="HH:MM:SS (24h)" required>
                         </div>
-               
+
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
                 </div>
                 <div class="theme-div theme-content" style="width:60%">
-                    <%                                            
-  //code here logic
+                    <%
 
+                        HashMap<String, String> result = (HashMap<String, String>) request.getAttribute("result");
+                        
+                        if (result != null) {
+                            out.print("results: ");
+
+                            out.print(result.get("overuseindex"));
+
+                            out.print("results: ");
+                            out.print(result.get("usage"));
+
+                            out.print("results: ");
+                            out.print(result.get("gaming"));
+
+                        }
                     %>
 
                 </div>
