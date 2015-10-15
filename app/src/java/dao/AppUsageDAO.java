@@ -311,9 +311,10 @@ public class AppUsageDAO {
 
             Connection conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT macaddress from appusage where "
-                    + "timestamp >= ? AND timestamp <= ? "
-                    + "GROUP BY macaddress");
+            PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u where "
+					+ "au.macaddress = u.macaddress "
+					+ "AND timestamp >= ? AND timestamp <= ? "
+					+ "GROUP BY macaddress");
             ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
             ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
@@ -330,7 +331,7 @@ public class AppUsageDAO {
             ConnectionManager.close(conn, ps, rs);
 
         } catch (SQLException e) {
-
+e.printStackTrace();
         }
 
         return result;
@@ -389,7 +390,7 @@ public class AppUsageDAO {
             }
 
         } catch (SQLException e) {
-
+e.printStackTrace();
         }
 
         return result;
