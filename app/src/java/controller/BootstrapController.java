@@ -8,6 +8,7 @@ package controller;
 import com.opencsv.CSVReader;
 import dao.AppDAO;
 import dao.AppUsageDAO;
+import dao.ConnectionManager;
 import dao.InitDAO;
 import dao.LocationDAO;
 import dao.LocationUsageDAO;
@@ -16,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +50,7 @@ public class BootstrapController {
         try {
             InitDAO.createTable();
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         // initialise the number of rows updated
@@ -67,12 +69,17 @@ public class BootstrapController {
         LocationDAO lDao = new LocationDAO();
         AppUsageDAO auDao = new AppUsageDAO();
         LocationUsageDAO luDao = new LocationUsageDAO();
+		Connection conn = ConnectionManager.getConnection();
+		
+		ArrayList<String> macList = new ArrayList<String>();
+		ArrayList<Integer> appIdList = new ArrayList<Integer>();
+		ArrayList<Integer> locationIdList = new ArrayList<Integer>();
 
         //app-lookup.csv
         ZipInputStream zipInputStream = new ZipInputStream(fileContent);
         InputStreamReader isr = new InputStreamReader(zipInputStream);
         BufferedReader br = new BufferedReader(isr);
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("app-lookup.csv")) {
@@ -81,7 +88,7 @@ public class BootstrapController {
                     //returns number of successfully entered entries
                     //success >= 0;
                     //unsuccess: anything other than a number;
-                    int[] updatedRecords = appDao.insert(reader, appErrMap);
+                    int[] updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
 
                     //count how many 1 = success
                     for (int i : updatedRecords) {
@@ -91,9 +98,10 @@ public class BootstrapController {
                     zipInputStream.closeEntry();
                 }
             }
-        } catch (IOException e) {
+			br.close();
+//        } catch (IOException e) {
 //            e.printStackTrace();
-        }
+//        }
 
         //demographics.csv
         fileContent = filePart.getInputStream();
@@ -101,13 +109,13 @@ public class BootstrapController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("demographics.csv")) {
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = uDao.insert(reader, userErrMap);
+                    int[] updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
 
                     for (int i : updatedRecords) {
                         userUpdated+= i;
@@ -116,9 +124,10 @@ public class BootstrapController {
                     zipInputStream.closeEntry();
                 }
             }
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+			br.close();
+//        } catch (IOException e) {
+////            e.printStackTrace();
+//        }
 
         //app.csv
         fileContent = filePart.getInputStream();
@@ -126,13 +135,13 @@ public class BootstrapController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("app.csv")) {
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = auDao.insert(reader, auErrMap);
+                    int[] updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
 
                     for (int i : updatedRecords) {
                         auUpdated++;
@@ -141,9 +150,10 @@ public class BootstrapController {
                     zipInputStream.closeEntry();
                 }
             }
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+			br.close();
+//        } catch (IOException e) {
+////            e.printStackTrace();
+//        }
 
         //location
         fileContent = filePart.getInputStream();
@@ -151,13 +161,13 @@ public class BootstrapController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("location-lookup.csv")) {
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = lDao.insert(reader, locErrMap);
+                    int[] updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
 
                     for (int i : updatedRecords) {
                         locUpdated++;
@@ -166,9 +176,10 @@ public class BootstrapController {
                     zipInputStream.closeEntry();
                 }
             }
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+////            e.printStackTrace();
+//        }
+			br.close();
 		
 		//locationUsage
         fileContent = filePart.getInputStream();
@@ -176,13 +187,13 @@ public class BootstrapController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("location.csv")) {
                     reader = new CSVReader(br);
                     reader.readNext();
-                    int[] updatedRecords = luDao.insert(reader, luErrMap);
+                    int[] updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
 
                     for (int i : updatedRecords) {
                         luUpdated++;
@@ -192,9 +203,10 @@ public class BootstrapController {
                 }
 
             }
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+////            e.printStackTrace();
+//        }
+			br.close();
 		
 		//location-delete.csv
         fileContent = filePart.getInputStream();
@@ -202,27 +214,28 @@ public class BootstrapController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 String fileName = entry.getName();
                 if (fileName.equals("location-delete.csv")) {
                     reader = new CSVReader(br);
                     reader.readNext();
                     int[] updatedRecords = luDao.delete(reader, delErrMap);
-					System.out.println("LOOK BELOW");
+//					System.out.println("LOOK BELOW");
 //                    for (int i : updatedRecords) {
 //						System.out.println(i);
 //                        delUpdated+= i;
 //                    }
 					delUpdated = updatedRecords[0];
-					System.out.println("LOOK ABOVE");
+//					System.out.println("LOOK ABOVE");
                 } else {
                     zipInputStream.closeEntry();
                 }
             }
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+////            e.printStackTrace();
+//        }
+			br.close();
 
         result.put("demographics.csv", userUpdated);
         result.put("app-lookup.csv", appUpdated);
@@ -230,6 +243,7 @@ public class BootstrapController {
         result.put("app.csv", auUpdated);
         result.put("location.csv", luUpdated);
         result.put("location-delete.csv", delUpdated);
+		ConnectionManager.close(conn);
 
         return result;
     }

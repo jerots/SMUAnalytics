@@ -25,8 +25,7 @@ public class AppDAO {
     public AppDAO() {
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> appIdList) throws IOException, SQLException {
         conn.setAutoCommit(false);
         String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -91,6 +90,7 @@ public class AppDAO {
 
             if (!err) {
                 //insert into tables
+				appIdList.add(appId);
                 stmt.setInt(1, appId);
                 stmt.setString(2, name);
                 stmt.setString(3, cat);
@@ -103,8 +103,6 @@ public class AppDAO {
         int[] updatedRecords = stmt.executeBatch();
         conn.commit();
 
-        reader.close();
-        ConnectionManager.close(conn, stmt);
 
         return updatedRecords;
     }
@@ -112,25 +110,25 @@ public class AppDAO {
     public App retrieveAppbyId(int appId) {
 
         String sql = "SELECT * FROM app WHERE app-id=? ";
- System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
+// System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
         try {
             Connection conn = ConnectionManager.getConnection();
-             System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
+//             System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
             PreparedStatement ps = conn.prepareStatement(sql);
-             System.out.println("PSVALUE" + ps);
+//             System.out.println("PSVALUE" + ps);
             
            ps.setInt(1,appId);
-         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
+//         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
             ResultSet rs = ps.executeQuery();
-   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
+//   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
             while (rs.next()) {
 
-                System.out.println("L");
+//                System.out.println("L");
                 int appid = rs.getInt(1);
                 String appname = rs.getString(2);
                 String category = rs.getString(3);
                 
-                System.out.println("APPNAMMMEEE"+ appname);
+//                System.out.println("APPNAMMMEEE"+ appname);
                
                 return new App(appid,appname,category);
                 

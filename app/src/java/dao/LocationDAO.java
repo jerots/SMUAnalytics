@@ -15,8 +15,7 @@ public class LocationDAO {
     public LocationDAO() {
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> locationIdList) throws IOException, SQLException {
         conn.setAutoCommit(false);
         String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
                 + "VALUES(semanticplace);";
@@ -64,7 +63,7 @@ public class LocationDAO {
             }
 
             if (!err) {
-                
+                locationIdList.add(locationId);
                 //insert into tables
                 stmt.setInt(1, locationId);
                 stmt.setString(2, semanticPl);
@@ -77,9 +76,6 @@ public class LocationDAO {
         int[] updateCounts = stmt.executeBatch();
         conn.commit();
 
-        //closing
-        reader.close();
-        ConnectionManager.close(conn, stmt);
         return updateCounts;
     }
 
@@ -104,7 +100,7 @@ public class LocationDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         return result;
@@ -126,7 +122,7 @@ public class LocationDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         return result;

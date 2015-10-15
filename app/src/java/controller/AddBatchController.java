@@ -8,6 +8,7 @@ package controller;
 import com.opencsv.CSVReader;
 import dao.AppDAO;
 import dao.AppUsageDAO;
+import dao.ConnectionManager;
 import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import dao.UserDAO;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -29,12 +31,12 @@ public class AddBatchController {
 
 	public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
 			TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
-
+		Connection conn = ConnectionManager.getConnection();
 		InputStream fileContent = filePart.getInputStream();
 		ZipEntry entry = null;
 
 		CSVReader reader = null;
-
+		
 		// initialise the number of rows updated
 		int userUpdated = 0;
 		int delUpdated = 0;
@@ -60,7 +62,7 @@ public class AddBatchController {
 				if (fileName.equals("demographics.csv")) {
 					reader = new CSVReader(br);
 					reader.readNext();
-					int[] updatedRecords = uDao.insert(reader, userErrMap);
+					int[] updatedRecords = uDao.add(reader, userErrMap);
 
 					for (int i : updatedRecords) {
 						userUpdated += i;
@@ -144,6 +146,8 @@ public class AddBatchController {
 		} catch (IOException e) {
 //            e.printStackTrace();
 		}
+		
+		ConnectionManager.close(conn);
 
 		result.put("demographics.csv", userUpdated);
 		result.put("app.csv", auUpdated);
