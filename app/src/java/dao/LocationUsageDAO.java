@@ -417,7 +417,7 @@ public class LocationUsageDAO {
 				result.add(curr);
 
 			}
-
+                        ConnectionManager.close(conn,ps,rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

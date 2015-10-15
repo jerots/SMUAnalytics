@@ -8,9 +8,12 @@ package controller;
 import dao.AppUsageDAO;
 import dao.UserDAO;
 import entity.AppUsage;
+import entity.Breakdown;
 import entity.User;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
@@ -19,197 +22,291 @@ import java.util.TreeMap;
  */
 public class BasicAppController {
 
-	public TreeMap<String, int[]> generateReport(Date startDate, Date endDate, String sql) {
-		TreeMap<String, int[]> result = new TreeMap<String, int[]>();
+    public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList) {
+		//TreeMap<String, int[]> result = new TreeMap<String, int[]>();
 
-		result.put("intense-count", new int[2]);
-		result.put("normal-count", new int[2]);
-		result.put("mild-count", new int[2]);
+        //	result.put("intense-count", new int[2]);
+        //	result.put("normal-count", new int[2]);
+        //	result.put("mild-count", new int[2]);
+        Breakdown result = new Breakdown();
 
-		AppUsageDAO auDAO = new AppUsageDAO();
-		ArrayList<String> userList = new ArrayList<String>();
-		if (sql == null) {
-			userList = auDAO.retrieveUsers(startDate, endDate);
-		} else {
-			userList = auDAO.retrieveUsers(startDate, endDate, sql);
-		}
-		System.out.println("userList size: " + userList.size());
-		for (int i = 0; i < userList.size(); i++) {
+        HashMap<String, Breakdown> intenseMap = new HashMap<String, Breakdown>();
+        HashMap<String, Breakdown> normalMap = new HashMap<String, Breakdown>();
+        HashMap<String, Breakdown> mildMap = new HashMap<String, Breakdown>();
 
-			String currentMac = userList.get(i);
-			System.out.println("MAC: " + currentMac);
-			ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currentMac, startDate, endDate);
-			System.out.println("usageList size: " + userUsage.size());
+        int intenseCount = 0;
+        int normalCount = 0;
+        int mildCount = 0;
 
-			double totalSeconds = 0;
+        result.addInList(intenseMap);
+        result.addInList(normalMap);
+        result.addInList(mildMap);
 
-			Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
+        AppUsageDAO auDAO = new AppUsageDAO();
 
-			Date oldTime = null;
-			if (userUsage.size() > 0) {
-				oldTime = userUsage.get(0).getDate();
+        if (userList == null) {
+            userList = auDAO.retrieveUsers(startDate, endDate);
+        }
 
-			}
+        //System.out.println("userList size: " + userList.size());
+        for (int i = 0; i < userList.size(); i++) {
 
-			for (int j = 1; j < userUsage.size(); j++) {
-				AppUsage au = userUsage.get(j);
-				Date newTime = au.getDate();
+            User currUser = userList.get(i);
+            //System.out.println("MAC: " + currentMac);
+            ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
+            //System.out.println("usageList size: " + userUsage.size());
 
-				if (newTime.before(nextDay)) {
+            double totalSeconds = 0;
 
-					//difference between app usage timing
-					long difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+            Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
 
-					//If difference less than/equal 2 minutes
-					if (difference <= 2 * 60) {
-						// add difference to totalSeconds if <= 2 mins
-						totalSeconds += difference;
-					} else {
-						// add 10sec to totalSeconds if > 2 mins
-						totalSeconds += 10;
-					}
+            Date oldTime = null;
+            if (userUsage.size() > 0) {
+                oldTime = userUsage.get(0).getDate();
 
-				} else {  // NEW TIMING AFTER NEXT HOUR
+            }
 
-					totalSeconds += (nextDay.getTime() - oldTime.getTime()) / 1000;
-					nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
-				}
+            for (int j = 1; j < userUsage.size(); j++) {
+                AppUsage au = userUsage.get(j);
+                Date newTime = au.getDate();
 
-				oldTime = newTime;
+                if (newTime.before(nextDay)) {
 
-			}
+                    //difference between app usage timing
+                    long difference = (newTime.getTime() - oldTime.getTime()) / 1000;
 
-			System.out.println(oldTime);
-			if (oldTime.before(nextDay)) {
-				System.out.println("before totalSeconds" + totalSeconds);
-				long difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
-				if (difference <= 120) {
-					totalSeconds += difference;
-				} else {
-					totalSeconds += 10;
-				}
-				System.out.println("after totalSeconds" + totalSeconds);
-			} else {
-				totalSeconds += 10;
+                    //If difference less than/equal 2 minutes
+                    if (difference <= 2 * 60) {
+                        // add difference to totalSeconds if <= 2 mins
+                        totalSeconds += difference;
+                    } else {
+                        // add 10sec to totalSeconds if > 2 mins
+                        totalSeconds += 10;
+                    }
 
-			}
+                } else {  // NEW TIMING AFTER NEXT HOUR
 
-			//DIVIDE TO GET INTO DAYS
-			long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
-			totalSeconds /= days;
+                    totalSeconds += (nextDay.getTime() - oldTime.getTime()) / 1000;
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
+                }
 
-			//FILTER USER'S USAGE INTO CATEGORIES
-			double totalHours = totalSeconds / (60 * 60);
+                oldTime = newTime;
 
-			if (totalHours > 0) {
-				if (totalHours < 1.0) {
-					//MILD
-					int[] countArr = result.get("mild-count");
+            }
 
-					int count = countArr[0];
-					countArr[0] = count + 1;
-					result.put("mild-count", countArr);
+            //System.out.println(oldTime);
+            if (oldTime.before(nextDay)) {
+                //System.out.println("before totalSeconds" + totalSeconds);
+                long difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
+                if (difference <= 120) {
+                    totalSeconds += difference;
+                } else {
+                    totalSeconds += 10;
+                }
+                //System.out.println("after totalSeconds" + totalSeconds);
+            } else {
+                totalSeconds += 10;
 
-				} else if (totalHours < 5.0) {
-					//NORMAL
-					int[] countArr = result.get("normal-count");
-					int count = countArr[0];
-					countArr[0] = count + 1;
-					result.put("normal-count", countArr);
+            }
 
-				} else {
-					//INTENSE
-					int[] countArr = result.get("intense-count");
-					int count = countArr[0];
-					countArr[0] = count + 1;
-					result.put("intense-count", countArr);
+            //DIVIDE TO GET INTO DAYS
+            long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
+            totalSeconds /= days;
 
-				}
-			}
+            //FILTER USER'S USAGE INTO CATEGORIES
+            double totalHours = totalSeconds / (60 * 60);
 
-		}
+            if (totalHours > 0) {
+                if (totalHours < 1.0) {
+                    //MILD
+                    mildCount++;
 
-		int[] mildArr = result.get("mild-count");
-		int[] normalArr = result.get("normal-count");
-		int[] intenseArr = result.get("intense-count");
+                } else if (totalHours < 5.0) {
+                    //NORMAL
+                    normalCount++;
 
-		int mildCount = mildArr[0];
-		int normalCount = normalArr[0];
-		int intenseCount = intenseArr[0];
+                } else {
+                    //INTENSE
+                    intenseCount++;
 
-		double totalCount = mildCount + normalCount + intenseCount;
+                }
+            }
 
-		mildArr[1] = (int) Math.round(mildCount / totalCount * 100);
-		normalArr[1] = (int) Math.round(normalCount / totalCount * 100);
-		intenseArr[1] = (int) Math.round(intenseCount / totalCount * 100);
+        }
 
-		return result;
-	}
+        double totalCount = mildCount + normalCount + intenseCount;
 
-	public TreeMap<String, TreeMap<String, int[]>> generateReportByOneDemo(Date startDate, Date endDate, String[] demoArr) {
+        int mildPercent = (int) Math.round(mildCount / totalCount * 100);
+        int normalPercent = (int) Math.round(normalCount / totalCount * 100);
+        int intensePercent = (int) Math.round(intenseCount / totalCount * 100);
 
-		String demo = demoArr[0];
-		TreeMap<String,TreeMap<String,int[]>> result = new TreeMap<String,TreeMap<String,int[]>>();
+        intenseMap.put("intense-count", new Breakdown("" + intenseCount));
+        intenseMap.put("intense-percent", new Breakdown("" + intensePercent));
 
-		UserDAO userDAO = new UserDAO();
-		
-		if (demo.equals("year")) {
+        normalMap.put("normal-count", new Breakdown("" + normalCount));
+        normalMap.put("normal-percent", new Breakdown("" + normalPercent));
 
-			
-			ArrayList<String> years = userDAO.getYears();
-			//2011 to 2015 (inclusive)
-			for (String year : years) {
-				String sql = "SELECT au.macaddress from appusage au,user u where\n"
-						+ " au.macaddress = u.macaddress\n"
-						+ " AND timestamp >= ? AND timestamp <= ?\n"
-						+ " AND email like '%."+ year +"@%'\n"
-						+ " GROUP BY macaddress;";
-				TreeMap<String, int[]> breakdown = generateReport(startDate,endDate, sql);
-				result.put(year, breakdown);
-				//year
-				//count
-				//percent
-			}
+        mildMap.put("mild-count", new Breakdown("" + mildCount));
+        mildMap.put("mild-percent", new Breakdown("" + mildPercent));
 
-		} else if (demo.equals("school")) {
-			
-			ArrayList<String> schools = userDAO.getSchools();
-			
-			for (String school : schools ){
-				String sql = "SELECT au.macaddress from appusage au,user u where\n"
-						+ " au.macaddress = u.macaddress\n"
-						+ " AND timestamp >= ? AND timestamp <= ?\n"
-						+ " AND email like '%@"+ school +".%'\n"
-						+ " GROUP BY macaddress;";
-				
-				TreeMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
-				result.put(school, breakdown);
-				
-				
-			}
-			
-			// business, accountancy, sis, economics, law, socsc
-		} else if (demo.equals("gender")) {
-			// M and F
+        return result;
+    }
 
-			String[] genders = {"M","F"};
-			
-			for (String gender : genders ){
-				String sql = "SELECT au.macaddress from appusage au,user u where\n"
-						+ " au.macaddress = u.macaddress\n"
-						+ " AND timestamp >= ? AND timestamp <= ?\n"
-						+ " AND gender = '" + gender + "'"
-						+ " GROUP BY macaddress;";
-				
-				TreeMap<String, int[]> breakdown = generateReport(startDate, endDate,sql);
-				result.put(gender, breakdown);
-				
-				
-			}
-			
-		}
+    public Breakdown generateReportByDemo(Date startDate, Date endDate, String[] demoArr) {
+        Breakdown result = new Breakdown();
+        UserDAO userDAO = new UserDAO();
+        AppUsageDAO auDAO = new AppUsageDAO();
 
-		return result;
-	}
+        //Retrieve whole userList, from startDate to endDate
+        ArrayList<User> userList = auDAO.retrieveUsers(startDate, endDate);
 
+        //Instantiating variables
+        ArrayList<ArrayList<User>> prevLists = new ArrayList<ArrayList<User>>();
+
+        //Start prevLists with entire user list.
+        prevLists.add(userList);
+
+        Breakdown prevBreak = result;
+
+        //for each demographic (e.g. year,gender, school)
+        for (int d = 0; d < demoArr.length; d++) {
+
+            //Get demo as String
+            String demo = demoArr[d];
+
+            //Instantiating variables
+            ArrayList<ArrayList<User>> filteredLists = new ArrayList<ArrayList<User>>();
+            int breakIndex = 0;
+
+            //for each userList from prevLists
+            for (int i = 0; i < prevLists.size(); i++) {
+                ArrayList<User> prevList = prevLists.get(i);
+
+                HashMap<String, Breakdown> currMap = new HashMap<String, Breakdown>();
+
+//                ArrayList<HashMap<String, Breakdown>> breakdown = prevBreak.getBreakdown();
+//                while (breakdown.size() > 0 && breakdown.get(i).get("breakdown") != null) {
+//                    breakdown = breakdown.get(i).get("breakdown").getBreakdown();
+//				Breakdown currBreak = breakdown.get(i).get("breakdown");
+//				while (currBreak != null){
+//					currBreak = currBreak.getBreakdown().get(i).get("breakdown");
+//                }
+                //generate list of userlists by demographic and generate report for each
+                    filteredLists = filterDemo(demo, prevList, startDate, endDate, prevBreak, (d + 1) == demoArr.length, d);
+
+
+            }
+            prevLists = filteredLists;
+
+        }
+
+        return result;
+    }
+
+    public ArrayList<ArrayList<User>> filterDemo(String demo, ArrayList<User> userList, Date startDate, Date endDate, Breakdown breakdown, boolean lastDemo, int tier) {
+
+        ArrayList<ArrayList<User>> result = new ArrayList<ArrayList<User>>();
+        UserDAO userDAO = new UserDAO();
+        ArrayList<String> type = new ArrayList<String>();
+
+        if (demo.equals("year")) {
+
+            //2011,2012,2013,2014,2015
+            ArrayList<String> years = userDAO.getYears();
+
+            for (String year : years) {
+                ArrayList<User> toParse = (ArrayList<User>) userList.clone();
+                Iterator<User> iter = toParse.iterator();
+                while (iter.hasNext()) {
+                    User user = iter.next();
+                    if (!user.getYear().equals(year)) {
+                        iter.remove();
+                    }
+                }
+                result.add(toParse);
+                type.add(year);
+            }
+
+        } else if (demo.equals("school")) {
+
+            // business, accountancy, sis, economics, law, socsc
+            ArrayList<String> schools = userDAO.getSchools();
+
+            for (String school : schools) {
+                ArrayList<User> toParse = (ArrayList<User>) userList.clone();
+                Iterator<User> iter = toParse.iterator();
+                while (iter.hasNext()) {
+                    User user = iter.next();
+                    if (!user.getSchool().equals(school)) {
+                        iter.remove();
+                    }
+                }
+                result.add(toParse);
+                type.add(school);
+            }
+
+        } else if (demo.equals("gender")) {
+            // M and F
+
+            String[] genders = {"M", "F"};
+
+            for (String gender : genders) {
+                //Take previous list and clone it
+                ArrayList<User> toParse = (ArrayList<User>) userList.clone();
+
+                //For each user in prevList
+                Iterator<User> iter = toParse.iterator();
+                while (iter.hasNext()) {
+                    User user = iter.next();
+                    if (!user.getGender().toUpperCase().equals(gender)) {
+                        iter.remove();
+                    }
+                }
+                result.add(toParse);
+                type.add(gender);
+            }
+
+        }
+
+        //Put mini-reports into Breakdown
+        //For each userList in result
+        for (int i = 0; i < result.size(); i++) {
+            ArrayList<User> filteredList = result.get(i);
+
+            //map of current sub-demo (e.g. "M", "F")
+            HashMap<String, Breakdown> newMap = new HashMap<String, Breakdown>();
+
+            //put in type (e.g. year, 2011)
+            System.out.println(demo);
+            newMap.put(demo, new Breakdown(type.get(i)));
+
+            //generate report
+            Breakdown report = generateReport(startDate, endDate, filteredList);
+
+            Breakdown toPut = breakdown;
+
+            for (int t = tier; t > 0; t--) {
+                System.out.println("ENTERED TIER " + t);
+                toPut = breakdown.getBreakdown().get(i).get("breakdown");
+                if (toPut == null) {
+                    toPut = new Breakdown();
+                    breakdown.getBreakdown().get(i).put("breakdown", new Breakdown());
+                }
+            }
+            if (lastDemo) {
+                newMap.put("breakdown", report);
+            }
+
+            //put in count (e.g. count, 10)
+            int total = 0;
+            ArrayList<HashMap<String, Breakdown>> innerList = report.getBreakdown();
+            total += Integer.parseInt(innerList.get(0).get("intense-count").getMessage());
+            total += Integer.parseInt(innerList.get(1).get("normal-count").getMessage());
+            total += Integer.parseInt(innerList.get(2).get("mild-count").getMessage());
+            newMap.put("count", new Breakdown("" + total));
+
+            toPut.addInList(newMap);
+        }
+        return result;
+    }
 }

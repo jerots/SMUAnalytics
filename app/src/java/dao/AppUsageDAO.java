@@ -295,16 +295,17 @@ public class AppUsageDAO {
         return updateCounts;
     }
 
-    public ArrayList<String> retrieveUsers(Date startDate, Date endDate) {
+    public ArrayList<User> retrieveUsers(Date startDate, Date endDate) {
 
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<User> result = new ArrayList<User>();
 
         try {
 
             Connection conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT macaddress from appusage where "
-                    + "timestamp >= ? AND timestamp <= ? "
+            PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u where "
+                    + "au.macaddress = u.macaddress "
+                    + "AND timestamp >= ? AND timestamp <= ? "
                     + "GROUP BY macaddress");
             ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
             ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
@@ -313,11 +314,15 @@ public class AppUsageDAO {
 
             while (rs.next()) {
                 String macAdd = rs.getString(1);
-                result.add(macAdd);
+                String name = rs.getString(2);
+                String password = rs.getString(3);
+                String email = rs.getString(4);
+                String gender = rs.getString(5);
+                result.add(new User(macAdd, name, password, email, gender));
             }
-
+            ConnectionManager.close(conn,ps,rs);
         } catch (SQLException e) {
-
+            
         }
 
         return result;
@@ -341,7 +346,7 @@ public class AppUsageDAO {
                 String macAdd = rs.getString(1);
                 result.add(macAdd);
             }
-
+            ConnectionManager.close(conn,ps,rs);
         } catch (SQLException e) {
 
         }
@@ -374,14 +379,11 @@ public class AppUsageDAO {
                 result.add(new AppUsage(timestamp, macaddress, appid));
 
             }
-
+            ConnectionManager.close(conn,ps,rs);
         } catch (SQLException e) {
 
         }
 
         return result;
     }
-
-
-
 }

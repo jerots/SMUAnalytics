@@ -10,13 +10,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import entity.Breakdown;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,170 +34,172 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "BasicUsetimeReport", urlPatterns = {"/json/basic-usetime-report"})
 public class BasicUsetime extends HttpServlet {
 
-	/**
-	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-	 * methods.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.setContentType("application/json");
-		try (PrintWriter out = response.getWriter()) {
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        try (PrintWriter out = response.getWriter()) {
 
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-			JsonObject output = new JsonObject();
+            JsonObject output = new JsonObject();
 
-			JsonArray errors = new JsonArray();
+            JsonArray errors = new JsonArray();
 
-			String token = request.getParameter("token");
-			String startdate = request.getParameter("startdate");
-			String enddate = request.getParameter("enddate");
+            String token = request.getParameter("token");
+            String startdate = request.getParameter("startdate");
+            String enddate = request.getParameter("enddate");
 
-			//TOKEN VALIDATION
-			if (token == null) {
-				errors.add("missing token");
-			} else if (token.length() == 0) {
-				errors.add("blank token");
-			} else {
-				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
-					if (username == null) {
-						//failed
-						errors.add("invalid token");
-					}
+            //TOKEN VALIDATION
+            if (token == null) {
+                errors.add("missing token");
+            } else if (token.length() == 0) {
+                errors.add("blank token");
+            } else {
+                try {
+                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    if (username == null) {
+                        //failed
+                        errors.add("invalid token");
+                    }
 
-				} catch (JWTException e) {
-					//failed
-					errors.add("invalid token");
-				}
+                } catch (JWTException e) {
+                    //failed
+                    errors.add("invalid token");
+                }
 
-			}
+            }
 
-			//START DATE VALIDATION
-			if (startdate == null) {
-				errors.add("missing startdate");
-			} else if (startdate.length() == 0) {
-				errors.add("blank startdate");
-			} else {
-				if (startdate.length() != 10) {
-					errors.add("invalid startdate");
-				} else {
-					SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-					Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
-					if (dateFormatted == null) {
-						errors.add("invalid startdate");
-					}
-				}
-			}
+            //START DATE VALIDATION
+            if (startdate == null) {
+                errors.add("missing startdate");
+            } else if (startdate.length() == 0) {
+                errors.add("blank startdate");
+            } else {
+                if (startdate.length() != 10) {
+                    errors.add("invalid startdate");
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+                    Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
+                    if (dateFormatted == null) {
+                        errors.add("invalid startdate");
+                    }
+                }
+            }
 
-			//END DATE VALIDATION
-			if (enddate == null) {
-				errors.add("missing enddate");
-			} else if (enddate.length() == 0) {
-				errors.add("blank enddate");
-			} else {
-				if (enddate.length() != 10) {
-					errors.add("invalid enddate");
-				} else {
-					SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-					Date dateFormatted = sdf.parse(enddate, new ParsePosition(0));
-					if (dateFormatted == null) {
-						errors.add("invalid enddate");
-					}
-				}
-			}
+            //END DATE VALIDATION
+            if (enddate == null) {
+                errors.add("missing enddate");
+            } else if (enddate.length() == 0) {
+                errors.add("blank enddate");
+            } else {
+                if (enddate.length() != 10) {
+                    errors.add("invalid enddate");
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+                    Date dateFormatted = sdf.parse(enddate, new ParsePosition(0));
+                    if (dateFormatted == null) {
+                        errors.add("invalid enddate");
+                    }
+                }
+            }
 
-			//PRINT ERROR AND EXIT IF ERRORS EXIST
-			if (errors.size() > 0) {
-				output.addProperty("status", "error");
-				output.add("errors", errors);
-				out.println(gson.toJson(output));
-				return;
-			}
+            //PRINT ERROR AND EXIT IF ERRORS EXIST
+            if (errors.size() > 0) {
+                output.addProperty("status", "error");
+                output.add("errors", errors);
+                out.println(gson.toJson(output));
+                return;
+            }
 
-			//PASSES ALL VALIDATION, proceed to report generation
-			output.addProperty("status", "success");
+            //PASSES ALL VALIDATION, proceed to report generation
+            output.addProperty("status", "success");
 
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date startDate = dateFormat.parse(startdate + " " + "00:00:00", new ParsePosition(0));
-			Date endDate = dateFormat.parse(enddate + " " + "23:59:59", new ParsePosition(0));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate = dateFormat.parse(startdate + " " + "00:00:00", new ParsePosition(0));
+            Date endDate = dateFormat.parse(enddate + " " + "23:59:59", new ParsePosition(0));
 
-			BasicAppController ctrl = new BasicAppController();
+            BasicAppController ctrl = new BasicAppController();
 
-			TreeMap<String, int[]> resultMap = ctrl.generateReport(startDate, endDate, null);
-			int[] intenseArr = resultMap.get("intense-count");
-			int[] normalArr = resultMap.get("normal-count");
-			int[] mildArr = resultMap.get("mild-count");
+            Breakdown breakdown = ctrl.generateReport(startDate, endDate, null);
 
-			
-			JsonArray breakdown = new JsonArray();
+            ArrayList<HashMap<String, Breakdown>> breakdownList = breakdown.getBreakdown();
 
-			JsonObject intense = new JsonObject();
-			intense.addProperty("intense-count", intenseArr[0]);
-			intense.addProperty("intense-percent", intenseArr[1]);
+            HashMap<String, Breakdown> intenseMap = breakdownList.get(0);
+            HashMap<String, Breakdown> normalMap = breakdownList.get(1);
+            HashMap<String, Breakdown> mildMap = breakdownList.get(2);
+            
+            JsonArray breakdownArr = new JsonArray();
 
-			JsonObject normal = new JsonObject();
-			normal.addProperty("normal-count", normalArr[0]);
-			normal.addProperty("normal-percent", normalArr[1]);
+            JsonObject intense = new JsonObject();
+            intense.addProperty("intense-count", intenseMap.get("intense-count").getMessage());
+            intense.addProperty("intense-percent", intenseMap.get("intense-percent").getMessage());
 
-			JsonObject mild = new JsonObject();
-			mild.addProperty("mild-count", mildArr[0]);
-			mild.addProperty("mild-percent", mildArr[1]);
+            JsonObject normal = new JsonObject();
+            normal.addProperty("normal-count", normalMap.get("normal-count").getMessage());
+            normal.addProperty("normal-percent", normalMap.get("normal-percent").getMessage());
 
-			breakdown.add(intense);
-			breakdown.add(normal);
-			breakdown.add(mild);
+            JsonObject mild = new JsonObject();
+            mild.addProperty("mild-count", mildMap.get("mild-count").getMessage());
+            mild.addProperty("mild-percent", mildMap.get("mild-percent").getMessage());
 
-			output.add("breakdown", breakdown);
+            breakdownArr.add(intense);
+            breakdownArr.add(normal);
+            breakdownArr.add(mild);
 
-			out.println(gson.toJson(output));
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
+            output.add("breakdown", breakdownArr);
 
-	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-	/**
-	 * Handles the HTTP <code>GET</code> method.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		processRequest(request, response);
-	}
+            out.println(gson.toJson(output));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Handles the HTTP <code>POST</code> method.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		processRequest(request, response);
-	}
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-	/**
-	 * Returns a short description of the servlet.
-	 *
-	 * @return a String containing servlet description
-	 */
-	@Override
-	public String getServletInfo() {
-		return "Short description";
-	}// </editor-fold>
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
 
 }
