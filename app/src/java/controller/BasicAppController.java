@@ -47,8 +47,8 @@ public class BasicAppController {
         if (userList == null) {
             userList = auDAO.retrieveUsers(startDate, endDate);
         }
-
-        //System.out.println("userList size: " + userList.size());
+		
+        System.out.println("userList size: " + userList.size());
         for (int i = 0; i < userList.size(); i++) {
 
             User currUser = userList.get(i);
@@ -139,7 +139,6 @@ public class BasicAppController {
         int mildPercent = (int) Math.round(mildCount / totalCount * 100);
         int normalPercent = (int) Math.round(normalCount / totalCount * 100);
         int intensePercent = (int) Math.round(intenseCount / totalCount * 100);
-
         intenseMap.put("intense-count", new Breakdown("" + intenseCount));
         intenseMap.put("intense-percent", new Breakdown("" + intensePercent));
 

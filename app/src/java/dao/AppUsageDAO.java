@@ -355,6 +355,8 @@ e.printStackTrace();
                 String macAdd = rs.getString(1);
                 result.add(macAdd);
             }
+			
+			ConnectionManager.close(conn,ps,rs);
 
         } catch (SQLException e) {
 
@@ -388,9 +390,9 @@ e.printStackTrace();
                 result.add(new AppUsage(timestamp, macaddress, appid));
 
             }
+			ConnectionManager.close(conn,ps,rs);
 
         } catch (SQLException e) {
-e.printStackTrace();
         }
 
         return result;
