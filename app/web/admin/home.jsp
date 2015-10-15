@@ -184,14 +184,17 @@
                     <h4><b> AppUsage</b> </h4>
                     <hr>
                     <%
+						TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
+                        Iterator<Integer> auiter = auErrMap.keySet().iterator();
+						int auErrorSize = auErrMap.size();
+						
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-                        out.println("<b>AppUsage updated </b> " + "</td><td>" + recordMap.get("app.csv"));
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + (recordMap.get("app.csv") - auErrorSize) );
                         out.println("</td></tr><tr><td>");
-                        TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
-                        Iterator<Integer> auiter = auErrMap.keySet().iterator();
+                        
 
-                        out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrMap.size() + "</td></tr>");
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
                         if (auErrMap != null && auErrMap.size() != 0) {
                             out.println("<tr><td><b>" + "Row");
                             out.println("</b></td><td><b>" + "Error Messages");

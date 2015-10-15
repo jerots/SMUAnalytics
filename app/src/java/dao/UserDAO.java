@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -55,8 +56,7 @@ public class UserDAO {
 	
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> userMap) throws IOException, SQLException {
-        Connection conn = ConnectionManager.getConnection();
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> userMap, Connection conn, ArrayList<String> macList) throws IOException, SQLException {
         conn.setAutoCommit(false);
         String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -160,8 +160,132 @@ public class UserDAO {
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
+				macList.add(macAdd);
 				
-				System.out.println(name);
+//				System.out.println(name);
+                stmt.setString(2, name);
+                stmt.setString(3, password);
+                stmt.setString(4, email);
+                stmt.setString(5, gender);
+                stmt.addBatch();
+            }
+            index++;
+        }
+
+        int[] updateCounts = stmt.executeBatch();
+        conn.commit();
+
+        return updateCounts;
+    }
+	
+	
+	 public int[] add(CSVReader reader, TreeMap<Integer, String> userMap) throws IOException, SQLException {
+        Connection conn = ConnectionManager.getConnection();
+		 conn.setAutoCommit(false);
+        String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+
+        String arr[];
+        int index = 2;
+        while ((arr = reader.readNext()) != null) {
+            //retrieving per row
+            boolean err = false;
+
+            String errorMsg = userMap.get(index);
+            String macAdd = Utility.parseString(arr[0]);
+            if (macAdd == null) {
+                if (errorMsg == null) {
+                    userMap.put(index, "mac add cannot be blank");
+                } else {
+                    userMap.put(index, errorMsg + "," + "mac add cannot be blank");
+                }
+                err = true;
+            }
+
+            if (!Utility.checkHexadecimal(macAdd)) {
+                if (errorMsg == null) {
+                    userMap.put(index, "invalid mac address");
+                } else {
+                    userMap.put(index, errorMsg + "," + "invalid mac address");
+                }
+                err = true;
+            }
+
+            String name = Utility.parseString(arr[1]);
+
+            if (name == null) {
+                if (errorMsg == null) {
+                    userMap.put(index, "name cannot be blank");
+                } else {
+                    userMap.put(index, errorMsg + "," + "name cannot be blank");
+                }
+                err = true;
+            }
+
+            String password = Utility.parseString(arr[2]);
+            if (password == null) {
+                if (errorMsg == null) {
+                    userMap.put(index, "password cannot be blank");
+                } else {
+                    userMap.put(index, errorMsg + "," + "password cannot be blank");
+                }
+                err = true;
+            }
+
+            if (!Utility.checkPassword(password)) {
+                if (errorMsg == null) {
+                    userMap.put(index, "invalid password");
+                } else {
+                    userMap.put(index, errorMsg + "," + "invalid password");
+                }
+                err = true;
+            }
+
+            String email = Utility.parseString(arr[3]);
+            if (email == null) {
+                if (errorMsg == null) {
+                    userMap.put(index, "email cannot be blank");
+                } else {
+                    userMap.put(index, errorMsg + "," + "email cannot be blank");
+                }
+                err = true;
+            }
+            if (!Utility.checkEmail(email)) {
+                if (errorMsg == null) {
+                    userMap.put(index, "invalid email");
+                } else {
+                    userMap.put(index, errorMsg + "," + "invalid email");
+                }
+                err = true;
+            }
+
+            String g = Utility.parseString(arr[4]);
+            if (g == null) {
+                if (errorMsg == null) {
+                    userMap.put(index, "gender cannot be blank");
+                } else {
+                    userMap.put(index, errorMsg + "," + "gender cannot be blank");
+                }
+                err = true;
+            }
+
+            String gender = g.toLowerCase();
+
+            if (!gender.equals("f") && !gender.equals("m")) {
+                if (errorMsg == null) {
+                    userMap.put(index, "invalid gender");
+                } else {
+                    userMap.put(index, errorMsg + "," + "invalid gender");
+                }
+                err = true;
+            }
+
+            if (!err) {
+                //add to list
+                //insert into tables
+                stmt.setString(1, macAdd);
+				
+//				System.out.println(name);
                 stmt.setString(2, name);
                 stmt.setString(3, password);
                 stmt.setString(4, email);
@@ -176,7 +300,6 @@ public class UserDAO {
 
         //closing
         reader.close();
-        ConnectionManager.close(conn, stmt);
         return updateCounts;
     }
 
@@ -224,9 +347,12 @@ public class UserDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         return null;
     }
+	
+	
+	
 }

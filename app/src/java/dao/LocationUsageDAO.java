@@ -34,8 +34,7 @@ public class LocationUsageDAO {
 		locationList = new TreeMap<>();
 	}
 
-	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-		Connection conn = ConnectionManager.getConnection();
+	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> locationIdList) throws IOException, SQLException {
 		conn.setAutoCommit(false);
 		int index = 2;
 		String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
@@ -46,15 +45,15 @@ public class LocationUsageDAO {
 		while ((arr = reader.readNext()) != null) {
 			//retrieving per row
 			boolean err = false;
+			String errorMsg = errMap.get(index);
 
 			//check timestamp
 			String date = Utility.parseString(arr[0]);
 			if (date == null || !Utility.checkDate(date)) {
-				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
-					errMap.put(index, "invalid timestamp");
+					errorMsg = "invalid timestamp";
 				} else {
-					errMap.put(index, errorMsg + "," + "invalid timestamp");
+					errorMsg += ",invalid timestamp";
 				}
 				err = true;
 			}
@@ -62,20 +61,18 @@ public class LocationUsageDAO {
 			//check macAdd
 			String macAdd = Utility.parseString(arr[1]);
 			if (macAdd == null) {
-				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
-					errMap.put(index, "mac address cannot be blank");
+					errorMsg = "mac address cannot be blank";
 				} else {
-					errMap.put(index, errorMsg + "," + "mac address cannot be blank");
+					errorMsg += ",mac address cannot be blank";
 				}
 				err = true;
 			}
 			if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
-					errMap.put(index, "invalid mac address");
+					errorMsg = "invalid mac address";
 				} else {
-					errMap.put(index, errorMsg + "," + "invalid mac address");
+					errorMsg += ",invalid mac address";
 				}
 				err = true;
 			}
@@ -83,39 +80,44 @@ public class LocationUsageDAO {
 			//check appid
 			int locationId = Utility.parseInt(arr[2]);
 			if (locationId <= 0) {
-				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
-					errMap.put(index, "location id cannot be blank");
+					errorMsg = "location id cannot be blank";
 				} else {
-					errMap.put(index, errorMsg + "," + "location id cannot be blank");
+					errorMsg += ",location id cannot be blank";
 				}
 				err = true;
 			} else {
 
-				String query = "select locationid from location where locationid = ?;";
-				PreparedStatement pStmt = conn.prepareStatement(query);
-				pStmt.setInt(1, locationId);
-				ResultSet rs = pStmt.executeQuery();
-				if (!rs.next()) {
-					String errorMsg = errMap.get(index);
+				if (!locationIdList.contains(locationId)) {
 					if (errorMsg == null) {
-						errMap.put(index, "invalid location");
+						errorMsg = "invalid location";
 					} else {
-						errMap.put(index, errorMsg + "," + "invalid location");
+						errorMsg += ",invalid location";
 					}
 					err = true;
 				}
-				pStmt.close();
+
+//				String query = "select locationid from location where locationid = ?;";
+//				PreparedStatement pStmt = conn.prepareStatement(query);
+//				pStmt.setInt(1, locationId);
+//				ResultSet rs = pStmt.executeQuery();
+//				if (!rs.next()) {
+//					String errorMsg = errMap.get(index);
+//					if (errorMsg == null) {
+//						errMap.put(index, "invalid location");
+//					} else {
+//						errMap.put(index, errorMsg + "," + "invalid location");
+//					}
+//					err = true;
+//				}
+//				pStmt.close();
 			}
 
 			if (!err) {
 				if (duplicate.containsKey(date + macAdd)) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
-					} else {
-						errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
-					}
+
+					errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+
 				}
 				duplicate.put(date + macAdd, index);
 				//add to list
@@ -123,6 +125,8 @@ public class LocationUsageDAO {
 				stmt.setString(2, macAdd);
 				stmt.setInt(3, locationId);
 				stmt.addBatch();
+			} else {
+				errMap.put(index, errorMsg);
 			}
 			index++;
 
@@ -132,9 +136,6 @@ public class LocationUsageDAO {
 		int[] updateCounts = stmt.executeBatch();
 		conn.commit();
 
-		//close
-		reader.close();
-		ConnectionManager.close(conn, stmt);
 		return updateCounts;
 	}
 
@@ -194,7 +195,7 @@ public class LocationUsageDAO {
 					errMap.put(index, errorMsg + "," + "location id cannot be blank");
 				}
 				err = true;
-				
+
 				//IF LOCATION ID NOT BLANK
 			} else {
 
@@ -244,7 +245,7 @@ public class LocationUsageDAO {
 				stmt.addBatch();
 			}
 			int[] updatedArr = stmt.executeBatch();
-			for (int i : updatedArr){
+			for (int i : updatedArr) {
 				updateCounts += i;
 			}
 			conn.commit();
@@ -252,7 +253,7 @@ public class LocationUsageDAO {
 			//CATCH WHEN THERE IS DUPLICATE
 		} catch (BatchUpdateException e) {
 			int[] updatedArr = e.getUpdateCounts();
-			
+
 			for (int i = 0; i < updatedArr.length; i++) {
 				if (updatedArr[i] == Statement.EXECUTE_FAILED) {
 					// This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
@@ -264,8 +265,8 @@ public class LocationUsageDAO {
 						errMap.put(row, errorMsg + "," + "duplicate row ");
 					}
 				}
-				if (updatedArr[i] >= 0){
-					
+				if (updatedArr[i] >= 0) {
+
 					updateCounts += updatedArr[i];
 				}
 			}
@@ -359,9 +360,9 @@ public class LocationUsageDAO {
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			conn.setAutoCommit(false);
-			System.out.println(startDate);
-			System.out.println(endDate);
-			System.out.println(macAdd);
+//			System.out.println(startDate);
+//			System.out.println(endDate);
+//			System.out.println(macAdd);
 			String sql = "delete from locationusage where timestamp BETWEEN ? AND ?"
 					+ " AND macaddress = ?;";
 			PreparedStatement stmt = conn.prepareStatement(sql);

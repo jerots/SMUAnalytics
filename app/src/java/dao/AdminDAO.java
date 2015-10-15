@@ -39,7 +39,7 @@ public class AdminDAO {
 				
 			}
 			
-			
+			ConnectionManager.close(conn,ps);
 			
 		} catch (SQLException e){
 			
