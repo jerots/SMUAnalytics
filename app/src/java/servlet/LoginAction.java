@@ -51,7 +51,7 @@ public class LoginAction extends HttpServlet {
 			Admin admin = adminDAO.retrieve(username, password);
 			if (admin != null) {
 				session.setAttribute("admin", admin);
-				response.sendRedirect("admin/home.jsp");
+				response.sendRedirect("admin");
 				return;
 				//redirect to admin page
 
@@ -63,7 +63,7 @@ public class LoginAction extends HttpServlet {
 			System.out.println(user);
 			if (user != null) {
 				session.setAttribute("user", user);
-				response.sendRedirect("student/home.jsp");
+				response.sendRedirect("student");
 				return;
 				//redirect to student page
 
