@@ -13,19 +13,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
-import java.util.HashMap;
 import java.util.TreeMap;
 
-/**
- *
- * @author ASUS-PC
- */
 public class UserDAO {
 
-    private ArrayList<String> unsuccessful;
 
 	private ArrayList<String> schools;
 	private ArrayList<String> years;
+	private ArrayList<String> genders;
 	
     public UserDAO() {
 		schools = new ArrayList<String>();
@@ -42,7 +37,10 @@ public class UserDAO {
 		years.add("2013");
 		years.add("2014");
 		years.add("2015");
-        unsuccessful = new ArrayList<>();
+		
+		genders = new ArrayList<String>();
+		genders.add("M");
+		genders.add("F");
     }
 
 	public ArrayList<String> getSchools() {
@@ -51,6 +49,10 @@ public class UserDAO {
 
 	public ArrayList<String> getYears() {
 		return years;
+	}
+	
+	public ArrayList<String> getGenders(){
+		return genders;
 	}
 	
 	

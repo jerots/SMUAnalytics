@@ -163,7 +163,8 @@ public class BasicUsetimeDemo extends HttpServlet {
             BasicAppController ctrl = new BasicAppController();
             Breakdown breakdown = null;
             try {
-            breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
+//            breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
+				breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
             
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -198,6 +199,12 @@ public class BasicUsetimeDemo extends HttpServlet {
                 obj.addProperty("count", count.getMessage());
 
             }
+			
+			Breakdown percent = map.get("percent");
+			if (percent != null){
+				obj.addProperty("percent", percent.getMessage());
+			}
+			
 
             Breakdown further = map.get("breakdown");
             if (further != null) {

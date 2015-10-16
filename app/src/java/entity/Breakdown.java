@@ -13,16 +13,26 @@ import java.util.HashMap;
  * @author jeremyongts92
  */
 public class Breakdown {
-	ArrayList<HashMap<String, Breakdown>> breakdown = new ArrayList<HashMap<String,Breakdown>>();
+	ArrayList<HashMap<String, Breakdown>> breakdown;
 	String message;
 	String type;
 
 	public Breakdown() {
+		breakdown = new ArrayList<HashMap<String,Breakdown>>();
 	}
 
 	public Breakdown(String message) {
+		breakdown = new ArrayList<HashMap<String,Breakdown>>();
 		this.message = message;
 	}
+
+	public Breakdown(ArrayList<HashMap<String, Breakdown>> breakdown) {
+		this.breakdown = breakdown;
+	}
+	
+	
+		
+
 
 	public void setBreakdown(ArrayList<HashMap<String, Breakdown>> breakdown) {
 		this.breakdown = breakdown;
