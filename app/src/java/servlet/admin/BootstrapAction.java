@@ -102,7 +102,7 @@ public class BootstrapAction extends HttpServlet {
         
         request.setAttribute("recordMap", recordMap);
         System.out.println(recordMap);
-        RequestDispatcher rd = request.getRequestDispatcher("/admin/home.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher("admin");
         rd.forward(request, response);
         
     }

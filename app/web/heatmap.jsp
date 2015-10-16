@@ -19,8 +19,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-		<link rel="stylesheet" type="text/css" href="/app/css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="/app/css/style.css">
+		<%@include file="import-css.jsp" %>
     </head>
     <body>
 		<%			User user = (User) session.getAttribute("user");
@@ -44,9 +43,9 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 					<ul class="nav navbar-nav">
-						<li><a href="home.jsp">Basic App Usage</a></li>
+						<li><a href="student">Basic App Usage</a></li>
 						<li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
-						<li><a href="#">Smartphone Overuse</a></li>
+						<li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
 						<li class="active"><a href="#">Smartphone Usage Heatmap</a></li>
 						<li><a href="#">Social Activeness</a></li>
 
@@ -54,7 +53,7 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						<li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
-						<li><a href="/app/logout.jsp">Logout</a></li>
+						<li><a href="logout.jsp">Logout</a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
@@ -62,46 +61,46 @@
 		<!--END OF NAV BAR-->
         <!--START OF CONTENT-->
 		<%
-		String floor = (String) request.getAttribute("floor");
-		String time = (String) request.getAttribute("time");
-		String date = (String) request.getAttribute("date");
-		String dateCode = "";
-		if (date != null){
-			dateCode = "value='"+ date +"'";
-		}
-		String timeCode = "";
-		if (time != null){
-			timeCode = "value='" + time + "'";
-		}
-		
-		//Scan all levels available
+			String floor = (String) request.getParameter("floor");
+			String time = (String) request.getParameter("time");
+			String date = (String) request.getParameter("date");
+			String dateCode = "";
+			if (date != null) {
+				dateCode = "value='" + date + "'";
+			}
+			String timeCode = "";
+			if (time != null) {
+				timeCode = "value='" + time + "'";
+			}
+
+			//Scan all levels available
 			LocationDAO locDAO = new LocationDAO();
 			ArrayList<String> locationList = locDAO.retrieveAll();
 			TreeSet<String> levelSet = new TreeSet<String>();
 			//for each location in locationList
 			System.out.println("LOCATIONLIST SIZE " + locationList.size());
-			for (String location: locationList){
+			for (String location : locationList) {
 				//Scan all basements
 				String trimmed = location.replace("SMUSIS", "").toUpperCase();
-				if (trimmed.length() > 1){
+				if (trimmed.length() > 1) {
 					char type = trimmed.charAt(0);
-					if (type == 'B'){ //IF BASEMENT
+					if (type == 'B') { //IF BASEMENT
 						levelSet.add("B" + trimmed.charAt(1));
-					} else if (type == 'L'){ //IF LEVEL
+					} else if (type == 'L') { //IF LEVEL
 						levelSet.add("L" + trimmed.charAt(1));
 					}
 				}
-				
+
 			}
-		
-		
+
+
 		%>
-		
-		
+
+
 		<div class="theme-container container">
 			<div class="row">
 				<div class="theme-div" style="width:37%">
-					<form action="/app/HeatmapAction" method="GET">
+					<form action="HeatmapAction" method="GET">
 						<div class="form-group">
 							<label for="date">Date</label>
 							<input type="date" class="form-control" id="date" name="date" <%=dateCode%> required>
@@ -114,18 +113,18 @@
 							<label for="startdate">Floor</label>
 							<select class="form-control" name="floor">
 								<%
-								System.out.println("LEVEL SIZE " +levelSet.size());
-								for (String level : levelSet){
-									String levelCode = "";
-									if (level.equals(floor)){
-										levelCode = "selected";
+									System.out.println("LEVEL SIZE " + levelSet.size());
+									for (String level : levelSet) {
+										String levelCode = "";
+										if (level.equals(floor)) {
+											levelCode = "selected";
+										}
+										out.println("<option value='" + level + "' " + levelCode + ">" + level + "</option>");
 									}
-									out.println("<option value='"+level+"' "+ levelCode +">" + level + "</option>");
-								}
 								%>
-								
-								
-								
+
+
+
 								<!--<option value="B1">B1</option>-->
 								<%
 //									for (int i = 1; i <= 5; i++) {
@@ -139,18 +138,17 @@
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
-					<%
-						TreeMap<String, ArrayList<LocationUsage>> heatmap = (TreeMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
+					<%						TreeMap<String, ArrayList<LocationUsage>> heatmap = (TreeMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
 						String error = (String) request.getAttribute("error");
-						if (error != null){
-							
+						if (error != null) {
+
 							out.println("<h1 style='color:red'>Error!</h1>");
 							out.println("<h3 style='color:red'>" + error + "</h3>");
-							
+
 						} else if (heatmap == null) {
 							out.println("<h1>Result</h1>");
 							out.println("You have not uploaded any files.");
-							
+
 						} else {
 							Iterator<String> iter = heatmap.keySet().iterator();
 							out.println("<table class='table'>");
@@ -199,7 +197,6 @@
 		</div>
 		<!--END OF CONTENT-->
 
-		<script src="/app/js/jquery-2.1.4.min.js"></script>
-		<script src="/app/js/bootstrap.js"></script>
+		<%@include file="import-js.jsp" %>
     </body>
 </html>

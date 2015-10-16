@@ -50,7 +50,7 @@ public class DeleteLocationAction extends HttpServlet {
 			
 			
 			request.setAttribute("rowsDeleted", "" + deleted);
-			RequestDispatcher rd = request.getRequestDispatcher("/admin/delete-location.jsp");
+			RequestDispatcher rd = request.getRequestDispatcher("delete-location.jsp");
 			rd.forward(request, response);
 			
 		} catch (Exception e) {

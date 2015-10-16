@@ -48,4 +48,9 @@ body, html {
 	
 }
 
+.errorMsg {
+	background-color:brown;
+	color:white;
+}
+
 

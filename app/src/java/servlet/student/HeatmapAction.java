@@ -55,18 +55,12 @@ public class HeatmapAction extends HttpServlet {
 			out.println(dateStr + ",");
 			out.println(timeStr);
 			String floor = request.getParameter("floor");
-			request.setAttribute("date", dateStr);
-			request.setAttribute("time", timeStr);
-			request.setAttribute("floor", floor);
-			
-			
-			
 			
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date datetime = dateFormat.parse(dateStr + " " + timeStr, new ParsePosition(0));
 			if (datetime == null){
 				request.setAttribute("error", "You have entered an invalid date!");
-				RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+				RequestDispatcher rd = request.getRequestDispatcher("heatmap.jsp");
 				rd.forward(request, response);
 				return;
 			}
@@ -77,7 +71,7 @@ public class HeatmapAction extends HttpServlet {
 			
 //			return TreeMap<location,userlist>
 			request.setAttribute("heatmap", result);
-			RequestDispatcher rd = request.getRequestDispatcher("student/heatmap.jsp");
+			RequestDispatcher rd = request.getRequestDispatcher("heatmap.jsp");
 			rd.forward(request, response);
 			
 

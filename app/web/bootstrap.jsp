@@ -14,8 +14,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-        <link rel="stylesheet" type="text/css" href="/app/css/bootstrap.css">
-        <link rel="stylesheet" type="text/css" href="/app/css/style.css">
+        <%@include file="import-css.jsp" %>
     </head>
     <body>
         <%			Admin admin = (Admin) session.getAttribute("admin");
@@ -38,14 +37,14 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="/app/admin/home.jsp">Bootstrap <span class="sr-only">(current)</span></a></li>
-                        <li><a href="/app/admin/delete-location.jsp">Delete Location data</a></li>
+                        <li class="active"><a href="admin">Bootstrap <span class="sr-only">(current)</span></a></li>
+                        <li><a href="delete-location.jsp">Delete Location data</a></li>
 
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
                         <li><a>Welcome, <%=admin.getUsername() + " (admin)"%></a></li>
-                        <li><a href="/app/logout.jsp">Logout</a></li>
+                        <li><a href="logout.jsp">Logout</a></li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -58,7 +57,7 @@
             <div class="row">
                 <div class="theme-div" style="width:37%">
 
-                    <form action="/app/BootstrapAction" method="post" enctype="multipart/form-data">
+                    <form action="BootstrapAction" method="post" enctype="multipart/form-data">
                         Choose File to upload:<br/>
                         <div class="form-group">
                             <label for="exampleInputFile">File input</label>
@@ -280,7 +279,6 @@
             </div>
         </div>
         <!--END OF CONTENT-->
-        <script src="/app/js/jquery-2.1.4.min.js"></script>
-        <script src="/app/js/bootstrap.js"></script>
+        <%@include file="import-js.jsp" %>
     </body>
 </html>

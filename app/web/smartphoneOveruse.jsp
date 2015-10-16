@@ -19,8 +19,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
-        <link rel="stylesheet" type="text/css" href="/app/css/bootstrap.css">
-        <link rel="stylesheet" type="text/css" href="/app/css/style.css">
+        <%@include file="import-css.jsp" %>
     </head>
     <body>
         <%			User user = (User) session.getAttribute("user");
@@ -44,17 +43,17 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
                     <ul class="nav navbar-nav">
-                        <li><a href="home.jsp">Basic App Usage</a></li>
+                        <li><a href="student">Basic App Usage</a></li>
                         <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
-                        <li><a href="#">Smartphone Overuse</a></li>
-                        <li class="active"><a href="#">Smartphone Usage Heatmap</a></li>
+                        <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
+                        <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
                         <li><a href="#">Social Activeness</a></li>
 
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
                         <li><a>Welcome, <%=user.getName() + " (student)"%></a></li>
-                        <li><a href="/app/logout.jsp">Logout</a></li>
+                        <li><a href="logout.jsp">Logout</a></li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -80,7 +79,7 @@
         <div class="theme-container container">
             <div class="row">
                 <div class="theme-div" style="width:37%">
-                    <form action="/app/SmartphoneOveruse" method="GET">
+                    <form action="SmartphoneOveruse" method="GET">
                         <div class="form-group">
                             <label for="date">Start Date</label>
                             <input type="date" class="form-control" id="date" name="startDate" <%=dateCode%> required>
@@ -126,7 +125,6 @@
         </div>
         <!--END OF CONTENT-->
 
-        <script src="/app/js/jquery-2.1.4.min.js"></script>
-        <script src="/app/js/bootstrap.js"></script>
+  <%@include file="import-js.jsp" %>
     </body>
 </html>

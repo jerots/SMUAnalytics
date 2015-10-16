@@ -22,8 +22,6 @@
 			<form method='POST' action='LoginAction'>
 				<%
 
-					
-
 					String username = (String) request.getAttribute("username");
 					if (username == null) {
 						username = "";

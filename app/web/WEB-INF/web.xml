@@ -8,6 +8,22 @@
         <servlet-name>LoginAction</servlet-name>
         <url-pattern>/LoginAction</url-pattern>
     </servlet-mapping>
+	  <servlet>
+    <servlet-name>BootstrapUIServlet</servlet-name>
+    <jsp-file>/bootstrap.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BootstrapUIServlet</servlet-name>
+    <url-pattern>/admin</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>BasicAppUIServlet</servlet-name>
+    <jsp-file>/basicapp.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BasicAppUIServlet</servlet-name>
+    <url-pattern>/student</url-pattern>
+  </servlet-mapping>
     <session-config>
         <session-timeout>
             150
