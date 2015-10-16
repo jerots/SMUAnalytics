@@ -141,4 +141,37 @@ public class AppDAO {
 
         return null;
     }
+    
+    public TreeMap<String, ArrayList<Integer>> retrieveByCategory() {
+
+        TreeMap<String, ArrayList<Integer>> result = new TreeMap<String, ArrayList<Integer>>();
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+
+            PreparedStatement ps = conn.prepareStatement("SELECT appid, appcategory from app");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int appid = rs.getInt(1);
+                String appcategory = rs.getString(2);
+                if(result.containsKey(appcategory)) {
+                    ArrayList<Integer> value = result.get(appcategory);
+                    value.add(appid);
+                    result.put(appcategory, value);
+                } else {
+                    ArrayList<Integer> value = new ArrayList<Integer>();
+                    value.add(appid);
+                    result.put(appcategory, value);
+                }
+            }
+
+        } catch (SQLException e) {
+
+        }
+
+        return result;
+    }
 }
