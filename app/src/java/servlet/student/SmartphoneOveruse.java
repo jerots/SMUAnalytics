@@ -50,7 +50,7 @@ public class SmartphoneOveruse extends HttpServlet {
             TreeMap<String, String> result = new TreeMap<String, String>();
         System.out.println("BBBBBBBB");
             HttpSession session = request.getSession();
-            User loggedInUser = (User) session.getAttribute("user");
+            User loggedInUser = (User) session.getAttribute("user");         
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDatetime = dateFormat.parse(startDateStr + " " + startTimeStr, new ParsePosition(0));
@@ -58,6 +58,7 @@ public class SmartphoneOveruse extends HttpServlet {
         System.out.println("CCCCCCCCCCC");
             SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
              System.out.println("hhhhhhh");
+              System.out.println("loggedinuser = " + loggedInUser.getMacAddress() +"startDatetime = "+ startDatetime + endDatetime);
             result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
                     System.out.println("DDDDDDD");
             request.setAttribute("result", result);

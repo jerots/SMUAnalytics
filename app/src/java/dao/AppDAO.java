@@ -109,26 +109,26 @@ public class AppDAO {
 
     public App retrieveAppbyId(int appId) {
 
-        String sql = "SELECT * FROM app WHERE app-id=? ";
-// System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
+        String sql = "SELECT * FROM app WHERE appid=? ";
+ System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
         try {
             Connection conn = ConnectionManager.getConnection();
-//             System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
+        System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
             PreparedStatement ps = conn.prepareStatement(sql);
-//             System.out.println("PSVALUE" + ps);
+            System.out.println("PSVALUE" + ps);
             
            ps.setInt(1,appId);
-//         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
+         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
             ResultSet rs = ps.executeQuery();
-//   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
+   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
             while (rs.next()) {
 
-//                System.out.println("L");
+               System.out.println("L");
                 int appid = rs.getInt(1);
                 String appname = rs.getString(2);
                 String category = rs.getString(3);
                 
-//                System.out.println("APPNAMMMEEE"+ appname);
+                System.out.println("APPNAMMMEEE"+ appname);
                
                 return new App(appid,appname,category);
                 
