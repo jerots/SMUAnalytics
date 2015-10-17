@@ -116,18 +116,15 @@
                             }
                             Iterator<String> iter = catList.keySet().iterator();
                             out.println("<table class='table'>");
-                            out.println("<tr><th>Category</th><th>Average Duration</th><th>Percentage</th></tr>");//System.out.println(resultMap.size());
+                            out.println("<tr><th>Category</th><th>Average Duration</th><th>Percentage</th></tr>");
 
                             while (iter.hasNext()) {
 
                                 String catName = iter.next();
-                                //out.println(catName);
 
                                 Double[] infoArr = catList.get(catName);
-                                long duration =  Math.round(infoArr[0]);
-                                //out.println(duration);
-                                long percent =  Math.round(infoArr[1]);
-                                //out.println(percent);
+                                long duration = Math.round(infoArr[0]);
+                                long percent = Math.round(infoArr[1]);
                                 out.println("<tr><td>" + catName + "</td><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
 
                             }

@@ -12,7 +12,6 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.TreeMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -73,19 +72,6 @@ public class BasicAppCatAction extends HttpServlet {
                 rd.forward(request,response);
                 return;
             }
-            
-            /*
-            Iterator<String> iter = catList.keySet().iterator();
-            //System.out.println(resultMap.size());
-            while (iter.hasNext()) {
-
-                String catName = iter.next();
-                Double[] infoArr = catList.get(catName);
-                double duration = infoArr[0];
-                double percent = infoArr[1];
-
-            }
-            */
         }
     }
 
