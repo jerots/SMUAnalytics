@@ -361,8 +361,12 @@ public class BasicAppController {
 	}
 
 	public TreeMap<String, Double[]> generateAppCategory(Date startDate, Date endDate) {
-		TreeMap<String, Double> result = new TreeMap<String, Double>();
+
+		//Total Usage Time for each appid
 		TreeMap<Integer, Double> appResult = new TreeMap<Integer, Double>();
+		//Total Usage Time for each category
+		TreeMap<String, Double> result = new TreeMap<String, Double>();
+		//Total Usage Time and Percent for each category
 		TreeMap<String, Double[]> toResult = new TreeMap<String, Double[]>();
 
 		AppUsageDAO auDAO = new AppUsageDAO();
@@ -374,34 +378,31 @@ public class BasicAppController {
 		for (int i = 0; i < userList.size(); i++) {
 
 			User currUser = userList.get(i);
-			//System.out.println("MAC: " + currUser);
 			ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
-			//System.out.println("usageList size: " + userUsage.size());
-
-			double totalSeconds = 0;
 
 			Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
 
 			Date oldTime = null;
-			//int appId = 0;
 			if (userUsage.size() > 0) {
 				oldTime = userUsage.get(0).getDate();
-				//appId = userUsage.get(0).getAppId();
 			}
 
 			for (int j = 1; j < userUsage.size(); j++) {
 				AppUsage au = userUsage.get(j);
 				Date newTime = au.getDate();
+
+				//store oldTime appId
 				int appId = userUsage.get(j - 1).getAppId();
 				boolean beforeAppeared = false;
 				if (newTime.before(nextDay)) {
 					beforeAppeared = true;
-					//difference between app usage timing
+
+					//difference = usage time of the oldTime appId
 					double difference = (newTime.getTime() - oldTime.getTime()) / 1000;
 
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
-						// add difference to totalSeconds if <= 2 mins
+						// add time to the appId
 						if (appResult.containsKey(appId)) {
 							double value = appResult.get(appId);
 							appResult.put(appId, (value + difference));
@@ -410,8 +411,7 @@ public class BasicAppController {
 						}
 
 					} else {
-						// add 10sec to totalSeconds if > 2 mins
-
+						// add 10sec to appid if > 2 mins
 						if (appResult.containsKey(appId)) {
 							double value = appResult.get(appId);
 							appResult.put(appId, (value + 10));
@@ -424,7 +424,7 @@ public class BasicAppController {
 				} else {  // NEW TIMING AFTER NEXT HOUR
 					if (beforeAppeared) {
 						double diff = (nextDay.getTime() - oldTime.getTime()) / 1000;
-
+						//add time to the appid
 						if (appResult.containsKey(appId)) {
 							double value = appResult.get(appId);
 							appResult.put(appId, (value + diff));
@@ -439,12 +439,12 @@ public class BasicAppController {
 				oldTime = newTime;
 
 			}
+			//get the appId of the last user usage
 			int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
-			System.out.println(oldTime);
 			if (oldTime.before(nextDay)) {
-				System.out.println("before totalSeconds" + totalSeconds);
 				double difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
+				//add the time difference to last appId
 				if (difference <= 120) {
 					if (appResult.containsKey(lastAppId)) {
 						double value = appResult.get(lastAppId);
@@ -460,7 +460,6 @@ public class BasicAppController {
 						appResult.put(lastAppId, 10.0);
 					}
 				}
-				System.out.println("after totalSeconds" + totalSeconds);
 			} else {
 				if (appResult.containsKey(lastAppId)) {
 					double value = appResult.get(lastAppId);
@@ -476,10 +475,11 @@ public class BasicAppController {
 
 			AppDAO app = new AppDAO();
 
-			//retrieve all the category
+			//Retrieve appid in each category
 			TreeMap<String, ArrayList<Integer>> appCategoryList = app.retrieveByCategory();
 			Iterator<String> iter = appCategoryList.keySet().iterator();
 			double totTime = 0.0;
+			//Sum the total time by category
 			while (iter.hasNext()) {
 				String key = iter.next();
 				//EACH CATEGORY
@@ -500,31 +500,24 @@ public class BasicAppController {
 				double avgCatTime = totCatTime / days;
 				totTime += avgCatTime;
 				result.put(key, avgCatTime);
-				//Double[] arrToReturn = new Double[2];
-				//arrToReturn[0] = avgCatTime;
-				//result.put(key, arrToReturn);
 			}
 
 			Iterator<String> iterator = result.keySet().iterator();
-			System.out.println("result size" + result.size());
-			DecimalFormat df = new DecimalFormat("####0.00");
-
+			DecimalFormat df = new DecimalFormat("####0.0");
+			//Calculate the percentage for each category
 			while (iterator.hasNext()) {
 
 				String name = iterator.next();
 				double duration = result.get(name);
-				//double duration = infoArr[0];
 				double percent = (duration / totTime) * 100;
-
 				Double[] arrToReturn = new Double[2];
 				arrToReturn[0] = Double.valueOf(df.format(duration));
 				arrToReturn[1] = Double.valueOf(df.format(percent));
-				//arrToReturn[0] = avgCatTime;
 				toResult.put(name, arrToReturn);
+
 			}
 
 		}
-		System.out.println("result size2: " + result.size());
 		return toResult;
 	}
 
@@ -574,16 +567,16 @@ public class BasicAppController {
 						// add 10sec to totalSeconds if > 2 mins
 						secondsThisHour += 10;
 					}
-					
+
 					oldTime = newTime;
 
 				}
-				
-				if (auList.size() > 0){
+
+				if (auList.size() > 0) {
 					Date lastTime = auList.get(auList.size() - 1).getDate();
-					
+
 					long difference = endHour.getTime() - lastTime.getTime() / 1000;
-					
+
 					if (difference <= 2 * 60) {
 						// add difference to totalSeconds if <= 2 mins
 						secondsThisHour += difference;
@@ -591,10 +584,8 @@ public class BasicAppController {
 						// add 10sec to totalSeconds if > 2 mins
 						secondsThisHour += 10;
 					}
-					
-					
+
 				}
-				
 
 			}
 			int numUsers = userList.size();
@@ -612,4 +603,5 @@ public class BasicAppController {
 
 		return result;
 	}
+
 }
