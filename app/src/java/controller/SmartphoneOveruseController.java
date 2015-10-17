@@ -191,7 +191,7 @@ public class SmartphoneOveruseController {
                     
                    // int second = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
                     long defaultSecond = 2400000;
-                    diffSeconds = defaultSecond - second;
+//                    diffSeconds = defaultSecond - second;
                     System.out.println("HEYHEYHEYHEY 8888888888888888");
                     
                     
