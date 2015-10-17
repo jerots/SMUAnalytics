@@ -10,6 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.AddBatchController;
+import dao.AdminDAO;
+import dao.UserDAO;
+import entity.Admin;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -47,10 +51,11 @@ public class AddBatch extends HttpServlet {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonObject output = new JsonObject();
             JsonArray arrayErr = new JsonArray();
-            
+
             String token = request.getParameter("token");
-            
-            if (token == null){
+
+            //TOKEN VALIDATION
+            if (token == null) {
                 arrayErr.add("missing token");
             } else if (token.length() == 0) {
                 arrayErr.add("blank token");
@@ -60,48 +65,55 @@ public class AddBatch extends HttpServlet {
                     if (username == null) {
                         //failed
                         arrayErr.add("invalid token");
+                    } else {
+                        AdminDAO adminDAO = new AdminDAO();
+                        Admin admin = adminDAO.retrieve(username);
+                        if (admin == null) {
+                            arrayErr.add("invalid token");
+                        }
                     }
 
                 } catch (JWTException e) {
                     //failed
                     arrayErr.add("invalid token");
                 }
+
             }
-            
+
             Part filePart = request.getPart("zipFile"); // Retrieves <in addProperty type="file" name="zipFile">
-            if(filePart != null && filePart.getSize() > 0 && arrayErr.size() <= 0){
+            if (filePart != null && filePart.getSize() > 0 && arrayErr.size() <= 0) {
                 //Create ERROR MAPS - and pass to boostrapController to generate
                 TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
-                
+
                 TreeMap<String, Integer> recordMap = null;
-                
-                try{
+
+                try {
                     AddBatchController ctrl = new AddBatchController();
                     recordMap = ctrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
                     //Returns success as the head of the JSON if it is a success.
                     boolean success = false;
-                    if(userErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty() && delErrMap.isEmpty()){
+                    if (userErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty() && delErrMap.isEmpty()) {
                         success = true;
                         output.addProperty("status", "success");
-                    }else{
+                    } else {
                         output.addProperty("status", "error");
                     }
-                    
+
                     //Iterates through the main TreeMap to consolidate the number of rows that were updated.
                     Iterator<String> iter = recordMap.keySet().iterator();
                     JsonArray arr = new JsonArray();
                     JsonObject list = new JsonObject();
-                    while(iter.hasNext()){
+                    while (iter.hasNext()) {
                         String fileName = iter.next();
                         list.addProperty(fileName, recordMap.get(fileName));
                         arr.add(list);
                     }
                     output.add("num-record-uploaded", arr);
-                    
-                    if(!success){ //This only occurs when there is an error in the upload
+
+                    if (!success) { //This only occurs when there is an error in the upload
 
                         //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
                         Iterator<Integer> iterInt = userErrMap.keySet().iterator();
@@ -109,13 +121,13 @@ public class AddBatch extends HttpServlet {
                         list = new JsonObject();
                         JsonArray errors = new JsonArray();
                         //Goes through the list to split all the error messages into a jsonarray
-                        while(iterInt.hasNext()){
+                        while (iterInt.hasNext()) {
                             int id = iterInt.next();
                             list.addProperty("file", "demographics.csv");
                             list.addProperty("line", id);
                             String[] messages = userErrMap.get(id).split(",");
-                            for(String msg: messages){
-                                errors.add(msg); 
+                            for (String msg : messages) {
+                                errors.add(msg);
                             }
                             list.add("message", arr);
                         }
@@ -127,13 +139,13 @@ public class AddBatch extends HttpServlet {
                         list = new JsonObject();
                         errors = new JsonArray();
                         //Goes through the list to split all the error messages into a jsonarray
-                        while(iterInt.hasNext()){
+                        while (iterInt.hasNext()) {
                             int id = iterInt.next();
                             list.addProperty("file", "app.csv");
                             list.addProperty("line", id);
                             String[] messages = auErrMap.get(id).split(",");
-                            for(String msg: messages){
-                                errors.add(msg); 
+                            for (String msg : messages) {
+                                errors.add(msg);
                             }
                             list.add("message", arr);
                         }
@@ -145,13 +157,13 @@ public class AddBatch extends HttpServlet {
                         list = new JsonObject();
                         errors = new JsonArray();
                         //Goes through the list to split all the error messages into a jsonarray
-                        while(iterInt.hasNext()){
+                        while (iterInt.hasNext()) {
                             int id = iterInt.next();
                             list.addProperty("file", "location.csv");
                             list.addProperty("line", id);
                             String[] messages = luErrMap.get(id).split(",");
-                            for(String msg: messages){
-                                errors.add(msg); 
+                            for (String msg : messages) {
+                                errors.add(msg);
                             }
                             list.add("message", arr);
                         }
@@ -163,13 +175,13 @@ public class AddBatch extends HttpServlet {
                         list = new JsonObject();
                         errors = new JsonArray();
                         //Goes through the list to split all the error messages into a jsonarray
-                        while(iterInt.hasNext()){
+                        while (iterInt.hasNext()) {
                             int id = iterInt.next();
                             list.addProperty("file", "location-delete.csv");
                             list.addProperty("line", id);
                             String[] messages = delErrMap.get(id).split(",");
-                            for(String msg: messages){
-                                errors.add(msg); 
+                            for (String msg : messages) {
+                                errors.add(msg);
                             }
                             list.add("message", arr);
                         }
@@ -177,18 +189,18 @@ public class AddBatch extends HttpServlet {
 
                         output.add("error", arr);
                     }
-                }catch(SQLException e){
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                
-            }else{
+
+            } else {
                 //For errors, will throw the errors back IMMEDIATELY without checking the files.
                 output.addProperty("status", "error");
                 output.add("errors", arrayErr);
                 out.println(gson.toJson(output));
-		return;
+                return;
             }
-            
+
             out.println(gson.toJson(output));
         }
     }

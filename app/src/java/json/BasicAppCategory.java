@@ -10,7 +10,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import dao.UserDAO;
 import entity.LocationUsage;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -70,6 +72,12 @@ public class BasicAppCategory extends HttpServlet {
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
+                    } else {
+                        UserDAO userDAO = new UserDAO();
+                        User user = userDAO.retrieve(username);
+                        if (user == null) {
+                            errors.add("invalid token");
+                        }
                     }
 
                 } catch (JWTException e) {

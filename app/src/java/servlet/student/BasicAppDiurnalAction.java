@@ -82,12 +82,8 @@ public class BasicAppDiurnalAction extends HttpServlet {
 
             BasicAppController ctrl = new BasicAppController();
             Breakdown breakdown = null;
-            try {
-                breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
 
             ArrayList<HashMap<String, Breakdown>> breakdownList = breakdown.getBreakdown();
             request.setAttribute("result", breakdownList);

@@ -163,15 +163,11 @@
                             for (HashMap<String, Breakdown> map : breakdownList) {
 
                                 if (map.get("period") != null) {
-                                    
                                     out.println("<tr><td>" + map.get("period").getMessage() + "</td>");
-                                    
                                 }
                                 if (map.get("duration") != null) {
                                     out.println("<td>" + map.get("duration").getMessage() + "</td></tr>");
                                 }
-                                //out.println("<tr><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
-
                             }
                             out.println("</table>");
                         } else {

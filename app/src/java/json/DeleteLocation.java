@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dao.AdminDAO;
+import entity.Admin;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -43,10 +45,11 @@ public class DeleteLocation extends HttpServlet {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonObject output = new JsonObject();
             JsonArray arrayErr = new JsonArray();
-            
+
             String token = request.getParameter("token");
-            
-            if (token == null){
+
+            //TOKEN VALIDATION
+            if (token == null) {
                 arrayErr.add("missing token");
             } else if (token.length() == 0) {
                 arrayErr.add("blank token");
@@ -56,15 +59,21 @@ public class DeleteLocation extends HttpServlet {
                     if (username == null) {
                         //failed
                         arrayErr.add("invalid token");
+                    } else {
+                        AdminDAO adminDAO = new AdminDAO();
+                        Admin admin = adminDAO.retrieve(username);
+                        if (admin == null) {
+                            arrayErr.add("invalid token");
+                        }
                     }
 
                 } catch (JWTException e) {
                     //failed
                     arrayErr.add("invalid token");
                 }
+
             }
-            
-            
+
         }
     }
 

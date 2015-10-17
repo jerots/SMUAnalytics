@@ -10,7 +10,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import dao.UserDAO;
 import entity.Breakdown;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -69,6 +71,12 @@ public class BasicUsetime extends HttpServlet {
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
+                    } else {
+                        UserDAO userDAO = new UserDAO();
+                        User user = userDAO.retrieve(username);
+                        if (user == null) {
+                            errors.add("invalid token");
+                        }
                     }
 
                 } catch (JWTException e) {
@@ -136,7 +144,7 @@ public class BasicUsetime extends HttpServlet {
             HashMap<String, Breakdown> intenseMap = breakdownList.get(0);
             HashMap<String, Breakdown> normalMap = breakdownList.get(1);
             HashMap<String, Breakdown> mildMap = breakdownList.get(2);
-            
+
             JsonArray breakdownArr = new JsonArray();
 
             JsonObject intense = new JsonObject();

@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import controller.BasicAppController;
 import dao.UserDAO;
 import entity.Breakdown;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -71,7 +72,13 @@ public class BasicDiurnalPattern extends HttpServlet {
 					if (username == null) {
 						//failed
 						errors.add("invalid token");
-					}
+					} else {
+                                            UserDAO userDAO = new UserDAO();
+                                            User user = userDAO.retrieve(username);
+                                            if (user == null){
+                                                errors.add("invalid token");
+                                            }
+                                        }
 
 				} catch (JWTException e) {
 					//failed
@@ -82,17 +89,17 @@ public class BasicDiurnalPattern extends HttpServlet {
 
 			//DATE VALIDATION
 			if (date == null) {
-				errors.add("missing startdate");
+				errors.add("missing date");
 			} else if (date.length() == 0) {
-				errors.add("blank startdate");
+				errors.add("blank date");
 			} else {
 				if (date.length() != 10) {
-					errors.add("invalid startdate");
+					errors.add("invalid date");
 				} else {
 					SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 					Date dateFormatted = sdf.parse(date, new ParsePosition(0));
 					if (dateFormatted == null) {
-						errors.add("invalid startdate");
+						errors.add("invalid date");
 					}
 				}
 			}
@@ -155,16 +162,11 @@ public class BasicDiurnalPattern extends HttpServlet {
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date startDate = dateFormat.parse(date + " " + "00:00:00", new ParsePosition(0));
-//			Date endDate = dateFormat.parse(date + " " + "23:59:59", new ParsePosition(0));
-//
+
 			BasicAppController ctrl = new BasicAppController();
 			Breakdown breakdown = null;
-			try {
-				breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			
+                        breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
 			output.addProperty("status", "success");
 			JsonArray arr = new JsonArray();
 			output.add("breakdown", arr);

@@ -48,5 +48,34 @@ public class AdminDAO {
 		
 		return null;
 	}
+        
+        
+        public Admin retrieve(String username){
+		
+		String sql = "SELECT * FROM admin WHERE username=?";
+		
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, username);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()){
+				
+				return new Admin(rs.getString(1),rs.getString(2));
+				
+			}
+			
+			ConnectionManager.close(conn,ps);
+			
+		} catch (SQLException e){
+			
+		}
+		
+		
+		return null;
+	}
 	
 }

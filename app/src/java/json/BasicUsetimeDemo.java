@@ -10,7 +10,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import dao.UserDAO;
 import entity.Breakdown;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -71,6 +73,12 @@ public class BasicUsetimeDemo extends HttpServlet {
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
+                    } else {
+                        UserDAO userDAO = new UserDAO();
+                        User user = userDAO.retrieve(username);
+                        if (user == null) {
+                            errors.add("invalid token");
+                        }
                     }
 
                 } catch (JWTException e) {
@@ -164,11 +172,11 @@ public class BasicUsetimeDemo extends HttpServlet {
             Breakdown breakdown = null;
             try {
 //            breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
-				breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
-            
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                breakdown = ctrl.generateReportByDemo(startDate, endDate, validArr);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             output.addProperty("status", "success");
             JsonArray arr = new JsonArray();
             output.add("breakdown", arr);
@@ -199,12 +207,11 @@ public class BasicUsetimeDemo extends HttpServlet {
                 obj.addProperty("count", count.getMessage());
 
             }
-			
-			Breakdown percent = map.get("percent");
-			if (percent != null){
-				obj.addProperty("percent", percent.getMessage());
-			}
-			
+
+            Breakdown percent = map.get("percent");
+            if (percent != null) {
+                obj.addProperty("percent", percent.getMessage());
+            }
 
             Breakdown further = map.get("breakdown");
             if (further != null) {

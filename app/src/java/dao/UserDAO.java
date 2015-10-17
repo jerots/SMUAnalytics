@@ -355,6 +355,28 @@ public class UserDAO {
         return null;
     }
 	
-	
+    public User retrieve(String username) {
+        String sql = "SELECT * FROM user WHERE email like ?";
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, username + "@%.smu.edu.sg");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                return new User(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5));
+
+            }
+
+        } catch (SQLException e) {
+
+        }
+
+        return null;
+    }
 	
 }
