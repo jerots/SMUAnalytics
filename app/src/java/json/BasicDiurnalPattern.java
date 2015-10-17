@@ -118,7 +118,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (genderFilter.length() == 0) {
 				errors.add("blank genderfilter");
 			} else {
-
+				genderFilter = genderFilter.toUpperCase();
 				if (!genders.contains(genderFilter) && !genderFilter.equals("NA")) {
 					errors.add("invalid genderfilter");
 				}

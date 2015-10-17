@@ -398,7 +398,7 @@ public class AppUsageDAO {
 		return result;
 	}
 	
-	public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startDate, Date endDate) {
+	public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startHour, Date endHour) {
 
 		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
 
@@ -408,9 +408,11 @@ public class AppUsageDAO {
 
 			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
 					+ "timestamp >= ? AND timestamp < ? "
-					+ "AND macaddress = ? order by timestamp");
-			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+					+ "AND macaddress = ? "
+					+ "ORDER BY timestamp");
+			
+			ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
 			ps.setString(3, macAdd);
 
 			ResultSet rs = ps.executeQuery();

@@ -536,6 +536,10 @@ public class BasicAppController {
 			Date endHour = new Date(startHour.getTime() + 1000 * 60 * 60);
 			miniMap.put("period", new Breakdown(sdf.format(startHour) + "-" + sdf.format(endHour)));
 
+			//get number of targetted users
+			Date endDate = new Date(startDate.getTime() + 1000 * 60 * 60 * 24);
+			ArrayList<User> targetList = auDAO.retrieveUserByDemo(startDate, endDate, demoArr);
+			int targetCount = targetList.size();
 			//get userList for this hour, filtered by demo
 			ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
 
@@ -552,6 +556,7 @@ public class BasicAppController {
 					oldTime = auList.get(0).getDate();
 				}
 
+				//For each appusage in appUsageList
 				for (int j = 1; j < auList.size(); j++) {
 					Date newTime = auList.get(j).getDate();
 
@@ -571,27 +576,23 @@ public class BasicAppController {
 					oldTime = newTime;
 
 				}
-
+				//Add 10 seconds for the last appusage in the list
 				if (auList.size() > 0) {
 					Date lastTime = auList.get(auList.size() - 1).getDate();
 
 					long difference = endHour.getTime() - lastTime.getTime() / 1000;
 
-					if (difference <= 2 * 60) {
-						// add difference to totalSeconds if <= 2 mins
-						secondsThisHour += difference;
-					} else {
-						// add 10sec to totalSeconds if > 2 mins
-						secondsThisHour += 10;
+					if (difference > 10) {
+						difference = 10;
 					}
+					secondsThisHour += difference;
 
 				}
 
 			}
-			int numUsers = userList.size();
 			//divide by all users in this hour to get average usage time in this hour
-			if (numUsers > 0) {
-				secondsThisHour /= numUsers;
+			if (targetCount > 0) {
+				secondsThisHour /= targetCount;
 
 			}
 
