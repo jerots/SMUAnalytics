@@ -12,6 +12,7 @@ import entity.AppUsage;
 import entity.Breakdown;
 import entity.User;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -358,173 +359,257 @@ public class BasicAppController {
 		}
 
 	}
-    
-    public TreeMap<String, Double[]> generateAppCategory(Date startDate, Date endDate) {
-        TreeMap<String, Double> result = new TreeMap<String, Double>();
-        TreeMap<Integer, Double> appResult = new TreeMap<Integer, Double>();
-        TreeMap<String, Double[]> toResult = new TreeMap<String, Double[]>();
-        
-        AppUsageDAO auDAO = new AppUsageDAO();
-        ArrayList<User> userList = new ArrayList<User>();
 
-        userList = auDAO.retrieveUsers(startDate, endDate);
+	public TreeMap<String, Double[]> generateAppCategory(Date startDate, Date endDate) {
+		TreeMap<String, Double> result = new TreeMap<String, Double>();
+		TreeMap<Integer, Double> appResult = new TreeMap<Integer, Double>();
+		TreeMap<String, Double[]> toResult = new TreeMap<String, Double[]>();
 
-        System.out.println("userList size: " + userList.size());
-        for (int i = 0; i < userList.size(); i++) {
+		AppUsageDAO auDAO = new AppUsageDAO();
+		ArrayList<User> userList = new ArrayList<User>();
 
-            User currUser = userList.get(i);
-            //System.out.println("MAC: " + currUser);
-            ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
-            //System.out.println("usageList size: " + userUsage.size());
+		userList = auDAO.retrieveUsers(startDate, endDate);
 
-            double totalSeconds = 0;
+		System.out.println("userList size: " + userList.size());
+		for (int i = 0; i < userList.size(); i++) {
 
-            Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
+			User currUser = userList.get(i);
+			//System.out.println("MAC: " + currUser);
+			ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
+			//System.out.println("usageList size: " + userUsage.size());
 
-            Date oldTime = null;
-            //int appId = 0;
-            if (userUsage.size() > 0) {
-                oldTime = userUsage.get(0).getDate();
-                //appId = userUsage.get(0).getAppId();
-            }
+			double totalSeconds = 0;
 
-            for (int j = 1; j < userUsage.size(); j++) {
-                AppUsage au = userUsage.get(j);
-                Date newTime = au.getDate();
-                int appId = userUsage.get(j-1).getAppId();
-                boolean beforeAppeared = false;
-                if (newTime.before(nextDay)) {
-                    beforeAppeared = true;
-                    //difference between app usage timing
-                    double difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+			Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
 
-                    //If difference less than/equal 2 minutes
-                    if (difference <= 2 * 60) {
-                        // add difference to totalSeconds if <= 2 mins
-                        if (appResult.containsKey(appId)) {
-                            double value = appResult.get(appId);
-                            appResult.put(appId, (value + difference));
-                        } else {
-                            appResult.put(appId, difference);
-                        }
+			Date oldTime = null;
+			//int appId = 0;
+			if (userUsage.size() > 0) {
+				oldTime = userUsage.get(0).getDate();
+				//appId = userUsage.get(0).getAppId();
+			}
 
-                    } else {
-                        // add 10sec to totalSeconds if > 2 mins
-                        
-                        if (appResult.containsKey(appId)) {
-                            double value = appResult.get(appId);
-                            appResult.put(appId, (value + 10));
-                        } else {
-                            appResult.put(appId, 10.0);
-                        }
-                   
-                    }
+			for (int j = 1; j < userUsage.size(); j++) {
+				AppUsage au = userUsage.get(j);
+				Date newTime = au.getDate();
+				int appId = userUsage.get(j - 1).getAppId();
+				boolean beforeAppeared = false;
+				if (newTime.before(nextDay)) {
+					beforeAppeared = true;
+					//difference between app usage timing
+					double difference = (newTime.getTime() - oldTime.getTime()) / 1000;
 
-                } else {  // NEW TIMING AFTER NEXT HOUR
-                    if (beforeAppeared) {
-                        double diff = (nextDay.getTime() - oldTime.getTime()) / 1000;
-                        
-                        if (appResult.containsKey(appId)) {
-                        double value = appResult.get(appId);
-                        appResult.put(appId, (value + diff));
-                        } else {
-                            appResult.put(appId, diff);
-                        }
-                    }
-                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
-                    
-                    
-                }
+					//If difference less than/equal 2 minutes
+					if (difference <= 2 * 60) {
+						// add difference to totalSeconds if <= 2 mins
+						if (appResult.containsKey(appId)) {
+							double value = appResult.get(appId);
+							appResult.put(appId, (value + difference));
+						} else {
+							appResult.put(appId, difference);
+						}
 
-                oldTime = newTime;
+					} else {
+						// add 10sec to totalSeconds if > 2 mins
 
-            }
-            int lastAppId = userUsage.get(userUsage.size()-1).getAppId();
-            
-            System.out.println(oldTime);
-            if (oldTime.before(nextDay)) {
-                System.out.println("before totalSeconds" + totalSeconds);
-                double difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
-                if (difference <= 120) {
-                    if (appResult.containsKey(lastAppId)) {
-                        double value = appResult.get(lastAppId);
-                        appResult.put(lastAppId, (value + difference));
-                    } else {
-                        appResult.put(lastAppId, difference);
-                    }
-                } else {
-                    if (appResult.containsKey(lastAppId)) {
-                        double value = appResult.get(lastAppId);
-                        appResult.put(lastAppId, (value + 10));
-                    } else {
-                        appResult.put(lastAppId, 10.0);
-                    }
-                }
-                System.out.println("after totalSeconds" + totalSeconds);
-            } else {
-                if (appResult.containsKey(lastAppId)) {
-                    double value = appResult.get(lastAppId);
-                    appResult.put(lastAppId, (value + 10));
-                } else {
-                    appResult.put(lastAppId, 10.0);
-                }
+						if (appResult.containsKey(appId)) {
+							double value = appResult.get(appId);
+							appResult.put(appId, (value + 10));
+						} else {
+							appResult.put(appId, 10.0);
+						}
 
-            }
+					}
 
-            //DIVIDE TO GET INTO DAYS
-            long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
+				} else {  // NEW TIMING AFTER NEXT HOUR
+					if (beforeAppeared) {
+						double diff = (nextDay.getTime() - oldTime.getTime()) / 1000;
 
-            AppDAO app = new AppDAO();
+						if (appResult.containsKey(appId)) {
+							double value = appResult.get(appId);
+							appResult.put(appId, (value + diff));
+						} else {
+							appResult.put(appId, diff);
+						}
+					}
+					nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
 
-            //retrieve all the category
-            TreeMap<String, ArrayList<Integer>> appCategoryList = app.retrieveByCategory();
-            Iterator<String> iter = appCategoryList.keySet().iterator();
-            double totTime = 0.0;
-            while (iter.hasNext()) {
-                String key = iter.next();
-                //EACH CATEGORY
-                ArrayList<Integer> innerList = appCategoryList.get(key);
-                System.out.println("Category: " + key);
-                double totCatTime = 0.0;
-                for (int j = 0; j < innerList.size(); j++) {
-                    int appid = innerList.get(j);
-                    double timePerApp = 0.0;
-                    
-                    if(appResult.containsKey(appid)) {
-                        timePerApp = appResult.get(appid);
-                        
-                    }
-                    totCatTime += timePerApp; 
-                }
-                
-                double avgCatTime = totCatTime / days;
-                totTime += avgCatTime;
-                result.put(key, avgCatTime);
-                //Double[] arrToReturn = new Double[2];
-                //arrToReturn[0] = avgCatTime;
-                //result.put(key, arrToReturn);
-            }
-            
-            Iterator<String> iterator = result.keySet().iterator();
-            System.out.println("result size" + result.size());
-            DecimalFormat df = new DecimalFormat("####0.00");
+				}
 
-            while (iterator.hasNext()) {
-                
-                String name = iterator.next();
-                double duration = result.get(name);
-                //double duration = infoArr[0];
-                double percent = (duration/totTime) * 100;
-                
-                Double[] arrToReturn = new Double[2];
-                arrToReturn[0] = Double.valueOf(df.format(duration));
-                arrToReturn[1] = Double.valueOf(df.format(percent));
-                //arrToReturn[0] = avgCatTime;
-                toResult.put(name, arrToReturn);
-            }
-            
-        }
-        System.out.println("result size2: " + result.size());
-        return toResult;
-    }
+				oldTime = newTime;
+
+			}
+			int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
+
+			System.out.println(oldTime);
+			if (oldTime.before(nextDay)) {
+				System.out.println("before totalSeconds" + totalSeconds);
+				double difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
+				if (difference <= 120) {
+					if (appResult.containsKey(lastAppId)) {
+						double value = appResult.get(lastAppId);
+						appResult.put(lastAppId, (value + difference));
+					} else {
+						appResult.put(lastAppId, difference);
+					}
+				} else {
+					if (appResult.containsKey(lastAppId)) {
+						double value = appResult.get(lastAppId);
+						appResult.put(lastAppId, (value + 10));
+					} else {
+						appResult.put(lastAppId, 10.0);
+					}
+				}
+				System.out.println("after totalSeconds" + totalSeconds);
+			} else {
+				if (appResult.containsKey(lastAppId)) {
+					double value = appResult.get(lastAppId);
+					appResult.put(lastAppId, (value + 10));
+				} else {
+					appResult.put(lastAppId, 10.0);
+				}
+
+			}
+
+			//DIVIDE TO GET INTO DAYS
+			long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
+
+			AppDAO app = new AppDAO();
+
+			//retrieve all the category
+			TreeMap<String, ArrayList<Integer>> appCategoryList = app.retrieveByCategory();
+			Iterator<String> iter = appCategoryList.keySet().iterator();
+			double totTime = 0.0;
+			while (iter.hasNext()) {
+				String key = iter.next();
+				//EACH CATEGORY
+				ArrayList<Integer> innerList = appCategoryList.get(key);
+				System.out.println("Category: " + key);
+				double totCatTime = 0.0;
+				for (int j = 0; j < innerList.size(); j++) {
+					int appid = innerList.get(j);
+					double timePerApp = 0.0;
+
+					if (appResult.containsKey(appid)) {
+						timePerApp = appResult.get(appid);
+
+					}
+					totCatTime += timePerApp;
+				}
+
+				double avgCatTime = totCatTime / days;
+				totTime += avgCatTime;
+				result.put(key, avgCatTime);
+				//Double[] arrToReturn = new Double[2];
+				//arrToReturn[0] = avgCatTime;
+				//result.put(key, arrToReturn);
+			}
+
+			Iterator<String> iterator = result.keySet().iterator();
+			System.out.println("result size" + result.size());
+			DecimalFormat df = new DecimalFormat("####0.00");
+
+			while (iterator.hasNext()) {
+
+				String name = iterator.next();
+				double duration = result.get(name);
+				//double duration = infoArr[0];
+				double percent = (duration / totTime) * 100;
+
+				Double[] arrToReturn = new Double[2];
+				arrToReturn[0] = Double.valueOf(df.format(duration));
+				arrToReturn[1] = Double.valueOf(df.format(percent));
+				//arrToReturn[0] = avgCatTime;
+				toResult.put(name, arrToReturn);
+			}
+
+		}
+		System.out.println("result size2: " + result.size());
+		return toResult;
+	}
+
+	public Breakdown generateDiurnalReport(Date startDate, String[] demoArr) {
+
+		Breakdown result = new Breakdown();
+		AppUsageDAO auDAO = new AppUsageDAO();
+		Date startHour = startDate;
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:00");
+		//for each hour (for 24 loop)
+		for (int i = 0; i < 24; i++) {
+
+			HashMap<String, Breakdown> miniMap = new HashMap<String, Breakdown>();
+			result.addInList(miniMap);
+
+			Date endHour = new Date(startHour.getTime() + 1000 * 60 * 60);
+			miniMap.put("period", new Breakdown(sdf.format(startHour) + "-" + sdf.format(endHour)));
+
+			//get userList for this hour, filtered by demo
+			ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
+
+			int secondsThisHour = 0;
+
+			//for each user
+			for (User user : userList) {
+
+				//retrieve appUsageList
+				ArrayList<AppUsage> auList = auDAO.retrieveByUserHourly(user.getMacAddress(), startHour, endHour);
+
+				Date oldTime = null;
+				if (auList.size() > 0) {
+					oldTime = auList.get(0).getDate();
+				}
+
+				for (int j = 1; j < auList.size(); j++) {
+					Date newTime = auList.get(j).getDate();
+
+					//calculate usageTime and add to secondsThisHour
+					//difference between app usage timing
+					long difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+
+					//If difference less than/equal 2 minutes
+					if (difference <= 2 * 60) {
+						// add difference to totalSeconds if <= 2 mins
+						secondsThisHour += difference;
+					} else {
+						// add 10sec to totalSeconds if > 2 mins
+						secondsThisHour += 10;
+					}
+					
+					oldTime = newTime;
+
+				}
+				
+				if (auList.size() > 0){
+					Date lastTime = auList.get(auList.size() - 1).getDate();
+					
+					long difference = endHour.getTime() - lastTime.getTime() / 1000;
+					
+					if (difference <= 2 * 60) {
+						// add difference to totalSeconds if <= 2 mins
+						secondsThisHour += difference;
+					} else {
+						// add 10sec to totalSeconds if > 2 mins
+						secondsThisHour += 10;
+					}
+					
+					
+				}
+				
+
+			}
+			int numUsers = userList.size();
+			//divide by all users in this hour to get average usage time in this hour
+			if (numUsers > 0) {
+				secondsThisHour /= numUsers;
+
+			}
+
+			//store in breakdown
+			miniMap.put("duration", new Breakdown("" + secondsThisHour));
+
+			startHour = endHour;
+		}
+
+		return result;
+	}
 }
