@@ -79,60 +79,56 @@
         <div class="theme-container container">
             <div class="row">
                 <div class="theme-div" style="width:37%">
-                    <form action="BasicAppCatAction">
+                    <form action="BasicAppDiurnalAction">
                         <div class="form-group">
                             <label for="date">Date</label>
                             <input type="date" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
                         </div>
                         <div class="form-group">
                             <label for="year">Year</label>
-							<select name="yearfilter" class="form-control">
-								<option value="NA">- Year Filter -</option>
-								<%
-									UserDAO userDAO = new UserDAO();
-									
-									ArrayList<String> years = userDAO.getYears();
-									for (String year: years){
-										
-										out.println("<option value='"+ year +"'>"+ year +"</option>");
-										
-									}
-								
-								%>
-								
-							</select>
+                            <select name="yearfilter" class="form-control">
+                                <option value="NA">- Year Filter -</option>
+                                <%
+                                    UserDAO userDAO = new UserDAO();
+
+                                    ArrayList<String> years = userDAO.getYears();
+                                    for (String year : years) {
+
+                                        out.println("<option value='" + year + "'>" + year + "</option>");
+
+                                    }
+
+                                %>
+
+                            </select>
                         </div>
-						<div class="form-group">
+                        <div class="form-group">
                             <label for="gender">Gender</label>
-							<select class="form-control">
-								<option value="NA">- Gender Filter -</option>
-								<%
-									
-									ArrayList<String> genders = userDAO.getGenders();
-									for (String gender : genders){
-										
-										out.println("<option value='"+ gender +"'>"+ gender +"</option>");
-										
-									}
-								
-								%>
-							</select>
+                            <select name="genderfilter" class="form-control">
+                                <option value="NA">- Gender Filter -</option>
+                                <%                                                                    ArrayList<String> genders = userDAO.getGenders();
+                                    for (String gender : genders) {
+
+                                        out.println("<option value='" + gender + "'>" + gender + "</option>");
+
+                                    }
+
+                                %>
+                            </select>
                         </div>
-						<div class="form-group">
+                        <div class="form-group">
                             <label for="school">School</label>
-							<select class="form-control">
-								<option value="NA">- School Filter -</option>
-								<%
-									
-									ArrayList<String> schools = userDAO.getSchools();
-									for (String school : schools){
-										
-										out.println("<option value='"+ school +"'>"+ school +"</option>");
-										
-									}
-								
-								%>
-							</select>
+                            <select name="schoolfilter"class="form-control">
+                                <option value="NA">- School Filter -</option>
+                                <%                                                                    ArrayList<String> schools = userDAO.getSchools();
+                                    for (String school : schools) {
+
+                                        out.println("<option value='" + school + "'>" + school + "</option>");
+
+                                    }
+
+                                %>
+                            </select>
                         </div>
 
 
@@ -153,29 +149,28 @@
                             out.println("</ul>");
                             return;
                         }
-                        TreeMap<String, Double[]> catList = (TreeMap<String, Double[]>) request.getAttribute("result");
+                        ArrayList<HashMap<String, Breakdown>> breakdownList = (ArrayList<HashMap<String, Breakdown>>) request.getAttribute("result");
 
-                        if (catList != null) {
-                            if (catList.size() <= 0) {
+                        if (breakdownList != null) {
+                            if (breakdownList.size() <= 0) {
                                 out.println("<h1>Result</h1>");
                                 out.println("Invalid Date. Please select your desired date again.");
                                 return;
                             }
-                            Iterator<String> iter = catList.keySet().iterator();
                             out.println("<table class='table'>");
-                            out.println("<tr><th>Category</th><th>Average Duration</th><th>Percentage</th></tr>");//System.out.println(resultMap.size());
+                            out.println("<tr><th>Timing</th><th>Duration</th></tr>");
 
-                            while (iter.hasNext()) {
+                            for (HashMap<String, Breakdown> map : breakdownList) {
 
-                                String catName = iter.next();
-                                //out.println(catName);
-
-                                Double[] infoArr = catList.get(catName);
-                                long duration =  Math.round(infoArr[0]);
-                                //out.println(duration);
-                                long percent =  Math.round(infoArr[1]);
-                                //out.println(percent);
-                                out.println("<tr><td>" + catName + "</td><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
+                                if (map.get("period") != null) {
+                                    
+                                    out.println("<tr><td>" + map.get("period").getMessage() + "</td>");
+                                    
+                                }
+                                if (map.get("duration") != null) {
+                                    out.println("<td>" + map.get("duration").getMessage() + "</td></tr>");
+                                }
+                                //out.println("<tr><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
 
                             }
                             out.println("</table>");

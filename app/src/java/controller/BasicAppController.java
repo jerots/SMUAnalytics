@@ -526,7 +526,7 @@ public class BasicAppController {
 		Breakdown result = new Breakdown();
 		AppUsageDAO auDAO = new AppUsageDAO();
 		Date startHour = startDate;
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:00");
+		SimpleDateFormat sdf = new SimpleDateFormat("HH.00");
 		//for each hour (for 24 loop)
 		for (int i = 0; i < 24; i++) {
 
