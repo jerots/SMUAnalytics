@@ -43,7 +43,14 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
                     <ul class="nav navbar-nav">
-                        <li><a href="student">Basic App Usage</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Basic App Usage <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="student">Basic App (with demographic)</a></li>
+                                <li><a href="basicapp-appcat.jsp">App category</a></li>
+                                <li><a href="basicapp-diurnal.jsp">Diurnal Report</a></li>
+                            </ul>
+                        </li>
                         <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>

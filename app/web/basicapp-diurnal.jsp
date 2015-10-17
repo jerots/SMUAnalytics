@@ -90,11 +90,17 @@
                                 <option value="NA">- Year Filter -</option>
                                 <%
                                     UserDAO userDAO = new UserDAO();
-
+									String yearFilter = request.getParameter("yearfilter");
+									if (yearFilter == null){
+										yearFilter = "";
+									}
                                     ArrayList<String> years = userDAO.getYears();
                                     for (String year : years) {
-
-                                        out.println("<option value='" + year + "'>" + year + "</option>");
+										String code = "";
+										if (year.equals(yearFilter)){
+											code = "selected";
+										}
+                                        out.println("<option value='" + year + "' "+ code +">" + year + "</option>");
 
                                     }
 
@@ -106,10 +112,18 @@
                             <label for="gender">Gender</label>
                             <select name="genderfilter" class="form-control">
                                 <option value="NA">- Gender Filter -</option>
-                                <%                                                                    ArrayList<String> genders = userDAO.getGenders();
+                                <%         
+									String genderFilter = request.getParameter("genderfilter");
+									if (genderFilter == null){
+										genderFilter = "";
+									}
+									ArrayList<String> genders = userDAO.getGenders();
                                     for (String gender : genders) {
-
-                                        out.println("<option value='" + gender + "'>" + gender + "</option>");
+										String code = "";
+										if (gender.equals(genderFilter)){
+											code = "selected";
+										}
+                                        out.println("<option value='" + gender + "' "+ code +" >" + gender + "</option>");
 
                                     }
 
@@ -118,12 +132,20 @@
                         </div>
                         <div class="form-group">
                             <label for="school">School</label>
-                            <select name="schoolfilter"class="form-control">
+                            <select name="schoolfilter" class="form-control">
                                 <option value="NA">- School Filter -</option>
-                                <%                                                                    ArrayList<String> schools = userDAO.getSchools();
+                                <%           
+									String schoolFilter = request.getParameter("schoolfilter");
+									if (schoolFilter == null){
+										schoolFilter = "";
+									}
+									ArrayList<String> schools = userDAO.getSchools();
                                     for (String school : schools) {
-
-                                        out.println("<option value='" + school + "'>" + school + "</option>");
+										String code = "";
+										if (school.equals(schoolFilter)){
+											code = "selected";
+										}
+                                        out.println("<option value='" + school + "' "+ code +">" + school + "</option>");
 
                                     }
 
@@ -158,7 +180,7 @@
                                 return;
                             }
                             out.println("<table class='table'>");
-                            out.println("<tr><th>Timing</th><th>Duration</th></tr>");
+                            out.println("<tr><th>Timing (24 hours)</th><th>Duration</th></tr>");
 
                             for (HashMap<String, Breakdown> map : breakdownList) {
 
