@@ -538,9 +538,8 @@ public class BasicAppController {
 			
 			//get number of targetted users
 			Date endDate = new Date(startDate.getTime() + 1000 * 60 * 60 * 24);
-			ArrayList<User> targetList = auDAO.retrieveUsers(startDate, endDate);
+			ArrayList<User> targetList = auDAO.retrieveUserByDemo(startDate, endDate, demoArr);
 			int targetCount = targetList.size();
-			
 			//get userList for this hour, filtered by demo
 			ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
 
@@ -556,7 +555,8 @@ public class BasicAppController {
 				if (auList.size() > 0) {
 					oldTime = auList.get(0).getDate();
 				}
-
+				
+				//For each appusage in appUsageList
 				for (int j = 1; j < auList.size(); j++) {
 					Date newTime = auList.get(j).getDate();
 
@@ -567,9 +567,6 @@ public class BasicAppController {
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
 						// add difference to totalSeconds if <= 2 mins
-//						if (difference > 10){
-//							difference = 10;
-//						}
 						secondsThisHour += difference;
 					} else {
 						// add 10sec to totalSeconds if > 2 mins
@@ -579,7 +576,7 @@ public class BasicAppController {
 					oldTime = newTime;
 
 				}
-
+				//Add 10 seconds for the last appusage in the list
 				if (auList.size() > 0) {
 					Date lastTime = auList.get(auList.size() - 1).getDate();
 
