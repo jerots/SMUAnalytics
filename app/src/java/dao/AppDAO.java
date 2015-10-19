@@ -110,17 +110,13 @@ public class AppDAO {
     public App retrieveAppbyId(int appId) {
 
         String sql = "SELECT * FROM app WHERE appid=? ";
- System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
         try {
             Connection conn = ConnectionManager.getConnection();
-        System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
             PreparedStatement ps = conn.prepareStatement(sql);
             System.out.println("PSVALUE" + ps);
             
            ps.setInt(1,appId);
-         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
             ResultSet rs = ps.executeQuery();
-   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
             while (rs.next()) {
 
                System.out.println("L");
@@ -128,7 +124,6 @@ public class AppDAO {
                 String appname = rs.getString(2);
                 String category = rs.getString(3);
                 
-                System.out.println("APPNAMMMEEE"+ appname);
                
                 return new App(appid,appname,category);
                 

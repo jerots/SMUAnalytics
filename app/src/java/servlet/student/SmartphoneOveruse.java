@@ -46,21 +46,16 @@ public class SmartphoneOveruse extends HttpServlet {
             String startTimeStr = request.getParameter("startTime");
             String endDateStr = request.getParameter("endDate");
             String endTimeStr = request.getParameter("endTime");
-            System.out.println("AAAAAAAAAAAAA");
             TreeMap<String, String> result = new TreeMap<String, String>();
-        System.out.println("BBBBBBBB");
             HttpSession session = request.getSession();
-            User loggedInUser = (User) session.getAttribute("user");         
+            User loggedInUser = (User) session.getAttribute("user");
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDatetime = dateFormat.parse(startDateStr + " " + startTimeStr, new ParsePosition(0));
             Date endDatetime = dateFormat.parse(endDateStr + " " + endTimeStr, new ParsePosition(0));
-        System.out.println("CCCCCCCCCCC");
             SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
-             System.out.println("hhhhhhh");
-              System.out.println("loggedinuser = " + loggedInUser.getMacAddress() +"startDatetime = "+ startDatetime + endDatetime);
             result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
-                    System.out.println("DDDDDDD");
+            System.out.println("TESTING result printing" + result.size());
             request.setAttribute("result", result);
             RequestDispatcher view = request.getRequestDispatcher("smartphoneOveruse.jsp");
             view.forward(request, response);

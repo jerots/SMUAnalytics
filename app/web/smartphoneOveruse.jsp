@@ -66,6 +66,8 @@
             </div><!-- /.container-fluid -->
         </nav>
         <!--END OF NAV BAR-->
+        
+        
         <!--START OF CONTENT-->
         <%
             String time = (String) request.getAttribute("time");
@@ -78,8 +80,6 @@
             if (time != null) {
                 timeCode = "value='" + time + "'";
             }
-
-
         %>
 
 
@@ -107,28 +107,37 @@
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
                 </div>
+                        
                 <div class="theme-div theme-content" style="width:60%">
                     <%
 
-                        HashMap<String, String> result = (HashMap<String, String>) request.getAttribute("result");
+                        TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
                         
                         if (result != null) {
                             out.print("results: ");
 
-                            out.print(result.get("overuseindex"));
+                            out.print(result.get("overuseindex")+"<br>");
 
                             out.print("results: ");
-                            out.print(result.get("usage"));
+                            out.print(result.get("usage")+"<br>");
 
                             out.print("results: ");
-                            out.print(result.get("gaming"));
+                            out.print(result.get("gaming")+"<br>");
+                            
+                            
+                            out.print("results: ");
+                            out.print(result.get("frequency"));
+
 
                         }
+                        
+     
                     %>
 
                 </div>
 
             </div>
+                    
         </div>
         <!--END OF CONTENT-->
 
