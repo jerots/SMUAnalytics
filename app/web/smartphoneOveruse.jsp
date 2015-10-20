@@ -114,18 +114,18 @@
                         TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
                         
                         if (result != null) {
-                            out.print("results: ");
+                            out.print("Overuse results: ");
 
                             out.print(result.get("overuseindex")+"<br>");
 
-                            out.print("results: ");
+                            out.print("Usage results: ");
                             out.print(result.get("usage")+"<br>");
 
-                            out.print("results: ");
+                            out.print("Gaming Usage results: ");
                             out.print(result.get("gaming")+"<br>");
                             
                             
-                            out.print("results: ");
+                            out.print("Access Frequency results: ");
                             out.print(result.get("frequency"));
 
 
