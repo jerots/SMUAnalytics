@@ -411,10 +411,9 @@ public class LocationUsageDAO {
 			Connection conn = ConnectionManager.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
 
-			
-			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
-			ps.setString(3, macAdd);
+			ps.setString(1, macAdd);
+			ps.setString(2, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(3, new java.sql.Timestamp(endDate.getTime()).toString());
 
 			ResultSet rs = ps.executeQuery();
 

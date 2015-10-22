@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import javax.servlet.ServletException;
@@ -108,7 +109,7 @@ public class SocialActiveness extends HttpServlet {
 				return;
 			}
 
-			//PASSES ALL VALIDATION, proceed to report generation
+			//PASSES ALL VALIDATION, proceed to onlineReport generation
 			output.addProperty("status", "success");
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -117,28 +118,33 @@ public class SocialActiveness extends HttpServlet {
 
 			SocialActivenessController ctrl = new SocialActivenessController();
 
-			TreeMap<String, String> report = ctrl.generateOnlineReport(startDate, endDate, username);
+			TreeMap<String, String> onlineReport = ctrl.generateOnlineReport(startDate, endDate, username);
 
 			JsonObject results = new JsonObject();
 			output.add("results", results);
 
-			String socialAppDuration = report.get("total-social-app-usage-duration");
+			String socialAppDuration = onlineReport.get("total-social-app-usage-duration");
 			results.addProperty("total-social-app-usage-duration", socialAppDuration);
 			
 			JsonArray appUsageArr = new JsonArray();
 			results.add("individual-social-app-usage", appUsageArr);
-			report.remove("total-social-app-usage-duration");
-			Iterator<String> iter = report.keySet().iterator();
+			onlineReport.remove("total-social-app-usage-duration");
+			Iterator<String> iter = onlineReport.keySet().iterator();
 
 			while (iter.hasNext()) {
 				String appName = iter.next();
-				String percentage = report.get(appName);
+				String percentage = onlineReport.get(appName);
 				JsonObject obj = new JsonObject();
 				obj.addProperty("app-name", appName);
 				obj.addProperty("percent", percentage);
 				appUsageArr.add(obj);
 
 			}
+			
+			HashMap<String,String> physicalReport = ctrl.generatePhysicalReport(startDate, endDate, username);
+			
+			String totalTime = physicalReport.get("total-time-spent-in-sis");
+			results.addProperty("total-time-spent-in-sis", totalTime);
 			
 			
 			out.println(gson.toJson(output));

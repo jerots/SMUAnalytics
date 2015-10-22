@@ -138,15 +138,60 @@ public class SocialActivenessController {
 
 	}
 	
-	public TreeMap<String, String> generatePhysicalReport(Date startDate, Date endDate, String username) {
+	public HashMap<String, String> generatePhysicalReport(Date startDate, Date endDate, String username) {
+
+		//INSTANTIATING
+		HashMap<String,String> result = new HashMap<String,String>();
+		LocationUsageDAO luDAO = new LocationUsageDAO();
+		UserDAO userDAO = new UserDAO();
+		User user = userDAO.retrieve(username);
+		String macaddress = user.getMacAddress();
 		
 		//get logged-on user's locationUsage in the day
-		LocationUsageDAO luDAO = new LocationUsageDAO();
-		ArrayList<LocationUsage> luList = luDAO.retrieveByUser(username, startDate, endDate);
+		ArrayList<LocationUsage> luList = luDAO.retrieveByUser(macaddress, startDate, endDate);
+		Date oldTime = null;
+		int totalTime = 0;
+		int prevLocationId = 0;
+		
+		if (luList.size() > 0){
+			LocationUsage firstLU = luList.get(0);
+			oldTime = firstLU.getDate();
+			prevLocationId = firstLU.getLocationId();
+		}
+		
+		for (int i = 1; i < luList.size(); i++){
+			
+			LocationUsage lu = luList.get(i);
+			Date newTime = lu.getDate();
+			int locationId = lu.getLocationId();
+
+			long difference = newTime.getTime() - oldTime.getTime();
+			
+			if (difference <= 300){
+				totalTime += difference;
+				
+				
+			} else {
+				totalTime += 300;
+			}
+		
+		}
+		if (luList.size() > 0){
+			
+			long difference = endDate.getTime() - oldTime.getTime();
+			if (difference <= 300){
+				totalTime += difference;
+			} else {
+				totalTime += 300;
+			}
+			
+		}
+		result.put("total-time-spent-in-sis", "" + totalTime);
 		
 		
 		
-		return null;
+		
+		return result;
 	}
 
 }
