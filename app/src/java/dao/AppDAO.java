@@ -9,6 +9,7 @@ import com.opencsv.CSVReader;
 import entity.Admin;
 import entity.App;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 /*
@@ -22,156 +23,143 @@ import java.util.TreeMap;
  */
 public class AppDAO {
 
-    public AppDAO() {
-    }
+	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> appIdList) throws IOException, SQLException {
+		String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		String[] arr = null;
+		//index starts at 2 because the headers count as a row.
+		int index = 2;
+		while ((arr = reader.readNext()) != null) {
+			boolean err = false;
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> appIdList) throws IOException, SQLException {
-        conn.setAutoCommit(false);
-        String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        String[] arr = null;
-        //index starts at 2 because the headers count as a row.
-        int index = 2;
-        while ((arr = reader.readNext()) != null) {
-            boolean err = false;
+			int appId = Utility.parseInt(arr[0]);
+			if (appId <= 0) {
 
-            int appId = Utility.parseInt(arr[0]);
-            if (appId <= 0) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "invalid app id");
+				} else {
+					errMap.put(index, errorMsg + "," + "invalid app id");
+				}
 
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "invalid app id");
-                } else {
-                    errMap.put(index, errorMsg + "," + "invalid app id");
-                }
+				err = true;
+			}
 
-                err = true;
-            }
+			String name = Utility.parseString(arr[1]);
+			name = name.replace("\"", "");
+			if (name == null) {
 
-            String name = Utility.parseString(arr[1]);
-            name = name.replace("\"", "");
-            if (name == null) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "name cannot be blank");
+				} else {
+					errMap.put(index, errorMsg + "," + "name cannot be blank");
+				}
+				err = true;
+			}
 
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "name cannot be blank");
-                } else {
-                    errMap.put(index, errorMsg + "," + "name cannot be blank");
-                }
-                err = true;
-            }
+			String cat = Utility.parseString(arr[2]);
+			cat = cat.replace("\"", "");
 
-            String cat = Utility.parseString(arr[2]);
-            cat = cat.replace("\"", "");
+			if (cat == null) {
 
-            if (cat == null) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "category cannot be blank");
+				} else {
+					errMap.put(index, errorMsg + "," + "category cannot be blank");
+				}
 
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "category cannot be blank");
-                } else {
-                    errMap.put(index, errorMsg + "," + "category cannot be blank");
-                }
+				err = true;
 
-                err = true;
+			}
 
-            }
+			if (!Utility.checkCategory(cat)) {
 
-            if (!Utility.checkCategory(cat)) {
+				String errorMsg = errMap.get(index);
+				if (errorMsg == null) {
+					errMap.put(index, "invalid category");
+				} else {
+					errMap.put(index, errorMsg + "," + "invalid category");
+				}
+				err = true;
+			}
 
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errMap.put(index, "invalid category");
-                } else {
-                    errMap.put(index, errorMsg + "," + "invalid category");
-                }
-                err = true;
-            }
+			if (!err) {
+				//insert into tables
+				appIdList.put(appId,"");
+				stmt.setInt(1, appId);
+				stmt.setString(2, name);
+				stmt.setString(3, cat);
+				stmt.addBatch();
+			}
+			index++;
+		}
+		//closing
 
-            if (!err) {
-                //insert into tables
-				appIdList.add(appId);
-                stmt.setInt(1, appId);
-                stmt.setString(2, name);
-                stmt.setString(3, cat);
-                stmt.addBatch();
-            }
-            index++;
-        }
-        //closing
+		int[] updatedRecords = stmt.executeBatch();
+		conn.commit();
 
-        int[] updatedRecords = stmt.executeBatch();
-        conn.commit();
+		return updatedRecords;
+	}
+
+	public App retrieveAppbyId(int appId) {
+
+		String sql = "SELECT * FROM app WHERE appid = ? ";
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			ps.setInt(1, appId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+
+				int appid = rs.getInt(1);
+				String appname = rs.getString(2);
+				String category = rs.getString(3);
 
 
-        return updatedRecords;
-    }
+				return new App(appid, appname, category);
 
-    public App retrieveAppbyId(int appId) {
+			}
 
-        String sql = "SELECT * FROM app WHERE appid=? ";
- System.out.println("NNNNNNNNNNAAAAAAAAAAABbbbbbbbbbbb");
-        try {
-            Connection conn = ConnectionManager.getConnection();
-        System.out.println("NNNNNNNNNNAAAAAAAAAAACCCCCCCCCCCCCCC");
-            PreparedStatement ps = conn.prepareStatement(sql);
-            System.out.println("PSVALUE" + ps);
-            
-           ps.setInt(1,appId);
-         System.out.println("NNNNNNNNNNAAAAAAAAAAAEEEEEEEEEEEEG");
-            ResultSet rs = ps.executeQuery();
-   System.out.println("NNNNNNNNNNAAAAAAAAAAAFFFFFFFFFFFFFFF");
-            while (rs.next()) {
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-               System.out.println("L");
-                int appid = rs.getInt(1);
-                String appname = rs.getString(2);
-                String category = rs.getString(3);
-                
-                System.out.println("APPNAMMMEEE"+ appname);
-               
-                return new App(appid,appname,category);
-                
+		return null;
+	}
 
-            }
+	public TreeMap<String, ArrayList<Integer>> retrieveByCategory() {
 
-        } catch (SQLException e) {
+		TreeMap<String, ArrayList<Integer>> result = new TreeMap<String, ArrayList<Integer>>();
 
-        }
+		try {
+			Connection conn = ConnectionManager.getConnection();
 
-        return null;
-    }
-    
-    public TreeMap<String, ArrayList<Integer>> retrieveByCategory() {
+			PreparedStatement ps = conn.prepareStatement("SELECT appid, appcategory from app");
 
-        TreeMap<String, ArrayList<Integer>> result = new TreeMap<String, ArrayList<Integer>>();
+			ResultSet rs = ps.executeQuery();
 
-        try {
-            Connection conn = ConnectionManager.getConnection();
+			while (rs.next()) {
 
-            PreparedStatement ps = conn.prepareStatement("SELECT appid, appcategory from app");
+				int appid = rs.getInt(1);
+				String appcategory = rs.getString(2);
+				if (result.containsKey(appcategory)) {
+					ArrayList<Integer> value = result.get(appcategory);
+					value.add(appid);
+					result.put(appcategory, value);
+				} else {
+					ArrayList<Integer> value = new ArrayList<Integer>();
+					value.add(appid);
+					result.put(appcategory, value);
+				}
+			}
 
-            ResultSet rs = ps.executeQuery();
+		} catch (SQLException e) {
 
-            while (rs.next()) {
+		}
 
-                int appid = rs.getInt(1);
-                String appcategory = rs.getString(2);
-                if(result.containsKey(appcategory)) {
-                    ArrayList<Integer> value = result.get(appcategory);
-                    value.add(appid);
-                    result.put(appcategory, value);
-                } else {
-                    ArrayList<Integer> value = new ArrayList<Integer>();
-                    value.add(appid);
-                    result.put(appcategory, value);
-                }
-            }
-
-        } catch (SQLException e) {
-
-        }
-
-        return result;
-    }
+		return result;
+	}
 }

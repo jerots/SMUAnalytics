@@ -547,7 +547,7 @@ public class BasicAppController {
 
 			//for each user
 			for (User user : userList) {
-
+				
 				//retrieve appUsageList
 				ArrayList<AppUsage> auList = auDAO.retrieveByUserHourly(user.getMacAddress(), startHour, endHour);
 

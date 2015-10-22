@@ -17,7 +17,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Date;
-import java.util.TreeMap;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -34,10 +34,10 @@ public class LocationUsageDAO {
 		locationList = new TreeMap<>();
 	}
 
-	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> locationIdList) throws IOException, SQLException {
-		conn.setAutoCommit(false);
+	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException, SQLException {
 		int index = 2;
-		String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
+
+		String sql = "insert into locationusage values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
 				+ "VALUES(locationid);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
 
@@ -46,89 +46,61 @@ public class LocationUsageDAO {
 			//retrieving per row
 			boolean err = false;
 			String errorMsg = errMap.get(index);
-
+			if (errorMsg == null) {
+				errorMsg = "";
+			}
 			//check timestamp
 			String date = Utility.parseString(arr[0]);
 			if (date == null || !Utility.checkDate(date)) {
-				if (errorMsg == null) {
-					errorMsg = "invalid timestamp";
-				} else {
-					errorMsg += ",invalid timestamp";
-				}
+				errorMsg += ",invalid timestamp";
 				err = true;
 			}
 
 			//check macAdd
 			String macAdd = Utility.parseString(arr[1]);
 			if (macAdd == null) {
-				if (errorMsg == null) {
-					errorMsg = "mac address cannot be blank";
-				} else {
-					errorMsg += ",mac address cannot be blank";
-				}
+				errorMsg += ",mac address cannot be blank";
 				err = true;
-			}
-			if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-				if (errorMsg == null) {
-					errorMsg = "invalid mac address";
-				} else {
-					errorMsg += ",invalid mac address";
-				}
+			} else if (!Utility.checkHexadecimal(macAdd)) {
+
+				errorMsg += ",invalid mac address";
 				err = true;
 			}
 
 			//check appid
 			int locationId = Utility.parseInt(arr[2]);
 			if (locationId <= 0) {
-				if (errorMsg == null) {
-					errorMsg = "location id cannot be blank";
-				} else {
-					errorMsg += ",location id cannot be blank";
-				}
+				errorMsg += ",location id cannot be blank";
 				err = true;
-			} else {
+			} else if (!locationIdList.containsKey(locationId)) {
 
-				if (!locationIdList.contains(locationId)) {
-					if (errorMsg == null) {
-						errorMsg = "invalid location";
-					} else {
-						errorMsg += ",invalid location";
-					}
-					err = true;
-				}
+				errorMsg += ",invalid location";
+				err = true;
 
-//				String query = "select locationid from location where locationid = ?;";
-//				PreparedStatement pStmt = conn.prepareStatement(query);
-//				pStmt.setInt(1, locationId);
-//				ResultSet rs = pStmt.executeQuery();
-//				if (!rs.next()) {
-//					String errorMsg = errMap.get(index);
-//					if (errorMsg == null) {
-//						errMap.put(index, "invalid location");
-//					} else {
-//						errMap.put(index, errorMsg + "," + "invalid location");
-//					}
-//					err = true;
-//				}
-//				pStmt.close();
 			}
 
 			if (!err) {
-				if (duplicate.containsKey(date + macAdd)) {
+				String key = date + macAdd;
+				Integer exisMac = duplicate.get(key);
+				if (exisMac != null) {
 
-					errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+					errMap.put(index, "duplicate row " + exisMac);
 
 				}
-				duplicate.put(date + macAdd, index);
+				duplicate.put(key, index);
 				//add to list
 				stmt.setString(1, date);
 				stmt.setString(2, macAdd);
 				stmt.setInt(3, locationId);
 				stmt.addBatch();
 			} else {
-				errMap.put(index, errorMsg);
+
+				errMap.put(index, errorMsg.substring(1));
 			}
 			index++;
+//			if (index % 10000 == 0){
+//				stmt.executeBatch();
+//			}
 
 		}
 		//insert into tables
@@ -418,12 +390,50 @@ public class LocationUsageDAO {
 				result.add(curr);
 
 			}
-                        ConnectionManager.close(conn,ps,rs);
+			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return result;
+	}
+
+	public ArrayList<LocationUsage> retrieveByUser(String macAdd, java.util.Date startDate, java.util.Date endDate) {
+
+		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
+
+		try {
+			String sql = " select * from locationusage\n"
+					+ " WHERE macaddress = ? \n"
+					+ " AND timestamp >= ? AND timestamp <= ? \n"
+					+ " ORDER BY timestamp;";
+
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			
+			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+			ps.setString(3, macAdd);
+
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				Timestamp timestamp = rs.getTimestamp(1);
+				String macAddress = rs.getString(2);
+				String locationId = rs.getString(3);
+
+				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, Integer.parseInt(locationId));
+				result.add(curr);
+
+			}
+			ConnectionManager.close(conn, ps, rs);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+
 	}
 
 }

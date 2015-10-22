@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -34,217 +35,251 @@ import javax.servlet.http.Part;
  */
 public class BootstrapController {
 
-    //handles the number of rows updated 
-    //and the error message of the different files - pass to DAO to handle
-    //RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
-    public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
-            TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, TreeMap<Integer, String> delErrMap) 
-            throws SQLException, IOException {
+	//handles the number of rows updated 
+	//and the error message of the different files - pass to DAO to handle
+	//RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
+	public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
+			TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, TreeMap<Integer, String> delErrMap)
+			throws IOException {
 
-        InputStream fileContent = filePart.getInputStream();
-        ZipEntry entry = null;
+		InputStream fileContent = filePart.getInputStream();
+		ZipEntry entry = null;
 
-        CSVReader reader = null;
-        
-        //Clears the tables before loading.
-        try {
-            InitDAO.createTable();
-        } catch (SQLException e) {
-//            e.printStackTrace();
-        }
+		CSVReader reader = null;
+		Connection conn = null;
+		try {
+			conn = ConnectionManager.getConnection();
+			conn.setAutoCommit(false);
 
-        // initialise the number of rows updated
-        int userUpdated = 0;
-        int appUpdated = 0;
-        int locUpdated = 0;
-        int auUpdated = 0;
-        int luUpdated = 0;
-        int delUpdated = 0;
-        //put the results into aa hashmap to return to bootstrap action
-        TreeMap<String, Integer> result = new TreeMap<String, Integer>();
+			InitDAO.truncateTable(conn);
 
-        //initialised dao
-        UserDAO uDao = new UserDAO();
-        AppDAO appDao = new AppDAO();
-        LocationDAO lDao = new LocationDAO();
-        AppUsageDAO auDao = new AppUsageDAO();
-        LocationUsageDAO luDao = new LocationUsageDAO();
-		Connection conn = ConnectionManager.getConnection();
-		
-		ArrayList<String> macList = new ArrayList<String>();
-		ArrayList<Integer> appIdList = new ArrayList<Integer>();
-		ArrayList<Integer> locationIdList = new ArrayList<Integer>();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        //app-lookup.csv
-        ZipInputStream zipInputStream = new ZipInputStream(fileContent);
-        InputStreamReader isr = new InputStreamReader(zipInputStream);
-        BufferedReader br = new BufferedReader(isr);
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("app-lookup.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    //returns number of successfully entered entries
-                    //success >= 0;
-                    //unsuccess: anything other than a number;
-                    int[] updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
+		// initialise the number of rows updated
+		int userUpdated = -1;
+		int appUpdated = -1;
+		int locUpdated = -1;
+		int auUpdated = -1;
+		int luUpdated = -1;
+		int delUpdated = -1;
+		//put the results into aa hashmap to return to bootstrap action
+		TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
-                    //count how many 1 = success
-                    for (int i : updatedRecords) {
-                        appUpdated+= i;
-                    }
-                }else {
-                    zipInputStream.closeEntry();
-                }
-            }
-			br.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+		//initialised dao
+		UserDAO uDao = new UserDAO();
+		AppDAO appDao = new AppDAO();
+		LocationDAO lDao = new LocationDAO();
+		AppUsageDAO auDao = new AppUsageDAO();
+		LocationUsageDAO luDao = new LocationUsageDAO();
 
-        //demographics.csv
-        fileContent = filePart.getInputStream();
-        zipInputStream = new ZipInputStream(fileContent);
-        isr = new InputStreamReader(zipInputStream);
-        br = new BufferedReader(isr);
-        entry = null;
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("demographics.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    int[] updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
+		HashMap<String, String> macList = new HashMap<String, String>();
+		HashMap<Integer, String> appIdList = new HashMap<Integer, String>();
+		HashMap<Integer, String> locationIdList = new HashMap<Integer, String>();
 
-                    for (int i : updatedRecords) {
-                        userUpdated+= i;
-                    }
-                }else {
-                    zipInputStream.closeEntry();
-                }
-            }
-			br.close();
-//        } catch (IOException e) {
-////            e.printStackTrace();
-//        }
+		//app-lookup.csv
+		ZipInputStream zipInputStream = new ZipInputStream(fileContent);
+		InputStreamReader isr = new InputStreamReader(zipInputStream);
+		BufferedReader br = new BufferedReader(isr);
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("app-lookup.csv")) {
+				appUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				//returns number of successfully entered entries
+				//success >= 0;
+				//unsuccess: anything other than a number;
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
 
-        //app.csv
-        fileContent = filePart.getInputStream();
-        zipInputStream = new ZipInputStream(fileContent);
-        isr = new InputStreamReader(zipInputStream);
-        br = new BufferedReader(isr);
-        entry = null;
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("app.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    int[] updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 
-                    for (int i : updatedRecords) {
-                        auUpdated++;
-                    }
-                }else {
-                    zipInputStream.closeEntry();
-                }
-            }
-			br.close();
-//        } catch (IOException e) {
-////            e.printStackTrace();
-//        }
+				//count how many 1 = success
+				for (int i : updatedRecords) {
+					appUpdated += i;
+				}
+				break;
 
-        //location
-        fileContent = filePart.getInputStream();
-        zipInputStream = new ZipInputStream(fileContent);
-        isr = new InputStreamReader(zipInputStream);
-        br = new BufferedReader(isr);
-        entry = null;
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("location-lookup.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    int[] updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
+			} else {
+				zipInputStream.closeEntry();
+			}
+		}
+		br.close();
 
-                    for (int i : updatedRecords) {
-                        locUpdated++;
-                    }
-                }else {
-                    zipInputStream.closeEntry();
-                }
-            }
-//        } catch (IOException e) {
-////            e.printStackTrace();
-//        }
-			br.close();
-		
+		//demographics.csv
+		fileContent = filePart.getInputStream();
+		zipInputStream = new ZipInputStream(fileContent);
+		isr = new InputStreamReader(zipInputStream);
+		br = new BufferedReader(isr);
+		entry = null;
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("demographics.csv")) {
+				userUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+				for (int i : updatedRecords) {
+					userUpdated += i;
+				}
+				break;
+			} else {
+				zipInputStream.closeEntry();
+			}
+		}
+		br.close();
+
+		//app.csv
+		fileContent = filePart.getInputStream();
+		zipInputStream = new ZipInputStream(fileContent);
+		isr = new InputStreamReader(zipInputStream);
+		br = new BufferedReader(isr);
+		entry = null;
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("app.csv")) {
+				auUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+//				for (int i : updatedRecords) {
+//					auUpdated++;
+//				}
+				auUpdated = updatedRecords.length;
+				break;
+			} else {
+				zipInputStream.closeEntry();
+			}
+		}
+		br.close();
+
+		//location
+		fileContent = filePart.getInputStream();
+		zipInputStream = new ZipInputStream(fileContent);
+		isr = new InputStreamReader(zipInputStream);
+		br = new BufferedReader(isr);
+		entry = null;
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("location-lookup.csv")) {
+				locUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+//				for (int i : updatedRecords) {
+//					locUpdated++;
+//				}
+				locUpdated = updatedRecords.length;
+				break;
+			} else {
+				zipInputStream.closeEntry();
+			}
+		}
+		br.close();
+
 		//locationUsage
-        fileContent = filePart.getInputStream();
-        zipInputStream = new ZipInputStream(fileContent);
-        isr = new InputStreamReader(zipInputStream);
-        br = new BufferedReader(isr);
-        entry = null;
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("location.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    int[] updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
+		fileContent = filePart.getInputStream();
+		zipInputStream = new ZipInputStream(fileContent);
+		isr = new InputStreamReader(zipInputStream);
+		br = new BufferedReader(isr);
+		entry = null;
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("location.csv")) {
+				luUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
 
-                    for (int i : updatedRecords) {
-                        luUpdated++;
-                    }
-                }else {
-                    zipInputStream.closeEntry();
-                }
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 
-            }
-//        } catch (IOException e) {
-////            e.printStackTrace();
-//        }
-			br.close();
-		
+//				for (int i : updatedRecords) {
+//					luUpdated++;
+//				}
+				luUpdated = updatedRecords.length;
+				break;
+			} else {
+				zipInputStream.closeEntry();
+			}
+
+		}
+		br.close();
+
 		//location-delete.csv
-        fileContent = filePart.getInputStream();
-        zipInputStream = new ZipInputStream(fileContent);
-        isr = new InputStreamReader(zipInputStream);
-        br = new BufferedReader(isr);
-        entry = null;
-//        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                String fileName = entry.getName();
-                if (fileName.equals("location-delete.csv")) {
-                    reader = new CSVReader(br);
-                    reader.readNext();
-                    int[] updatedRecords = luDao.delete(reader, delErrMap);
-//					System.out.println("LOOK BELOW");
+		fileContent = filePart.getInputStream();
+		zipInputStream = new ZipInputStream(fileContent);
+		isr = new InputStreamReader(zipInputStream);
+		br = new BufferedReader(isr);
+		entry = null;
+		while ((entry = zipInputStream.getNextEntry()) != null) {
+			String fileName = entry.getName();
+			if (fileName.equals("location-delete.csv")) {
+				delUpdated = 0;
+				reader = new CSVReader(br);
+				reader.readNext();
+				int[] updatedRecords = null;
+				try {
+					updatedRecords = luDao.delete(reader, delErrMap);
+
+				} catch (SQLException e) {
+
+				}
 //                    for (int i : updatedRecords) {
 //						System.out.println(i);
 //                        delUpdated+= i;
 //                    }
-					delUpdated = updatedRecords[0];
-//					System.out.println("LOOK ABOVE");
-                } else {
-                    zipInputStream.closeEntry();
-                }
-            }
-//        } catch (IOException e) {
-////            e.printStackTrace();
-//        }
-			br.close();
+				delUpdated = updatedRecords[0];
+				break;
+			} else {
+				zipInputStream.closeEntry();
+			}
+		}
+		br.close();
 
-        result.put("demographics.csv", userUpdated);
-        result.put("app-lookup.csv", appUpdated);
-        result.put("location-lookup.csv", locUpdated);
-        result.put("app.csv", auUpdated);
-        result.put("location.csv", luUpdated);
-        result.put("location-delete.csv", delUpdated);
+		result.put("demographics.csv", userUpdated);
+		result.put("app-lookup.csv", appUpdated);
+		result.put("location-lookup.csv", locUpdated);
+		result.put("app.csv", auUpdated);
+		result.put("location.csv", luUpdated);
+		result.put("location-delete.csv", delUpdated);
+		try {
+			InitDAO.enableForeignKey(conn);
+
+		} catch (SQLException e) {
+
+		}
 		ConnectionManager.close(conn);
 
-        return result;
-    }
+		return result;
+	}
 }
