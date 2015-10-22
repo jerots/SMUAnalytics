@@ -16,6 +16,7 @@ import entity.User;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 
@@ -137,7 +138,7 @@ public class SocialActivenessController {
 
 		//INSTANTIATING
 		HashMap<String, String> result = new HashMap<String, String>();
-		ArrayList<LocationUsage> totalAUList = new ArrayList<LocationUsage>();
+		ArrayList<LocationUsage> totalLUList = new ArrayList<LocationUsage>();
 
 		LocationUsageDAO luDAO = new LocationUsageDAO();
 		UserDAO userDAO = new UserDAO();
@@ -168,9 +169,9 @@ public class SocialActivenessController {
 
 			if (prevLocationId != locationId) {
 				Date endInLocation = oldTime;
-				
+
 				//GET ALL locationUsage in this location, time period EXCEPT user
-				luDAO.retrieve(startInLocation, endInLocation, prevLocationId,macaddress , totalAUList);
+				luDAO.retrieve(startInLocation, endInLocation, prevLocationId, macaddress, totalLUList);
 
 				//reset variables
 				prevLocationId = locationId;
@@ -200,16 +201,94 @@ public class SocialActivenessController {
 		}
 
 		result.put("total-time-spent-in-sis", "" + totalTime);
-		
-		
+
 		//CALCULATE group time
+		//get all users in totalLUList
+		HashSet<String> userMacList = new HashSet<String>();
+		for (LocationUsage lu : totalLUList) {
+			userMacList.add(lu.getMacAddress());
+		}
+
 		
-		for (LocationUsage lu : totalAUList){
-			System.out.println(lu.getTimestamp() + ", " + lu.getLocationId() + ", " + lu.getMacAddress());
+		
+		//CALCULATE user instances
+		ArrayList<ArrayList<HashMap<String, Date>>> userInstances = new ArrayList<ArrayList<HashMap<String, Date>>>();
+		for (String userMac : userMacList) {
+			ArrayList<HashMap<String, Date>> userInstance = new ArrayList<HashMap<String, Date>>();
+
+			//INITIALISE
+			LocationUsage firstLU = totalLUList.get(0);
+			Date oldFriendTime = firstLU.getDate();
+			Date friendStartTime = oldFriendTime;
+			for (int i = 1; i < totalLUList.size(); i++) {
+
+				LocationUsage lu = totalLUList.get(i);
+				Date newFriendTime = lu.getDate();
+
+				long difference = newFriendTime.getTime() - oldFriendTime.getTime();
+
+				if (difference > 300) {
+					HashMap<String, Date> instanceRecord = new HashMap<String, Date>();
+					instanceRecord.put("start", new Date(friendStartTime.getTime()));
+					instanceRecord.put("end", new Date(oldFriendTime.getTime()));
+					friendStartTime = newFriendTime;
+					userInstance.add(instanceRecord);
+				}
+
+				oldFriendTime = newFriendTime;
+			}
+			HashMap<String, Date> instanceRecord = new HashMap<String, Date>();
+			instanceRecord.put("start", new Date(friendStartTime.getTime()));
+			instanceRecord.put("end", new Date(oldFriendTime.getTime()));
+			userInstance.add(instanceRecord);
+
 		}
 		
 		
+		//COMPRESS INSTANCES
+		
+		ArrayList<HashMap<String,Date>> mainInstance = null;
+		if (userInstances.size() > 0){
+			mainInstance = userInstances.get(0);
+		}
+		
+		for (ArrayList<HashMap<String,Date>> userInstance : userInstances){
+			
+			for (HashMap<String,Date> mainMap: mainInstance){
+				
+				for (HashMap<String,Date> userMap : userInstance){
+					
+					Date userStartDate = userMap.get("start");
+					Date userEndDate = userMap.get("end");
+					Date mainStart = mainMap.get("start");
+					Date mainEnd = mainMap.get("end");
+					
+					
+					
+					
+				}
+				
+				
+			}
+			
+			
+		}
+		
 
+//		if (totalLUList.size() > 0) {
+//			LocationUsage firstLU = totalLUList.get(0);
+//			oldFriendTime = firstLU.getDate();
+//			firstFriendTime = oldFriendTime;
+//		}
+//
+//		for (int i = 1; i < totalLUList.size(); i++) {
+//
+//			LocationUsage lu = totalLUList.get(i);
+//			Date newFriendTime = lu.getDate();
+//
+//			long difference = newFriendTime.getTime() - oldFriendTime.getTime();
+//
+//		}
 		return result;
 	}
 
