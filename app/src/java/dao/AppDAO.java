@@ -126,9 +126,9 @@ public class AppDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
+
 
 	public TreeMap<String, ArrayList<Integer>> retrieveByCategory() {
 

@@ -17,21 +17,22 @@ import java.util.TreeMap;
 
 public class AppUsageDAO {
 
-	private TreeMap<String, Integer> duplicate;
-	private TreeMap<String, AppUsage> appList;
+    private TreeMap<String, Integer> duplicate;
+    private TreeMap<String, AppUsage> appList;
 
-	public AppUsageDAO() {
-		appList = new TreeMap<>();
-		duplicate = new TreeMap<>();
-	}
+    public AppUsageDAO() {
+        appList = new TreeMap<>();
+        duplicate = new TreeMap<>();
+    }
+
 
 	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException, SQLException {
 		int index = 2;
 		String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
 				+ " = VALUES(appid);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-//        PreparedStatement pStmt = null;
-		String[] arr = null;
+
+        String[] arr = null;
 
 		while ((arr = reader.readNext()) != null) {
 			//retrieving per row
@@ -44,6 +45,7 @@ public class AppUsageDAO {
 			String date = Utility.parseString(arr[0]);
 			if (date == null || !Utility.checkDate(date)) {
 				err = true;
+
 
 				errorMsg += ",invalid timestamp";
 
@@ -72,7 +74,7 @@ public class AppUsageDAO {
 				err = true;
 			}
 
-			if (!err) {
+            if (!err) {
 
 				if (duplicate.containsKey(date + macAdd)) {
 					errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
@@ -90,103 +92,102 @@ public class AppUsageDAO {
 			}
 			index++;
 		}
+        int[] updatedRecords = stmt.executeBatch();
+        conn.commit();
 
-		int[] updatedRecords = stmt.executeBatch();
-		conn.commit();
+        return updatedRecords;
+    }
 
-		return updatedRecords;
-	}
+    public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
+        int updateCounts = 0;
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            conn.setAutoCommit(false);
+            int index = 2;
+            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            String query = null;
+            PreparedStatement pStmt = null;
+            ResultSet rs = null;
 
-	public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-		int updateCounts = 0;
-		try {
-			Connection conn = ConnectionManager.getConnection();
-			conn.setAutoCommit(false);
-			int index = 2;
-			String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			String query = null;
-			PreparedStatement pStmt = null;
-			ResultSet rs = null;
+            String[] arr = null;
+            while ((arr = reader.readNext()) != null) {
+                //retrieving per row
+                boolean err = false;
 
-			String[] arr = null;
-			while ((arr = reader.readNext()) != null) {
-				//retrieving per row
-				boolean err = false;
+                //check timestamp
+                String date = Utility.parseString(arr[0]);
+                if (date == null || !Utility.checkDate(date)) {
+                    err = true;
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "invalid timestamp");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "invalid timestamp");
+                    }
+                }
 
-				//check timestamp
-				String date = Utility.parseString(arr[0]);
-				if (date == null || !Utility.checkDate(date)) {
-					err = true;
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "invalid timestamp");
-					} else {
-						errMap.put(index, errorMsg + "," + "invalid timestamp");
-					}
-				}
+                //check macAdd
+                String macAdd = Utility.parseString(arr[1]);
+                if (macAdd == null) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "mac add cannot be blank");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "mac add cannot be blank");
+                    }
+                    err = true;
+                } else if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "invalid mac add");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "invalid mac add");
+                    }
+                    err = true;
+                } else {
+                    query = "select macaddress from user where macaddress = ?;";
+                    pStmt = conn.prepareStatement(query);
+                    pStmt.setString(1, macAdd);
 
-				//check macAdd
-				String macAdd = Utility.parseString(arr[1]);
-				if (macAdd == null) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "mac add cannot be blank");
-					} else {
-						errMap.put(index, errorMsg + "," + "mac add cannot be blank");
-					}
-					err = true;
-				} else if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "invalid mac add");
-					} else {
-						errMap.put(index, errorMsg + "," + "invalid mac add");
-					}
-					err = true;
-				} else {
-					query = "select macaddress from user where macaddress = ?;";
-					pStmt = conn.prepareStatement(query);
-					pStmt.setString(1, macAdd);
-
-					rs = pStmt.executeQuery();
-					if (!rs.next()) {
-						String errorMsg = errMap.get(index);
-						if (errorMsg == null) {
-							errMap.put(index, "no matching mac address");
-						} else {
-							errMap.put(index, errorMsg + "," + "no matching mac address");
-						}
-						err = true;
-					}
-					pStmt.close();
-				}
-				//check appid
-				int appId = Utility.parseInt(arr[2]);
-				if (appId <= 0) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "app id cannot be blank");
-					} else {
-						errMap.put(index, errorMsg + "," + "app id cannot be blank");
-					}
-					err = true;
-				} else {
-					query = "select appid from app where appid = ?;";
-					pStmt = conn.prepareStatement(query);
-					pStmt.setInt(1, appId);
-					rs = pStmt.executeQuery();
-					if (!rs.next()) {
-						String errorMsg = errMap.get(index);
-						if (errorMsg == null) {
-							errMap.put(index, "invalid app");
-						} else {
-							errMap.put(index, errorMsg + "," + "invalid app");
-						}
-						err = true;
-					}
-					pStmt.close();
-				}
+                    rs = pStmt.executeQuery();
+                    if (!rs.next()) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "no matching mac address");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "no matching mac address");
+                        }
+                        err = true;
+                    }
+                    pStmt.close();
+                }
+                //check appid
+                int appId = Utility.parseInt(arr[2]);
+                if (appId <= 0) {
+                    String errorMsg = errMap.get(index);
+                    if (errorMsg == null) {
+                        errMap.put(index, "app id cannot be blank");
+                    } else {
+                        errMap.put(index, errorMsg + "," + "app id cannot be blank");
+                    }
+                    err = true;
+                } else {
+                    query = "select appid from app where appid = ?;";
+                    pStmt = conn.prepareStatement(query);
+                    pStmt.setInt(1, appId);
+                    rs = pStmt.executeQuery();
+                    if (!rs.next()) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "invalid app");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "invalid app");
+                        }
+                        err = true;
+                    }
+                    pStmt.close();
+                }
 
 				if (!err) {
 					if (duplicate.containsKey(date + macAdd)) {
@@ -212,124 +213,124 @@ public class AppUsageDAO {
 					updateCounts += i;
 				}
 
-				conn.commit();
+                conn.commit();
 
-			} catch (BatchUpdateException e) {
-				int[] updateArr = e.getUpdateCounts();
-				for (int i = 0; i < updateArr.length; i++) {
-					if (updateArr[i] == Statement.EXECUTE_FAILED) {
-						// This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate TreeMap to find the offending row.
-						String errorMsg = errMap.get(index);
-						if (errorMsg == null) {
-							errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
-						} else {
-							errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
-						}
-					}
+            } catch (BatchUpdateException e) {
+                int[] updateArr = e.getUpdateCounts();
+                for (int i = 0; i < updateArr.length; i++) {
+                    if (updateArr[i] == Statement.EXECUTE_FAILED) {
+                        // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate TreeMap to find the offending row.
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
+                        } else {
+                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
+                        }
+                    }
 
-					if (updateArr[i] >= 0) {
-						updateCounts += updateArr[i];
-					}
-				}
-			}
+                    if (updateArr[i] >= 0) {
+                        updateCounts += updateArr[i];
+                    }
+                }
+            }
 
-			reader.close();
-			ConnectionManager.close(conn, stmt);
+            reader.close();
+            ConnectionManager.close(conn, stmt);
 
-		} catch (NullPointerException e) {
+        } catch (NullPointerException e) {
 //            e.printStackTrace();
-		}
-		return updateCounts;
-	}
+        }
+        return updateCounts;
+    }
 
-	public ArrayList<User> retrieveUsers(Date startDate, Date endDate) {
+    public ArrayList<User> retrieveUsers(Date startDate, Date endDate) {
 
-		ArrayList<User> result = new ArrayList<User>();
+        ArrayList<User> result = new ArrayList<User>();
 
-		try {
+        try {
 
-			Connection conn = ConnectionManager.getConnection();
+            Connection conn = ConnectionManager.getConnection();
 
-			PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u where "
-					+ "au.macaddress = u.macaddress "
-					+ "AND timestamp >= ? AND timestamp <= ? "
-					+ "GROUP BY macaddress");
-			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+            PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u where "
+                    + "au.macaddress = u.macaddress "
+                    + "AND timestamp >= ? AND timestamp <= ? "
+                    + "GROUP BY macaddress");
+            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
-			ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				String macAdd = rs.getString(1);
-				String name = rs.getString(2);
-				String password = rs.getString(3);
-				String email = rs.getString(4);
-				String gender = rs.getString(5);
-				result.add(new User(macAdd, name, password, email, gender));
-			}
-			ConnectionManager.close(conn, ps, rs);
+            while (rs.next()) {
+                String macAdd = rs.getString(1);
+                String name = rs.getString(2);
+                String password = rs.getString(3);
+                String email = rs.getString(4);
+                String gender = rs.getString(5);
+                result.add(new User(macAdd, name, password, email, gender));
+            }
+            ConnectionManager.close(conn, ps, rs);
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
+    public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
 
-		ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<String>();
 
-		try {
+        try {
 
-			Connection conn = ConnectionManager.getConnection();
+            Connection conn = ConnectionManager.getConnection();
 
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
-			ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				String macAdd = rs.getString(1);
-				result.add(macAdd);
-			}
+            while (rs.next()) {
+                String macAdd = rs.getString(1);
+                result.add(macAdd);
+            }
 
-			ConnectionManager.close(conn, ps, rs);
+            ConnectionManager.close(conn, ps, rs);
 
-		} catch (SQLException e) {
+        } catch (SQLException e) {
 
-		}
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
+    public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
 
-		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
+        ArrayList<AppUsage> result = new ArrayList<AppUsage>();
 
-		try {
+        try {
 
-			Connection conn = ConnectionManager.getConnection();
+            Connection conn = ConnectionManager.getConnection();
 
-			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
-					+ "timestamp >= ? AND timestamp <= ? "
-					+ "AND macaddress = ? order by timestamp");
-			ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
-			ps.setString(3, macAdd);
+            PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
+                    + "timestamp >= ? AND timestamp <= ? "
+                    + "AND macaddress = ? order by timestamp");
+            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+            ps.setString(3, macAdd);
 
-			ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
+            while (rs.next()) {
 
-				String timestamp = rs.getString(1);
-				String macaddress = rs.getString(2);
-				int appid = rs.getInt(3);
-				result.add(new AppUsage(timestamp, macaddress, appid));
+                String timestamp = rs.getString(1);
+                String macaddress = rs.getString(2);
+                int appid = rs.getInt(3);
+                result.add(new AppUsage(timestamp, macaddress, appid));
 
-			}
-			ConnectionManager.close(conn, ps, rs);
+            }
+            ConnectionManager.close(conn, ps, rs);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -340,11 +341,10 @@ public class AppUsageDAO {
 
 	public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startHour, Date endHour) {
 
-		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
+        ArrayList<AppUsage> result = new ArrayList<AppUsage>();
 
-		try {
-
-			Connection conn = ConnectionManager.getConnection();
+        try {
+            Connection conn = ConnectionManager.getConnection();
 
 			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
 					+ "timestamp >= ? AND timestamp < ? "
@@ -355,81 +355,82 @@ public class AppUsageDAO {
 			ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
 			ps.setString(3, macAdd);
 
-			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
+            ResultSet rs = ps.executeQuery();
 
-				String timestamp = rs.getString(1);
-				String macaddress = rs.getString(2);
-				int appid = rs.getInt(3);
-				result.add(new AppUsage(timestamp, macaddress, appid));
+            while (rs.next()) {
 
-			}
-			ConnectionManager.close(conn, ps, rs);
-
-		} catch (SQLException e) {
-		}
+                String timestamp = rs.getString(1);
+                String macaddress = rs.getString(2);
+                int appid = rs.getInt(3);
+                result.add(new AppUsage(timestamp, macaddress, appid));
 
 		return result;
 	}
 
-	public ArrayList<User> retrieveUserByDemo(Date startHour, Date endHour, String[] demoArr) {
+        } catch (SQLException e) {
+        }
 
-		ArrayList<User> result = new ArrayList<User>();
+        return result;
+    }
 
-		try {
+    public ArrayList<User> retrieveUserByDemo(Date startHour, Date endHour, String[] demoArr) {
 
-			Connection conn = ConnectionManager.getConnection();
+        ArrayList<User> result = new ArrayList<User>();
 
-			PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u \n"
-					+ "where au.macaddress = u.macaddress\n"
-					+ "AND timestamp >= ? AND timestamp < ?\n"
-					+ "AND email like ? \n"
-					+ "AND gender like ?\n"
-					+ "AND email like ?\n"
-					+ "GROUP BY macaddress;");
-			ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
-			ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
+        try {
 
-			String year = demoArr[0];
-			String gender = demoArr[1];
-			String school = demoArr[2];
+            Connection conn = ConnectionManager.getConnection();
 
-			if (year.equals("NA")) {
-				ps.setString(3, "%");
-			} else {
-				ps.setString(3, "%." + year + "@%.smu.edu.sg");
-			}
+            PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u \n"
+                    + "where au.macaddress = u.macaddress\n"
+                    + "AND timestamp >= ? AND timestamp < ?\n"
+                    + "AND email like ? \n"
+                    + "AND gender like ?\n"
+                    + "AND email like ?\n"
+                    + "GROUP BY macaddress;");
+            ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
+            ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
 
-			if (gender.equals("NA")) {
-				ps.setString(4, "%");
-			} else {
-				ps.setString(4, gender.toLowerCase());
-			}
+            String year = demoArr[0];
+            String gender = demoArr[1];
+            String school = demoArr[2];
 
-			if (school.equals("NA")) {
-				ps.setString(5, "%");
-			} else {
-				ps.setString(5, "%@" + school + ".smu.edu.sg");
-			}
+            if (year.equals("NA")) {
+                ps.setString(3, "%");
+            } else {
+                ps.setString(3, "%." + year + "@%.smu.edu.sg");
+            }
 
+            if (gender.equals("NA")) {
+                ps.setString(4, "%");
+            } else {
+                ps.setString(4, gender.toLowerCase());
+            }
+
+            if (school.equals("NA")) {
+                ps.setString(5, "%");
+            } else {
+                ps.setString(5, "%@" + school + ".smu.edu.sg");
+            }
+			
 			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				String macAdd = rs.getString(1);
-				String name = rs.getString(2);
-				String password = rs.getString(3);
-				String email = rs.getString(4);
-				String genderRes = rs.getString(5);
-				result.add(new User(macAdd, name, password, email, genderRes));
-			}
-			ConnectionManager.close(conn, ps, rs);
+            while (rs.next()) {
+                String macAdd = rs.getString(1);
+                String name = rs.getString(2);
+                String password = rs.getString(3);
+                String email = rs.getString(4);
+                String genderRes = rs.getString(5);
+                result.add(new User(macAdd, name, password, email, genderRes));
+            }
+            ConnectionManager.close(conn, ps, rs);
 
-		} catch (SQLException e) {
-		}
+        } catch (SQLException e) {
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 	public ArrayList<AppUsage> retrieveByAppCat(Date startHour, Date endHour, String macAdd, String appCat) {
 
@@ -467,4 +468,41 @@ public class AppUsageDAO {
 		return result;
 	}
 
+            
+
+    public ArrayList<AppUsage> getAppsBySchool(HashMap<Integer, String> priK, String school, String start, String end) {
+        ArrayList<AppUsage> aList = new ArrayList<>();
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT timestamp, appname, a.appid, u.macaddress\n"
+                    + "FROM appusage au, user u, app a\n"
+                    + "WHERE timestamp >= ?\n"
+                    + "AND timestamp <= ?\n"
+                    + "AND au.macaddress = u.macaddress\n"
+                    + "AND a.appid = au.appid\n"
+                    + "AND u.email LIKE ? \n"
+                    + "ORDER BY appid, timestamp;");
+
+            ps.setString(1, start);
+            ps.setString(2, end);
+            ps.setString(3, "%" + school + "%");
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                String timestamp = rs.getString(1);
+                String appName = rs.getString(2);
+                int appId = rs.getInt(3);
+                String macAdd = rs.getString(4);
+
+                aList.add(new AppUsage(timestamp, macAdd, appId));
+                priK.put(appId, appName);
+            }
+            ConnectionManager.close(conn, ps);
+
+        } catch (SQLException e) {
+        }
+
+        return aList;
+    }
 }

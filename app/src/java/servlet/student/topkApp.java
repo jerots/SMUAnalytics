@@ -5,29 +5,20 @@
  */
 package servlet.student;
 
-import controller.HeatmapController;
-import controller.SmartphoneOveruseController;
-import entity.User;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TreeMap;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author ASUS-PC
  */
-@WebServlet(name = "SmartphoneOveruse", urlPatterns = {"/SmartphoneOveruse"})
-public class SmartphoneOveruse extends HttpServlet {
+@WebServlet(name = "topkApp", urlPatterns = {"/topkApp"})
+public class topkApp extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,26 +33,17 @@ public class SmartphoneOveruse extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            String startDateStr = request.getParameter("startDate");
-            String startTimeStr = request.getParameter("startTime");
-            String endDateStr = request.getParameter("endDate");
-            String endTimeStr = request.getParameter("endTime");
-            TreeMap<String, String> result = new TreeMap<String, String>();
-            HttpSession session = request.getSession();
-            User loggedInUser = (User) session.getAttribute("user");
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date startDatetime = dateFormat.parse(startDateStr + " " + startTimeStr, new ParsePosition(0));
-            Date endDatetime = dateFormat.parse(endDateStr + " " + endTimeStr, new ParsePosition(0));
-            SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
-            result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
-            System.out.println("TESTING result printing" + result.size());
-            request.setAttribute("result", result);
-            RequestDispatcher view = request.getRequestDispatcher("smartphoneOveruse.jsp");
-            view.forward(request, response);
-
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet topkApp</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet topkApp at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
         }
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
