@@ -72,6 +72,40 @@ public class topkAppController {
             total += diff;
             prevTime = time;
         }
+        
+        prevTime = 0;
+        
+        Iterator<Long> kIter = appTime.descendingMap().keySet().iterator();
+        
+        Iterator<Integer> vIter = appTime.descendingMap().values().iterator();
+        
+        int num = 0;
+       
+        ArrayList<HashMap<String, String>> returnList = null;
+        
+        while (vIter.hasNext() && topK > 0) {
+            appId = vIter.next();
+            
+            time = kIter.next();
+            
+            String appName = hMap.get(appId);
+            System.out.println(appId + " " + time);
+            if (time != prevTime) {
+              
+                prevTime = time;
+               
+                int size = returnList.size();
+               
+                num = size;
+            }
+            HashMap<String, String> kDetails = new HashMap<>();
+            kDetails.put("rank", String.valueOf(num + 1));
+            kDetails.put("app-name", appName);
+            kDetails.put("duration", String.valueOf(time));
+
+            returnList.add(kDetails);
+            topK--;
+        }
         return resultList;
     }
 
