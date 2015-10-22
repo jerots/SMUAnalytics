@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `locationusage` (
   `timestamp` datetime NOT NULL,
   `macaddress` varchar(40) COLLATE utf8_bin DEFAULT NULL,
   `locationid` int(40) NOT NULL,
-  PRIMARY KEY (`timestamp`,`locationid`),
+  PRIMARY KEY (`timestamp`,`macaddress`),
   KEY `locationUsage_fk2` (`locationid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

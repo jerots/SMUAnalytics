@@ -364,10 +364,8 @@ public class AppUsageDAO {
                 String macaddress = rs.getString(2);
                 int appid = rs.getInt(3);
                 result.add(new AppUsage(timestamp, macaddress, appid));
-
-		return result;
-	}
-
+			}
+			ConnectionManager.close(conn,ps,rs);
         } catch (SQLException e) {
         }
 
