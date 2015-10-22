@@ -61,11 +61,11 @@ public class topkApp extends HttpServlet {
                     break;
                 case "appstudents":
                     //This parameter is only for those who select App Category and return Students
-                   // catValues = ctrl.getTopkStudents(entry, selected, startDate, endDate);
+                    catValues = ctrl.getTopkStudents(entry, selected, startDate, endDate);
                     //break;
                 default:
                     //This parameter is only for those who select App Category and return School
-                    //catValues = ctrl.getTopkSchool(entry, selected, startDate, endDate);
+                    catValues = ctrl.getTopkSchool(entry, selected, startDate, endDate);
                     //break;
             }
             request.setAttribute("catValues", catValues);
