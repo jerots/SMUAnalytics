@@ -435,4 +435,40 @@ public class LocationUsageDAO {
 
 	}
 
+	public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress , ArrayList<LocationUsage> totalAUList) {
+
+		try {
+			String sql = "select * from locationusage\n"
+					+ " WHERE timestamp >= ? AND timestamp < ? \n"
+					+ " AND locationid = ? \n"
+					+ " AND macaddress != ? \n"
+					+ " ORDER BY timestamp\n"
+					+ " ;";
+
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			ps.setString(1, new java.sql.Timestamp(startInLocation.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endInLocation.getTime()).toString());
+			ps.setInt(3, prevLocationId);
+			ps.setString(4, macaddress);
+
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				Timestamp timestamp = rs.getTimestamp(1);
+				String macAddress = rs.getString(2);
+				String locationId = rs.getString(3);
+
+				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, Integer.parseInt(locationId));
+				totalAUList.add(curr);
+
+			}
+			ConnectionManager.close(conn, ps, rs);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 }
