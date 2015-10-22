@@ -503,4 +503,41 @@ public class AppUsageDAO {
 
         return aList;
     }
+    
+        public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priK, String category, String start, String end) {
+        ArrayList<AppUsage> aList = new ArrayList<>();
+
+        String sql = "SELECT timestamp, u.name, u.macaddress, a.appid"
+                + "FROM appusage au, user u, app a"
+                + "WHERE timestamp >= STR_TO_DATE('?','%Y-%m-%d %H:%i:%s')"
+                + "AND timestamp <= STR_TO_DATE('?','%Y-%m-%d %H:%i:%s')"
+                + "AND au.macaddress = u.macaddress"
+                + "AND a.appid = au.appid"
+                + "AND appcategory = ?"
+                + "ORDER BY u.macaddress, timestamp";
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pStmt = conn.prepareStatement(sql);
+            pStmt.setString(1, start);
+            pStmt.setString(2, end);
+            pStmt.setString(3, category);
+
+            ResultSet rs = pStmt.executeQuery();
+
+            while (rs.next()) {
+                String timeStamp = rs.getString(1);
+                String name = rs.getString(2);
+                String macAdd = rs.getString(3);
+                int appId = rs.getInt(4);
+
+                aList.add(new AppUsage(macAdd, timeStamp, appId));
+                priK.put(macAdd, name);
+            }
+
+        } catch (SQLException e) {
+
+        }
+        return aList;
+    }
 }
