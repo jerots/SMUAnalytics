@@ -107,7 +107,7 @@
                                 <select class="form-control" name="category">
                                     <%                                    for (String s : schools) {
                                     %>
-                                    <option class='form-control' id='category' name='<%= s%>' value='<%= s%>' ></option>
+                                    <option class='form-control' id='category' name='<%= s%>' value='<%= s%>' ><%= s%></option>
                                     <%
                                         }
                                     %>

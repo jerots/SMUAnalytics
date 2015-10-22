@@ -106,10 +106,10 @@
                             %>
                             <div class="form-group">
                                 <label for="categories">Top K App</label>
-                                <select>
+                                <select class="form-control" name="school">
                                     <%                                    for (String s : categories) {
                                     %>
-                                    <option class='form-control' id='school' name='<%= s%>' value='<%= s%>' ></option>
+                                    <option class='form-control' id='school' name='<%= s%>' value='<%= s%>' ><%= s%></option>
                                     <%
                                         }
                                     %>
