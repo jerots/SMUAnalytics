@@ -129,5 +129,13 @@ public final class Utility {
         categories.add("games");
         categories.add("others");
     }
+    
+    public static ArrayList<String> getCategories(){
+        return categories;
+    }
+    
+    public static ArrayList<String> getSchoolist(){
+        return schoolList;
+    }
 
 }
