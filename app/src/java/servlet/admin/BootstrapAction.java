@@ -36,16 +36,10 @@ public class BootstrapAction extends HttpServlet {
         TreeMap<String, Integer> recordMap = null;
         String option = request.getParameter("option");
         Part filePart = request.getPart("zipFile");
+		long timeBefore = System.currentTimeMillis();
         if(option.equals("bootstrap")){
             
             //BOOTSTRAP
-            try {
-
-                try {
-                    InitDAO.createTable();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
 
              // Retrieves <input type="file" name="zipFile">
                 if (filePart != null && filePart.getSize() > 0) {
@@ -71,16 +65,12 @@ public class BootstrapAction extends HttpServlet {
                     recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
                 }
 
-            } catch (Exception e) {
-                System.out.println("Exception Caught in bootstrap action.java");
-                e.printStackTrace();
-            }
         } else {
             
             //ADD BATCH
             try {
                 if(filePart != null && filePart.getSize() > 0){
-                    TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
+				     TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
                     TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
                     TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
                     TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
@@ -100,6 +90,11 @@ public class BootstrapAction extends HttpServlet {
             }
         }
         
+		long timeAfter = System.currentTimeMillis();
+		
+		long timeTaken = (timeAfter - timeBefore) / 1000;
+		
+		request.setAttribute("timeTaken", "" + timeTaken);
         request.setAttribute("recordMap", recordMap);
         System.out.println(recordMap);
         RequestDispatcher rd = request.getRequestDispatcher("admin");

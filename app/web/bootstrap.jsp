@@ -77,7 +77,10 @@
 
 
                     <%
-
+						String timeTaken = (String) request.getAttribute("timeTaken");
+						if (timeTaken != null){
+							out.println("Bootstrap time taken: " + timeTaken + " seconds");
+						}
                         TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
                         if (recordMap != null) {
                              if(recordMap.containsKey("app-lookup.csv")){

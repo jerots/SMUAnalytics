@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class LocationDAO {
@@ -15,8 +16,7 @@ public class LocationDAO {
     public LocationDAO() {
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<Integer> locationIdList) throws IOException, SQLException {
-        conn.setAutoCommit(false);
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> locationIdList) throws IOException, SQLException {
         String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
                 + "VALUES(semanticplace);";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -63,7 +63,7 @@ public class LocationDAO {
             }
 
             if (!err) {
-                locationIdList.add(locationId);
+                locationIdList.put(locationId,"");
                 //insert into tables
                 stmt.setInt(1, locationId);
                 stmt.setString(2, semanticPl);

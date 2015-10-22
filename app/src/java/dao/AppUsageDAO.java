@@ -25,130 +25,73 @@ public class AppUsageDAO {
         duplicate = new TreeMap<>();
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, ArrayList<String> macList, ArrayList<Integer> appIdList) throws IOException, SQLException {
-        conn.setAutoCommit(false);
-        int index = 2;
-        String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
-                + " = VALUES(appid);";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-//        PreparedStatement pStmt = null;
+
+	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException, SQLException {
+		int index = 2;
+		String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
+				+ " = VALUES(appid);";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+
         String[] arr = null;
 
-        while ((arr = reader.readNext()) != null) {
-            //retrieving per row
-            boolean err = false;
-            String errorMsg = errMap.get(index);
-            //check timestamp
-            String date = Utility.parseString(arr[0]);
-            if (date == null || !Utility.checkDate(date)) {
-                err = true;
+		while ((arr = reader.readNext()) != null) {
+			//retrieving per row
+			boolean err = false;
+			String errorMsg = errMap.get(index);
+			if (errorMsg == null) {
+				errorMsg = "";
+			}
+			//check timestamp
+			String date = Utility.parseString(arr[0]);
+			if (date == null || !Utility.checkDate(date)) {
+				err = true;
 
-                if (errorMsg == null) {
-                    errorMsg = "invalid timestamp";
-                } else {
-                    errorMsg += ",invalid timestamp";
-                }
-            }
 
-            //check macAdd
-            String macAdd = Utility.parseString(arr[1]);
-            if (macAdd == null) {
-                if (errorMsg == null) {
-                    errorMsg = "mac add cannot be blank";
-                } else {
-                    errorMsg += ",mac add cannot be blank";
-                }
-                err = true;
-            }
+				errorMsg += ",invalid timestamp";
 
-            if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-                if (errorMsg == null) {
-                    errorMsg = "invalid mac add";
-                } else {
-                    errorMsg += ",invalid mac add";
-                }
-                err = true;
-            } else {
-                if (!macList.contains(macAdd)) {
-                    if (errorMsg == null) {
-                        errorMsg = "no matching mac address";
-                    } else {
-                        errorMsg += ",no matching mac address";
-                    }
-                    err = true;
-                }
+			}
 
-//                query = "select macaddress from user where macaddress = ?;";
-//                pStmt = conn.prepareStatement(query);
-//                pStmt.setString(1, macAdd);
-//
-//                rs = pStmt.executeQuery();
-//                if (!rs.next()) {
-//                    String errorMsg = errMap.get(index);
-//                    if (errorMsg == null) {
-//                        errMap.put(index, "no matching mac address");
-//                    } else {
-//                        errMap.put(index, errorMsg + "," + "no matching mac address");
-//                    }
-//                    err = true;
-//                }
-//                pStmt.close();
-            }
+			//check macAdd
+			String macAdd = Utility.parseString(arr[1]);
+			if (macAdd == null) {
+				errorMsg += ",mac add cannot be blank";
+				err = true;
+			} else if (!Utility.checkHexadecimal(macAdd)) {
+				errorMsg += ",invalid mac add";
+				err = true;
+			} else if (!macList.containsKey(macAdd)) {
+				errorMsg += ",no matching mac address";
+				err = true;
+			}
 
-            //check appid
-            int appId = Utility.parseInt(arr[2]);
-            if (appId <= 0) {
-                if (errorMsg == null) {
-                    errorMsg = "app id cannot be blank";
-                } else {
-                    errorMsg += ",app id cannot be blank";
-                }
-                err = true;
-            } else {
-                if (!appIdList.contains(appId)) {
-                    if (errorMsg == null) {
-                        errorMsg = "invalid app";
-                    } else {
-                        errorMsg += ",invalid app";
-                    }
-                    err = true;
-                }
-//                query = "select appid from app where appid = ?;";
-//                pStmt = conn.prepareStatement(query);
-//                pStmt.setInt(1, appId);
-//                rs = pStmt.executeQuery();
-//                if (!rs.next()) {
-//                    String errorMsg = errMap.get(index);
-//                    if (errorMsg == null) {
-//                        errMap.put(index, "invalid app");
-//                    } else {
-//                        errMap.put(index, errorMsg + "," + "invalid app");
-//                    }
-//                    err = true;
-//                }
-//                pStmt.close();
-            }
+			//check appid
+			int appId = Utility.parseInt(arr[2]);
+			if (appId <= 0) {
+				errorMsg += ",app id cannot be blank";
+				err = true;
+			} else if (!appIdList.containsKey(appId)) {
+				errorMsg += ",invalid app";
+				err = true;
+			}
 
             if (!err) {
 
-                if (duplicate.containsKey(date + macAdd)) {
+				if (duplicate.containsKey(date + macAdd)) {
+					errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+				}
+				duplicate.put(date + macAdd, index);
+				//add to list
+				stmt.setString(1, date);
+				stmt.setString(2, macAdd);
+				stmt.setInt(3, appId);
+				stmt.addBatch();
+				//insert into tables
+			} else {
 
-                    errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
-
-                }
-                duplicate.put(date + macAdd, index);
-                //add to list
-                stmt.setString(1, date);
-                stmt.setString(2, macAdd);
-                stmt.setInt(3, appId);
-                stmt.addBatch();
-                //insert into tables
-            } else {
-                errMap.put(index, errorMsg);
-            }
-            index++;
-        }
-
+				errMap.put(index, errorMsg.substring(1));
+			}
+			index++;
+		}
         int[] updatedRecords = stmt.executeBatch();
         conn.commit();
 
@@ -246,33 +189,29 @@ public class AppUsageDAO {
                     pStmt.close();
                 }
 
-                if (!err) {
-                    if (duplicate.containsKey(date + macAdd)) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
-                        } else {
-                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
-                        }
-                    }
-                    duplicate.put(date + macAdd, index);
-                    appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
-                }
-                index++;
-            }
-            ArrayList<AppUsage> appArray = new ArrayList<AppUsage>(appList.values());
-            try {
-                for (AppUsage app : appArray) {
-                    stmt.setString(1, app.getTimestamp());
-                    stmt.setString(2, app.getMacAddress());
-                    stmt.setInt(3, app.getAppId());
-                    stmt.addBatch();
-                }
-                //closing
-                int[] updatedArr = stmt.executeBatch();
-                for (int i : updatedArr) {
-                    updateCounts += i;
-                }
+				if (!err) {
+					if (duplicate.containsKey(date + macAdd)) {
+						String errorMsg = errMap.get(index);
+						errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
+					}
+					duplicate.put(date + macAdd, index);
+					appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
+				}
+				index++;
+			}
+			ArrayList<AppUsage> appArray = new ArrayList<AppUsage>(appList.values());
+			try {
+				for (AppUsage app : appArray) {
+					stmt.setString(1, app.getTimestamp());
+					stmt.setString(2, app.getMacAddress());
+					stmt.setInt(3, app.getAppId());
+					stmt.addBatch();
+				}
+				//closing
+				int[] updatedArr = stmt.executeBatch();
+				for (int i : updatedArr) {
+					updateCounts += i;
+				}
 
                 conn.commit();
 
@@ -393,28 +332,29 @@ public class AppUsageDAO {
             }
             ConnectionManager.close(conn, ps, rs);
 
-        } catch (SQLException e) {
-        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startHour, Date endHour) {
+	public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startHour, Date endHour) {
 
         ArrayList<AppUsage> result = new ArrayList<AppUsage>();
 
         try {
-
             Connection conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
-                    + "timestamp >= ? AND timestamp < ? "
-                    + "AND macaddress = ? "
-                    + "ORDER BY timestamp");
+			PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
+					+ "timestamp >= ? AND timestamp < ? "
+					+ "AND macaddress = ? "
+					+ "ORDER BY timestamp");
 
-            ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
-            ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
-            ps.setString(3, macAdd);
+			ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
+			ps.setString(3, macAdd);
+
 
             ResultSet rs = ps.executeQuery();
 
@@ -425,8 +365,8 @@ public class AppUsageDAO {
                 int appid = rs.getInt(3);
                 result.add(new AppUsage(timestamp, macaddress, appid));
 
-            }
-            ConnectionManager.close(conn, ps, rs);
+		return result;
+	}
 
         } catch (SQLException e) {
         }
@@ -473,8 +413,8 @@ public class AppUsageDAO {
             } else {
                 ps.setString(5, "%@" + school + ".smu.edu.sg");
             }
-
-            ResultSet rs = ps.executeQuery();
+			
+			ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String macAdd = rs.getString(1);
@@ -491,6 +431,44 @@ public class AppUsageDAO {
 
         return result;
     }
+
+	public ArrayList<AppUsage> retrieveByAppCat(Date startHour, Date endHour, String macAdd, String appCat) {
+
+		ArrayList<AppUsage> result = new ArrayList<AppUsage>();
+
+		try {
+
+			Connection conn = ConnectionManager.getConnection();
+
+			PreparedStatement ps = conn.prepareStatement("select * from appusage au, app a\n"
+					+ "WHERE au.appid = a.appid\n"
+					+ "AND timestamp >= ? AND timestamp <= ? \n"
+					+ "AND appcategory = ? \n"
+					+ "AND macaddress = ? \n"
+					+ "ORDER BY timestamp;");
+
+			ps.setString(1, new java.sql.Timestamp(startHour.getTime()).toString());
+			ps.setString(2, new java.sql.Timestamp(endHour.getTime()).toString());
+			ps.setString(3, appCat);
+			ps.setString(4, macAdd);
+
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String timestamp = rs.getString(1) ;
+				String macAddress = rs.getString(2);
+				int appId = rs.getInt(3);
+				result.add(new AppUsage(timestamp, macAddress, appId));
+			}
+			ConnectionManager.close(conn, ps, rs);
+
+		} catch (SQLException e) {
+		}
+
+		return result;
+	}
+
+            
 
     public ArrayList<AppUsage> getAppsBySchool(HashMap<Integer, String> priK, String school, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();

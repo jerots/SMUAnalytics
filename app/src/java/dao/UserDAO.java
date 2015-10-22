@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import com.opencsv.CSVReader;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class UserDAO {
@@ -58,8 +59,7 @@ public class UserDAO {
 	
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> userMap, Connection conn, ArrayList<String> macList) throws IOException, SQLException {
-        conn.setAutoCommit(false);
+    public int[] insert(CSVReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String,String> macList) throws IOException, SQLException {
         String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
         PreparedStatement stmt = conn.prepareStatement(sql);
 
@@ -162,7 +162,7 @@ public class UserDAO {
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
-				macList.add(macAdd);
+				macList.put(macAdd,"");
 				
 //				System.out.println(name);
                 stmt.setString(2, name);
