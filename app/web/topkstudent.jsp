@@ -95,11 +95,11 @@
 						</div>
 						<div class="form-group">
 							<label for="startdate">Start Date</label>
-							<input type="date" class="form-control" id="startdate" name="startdate" <%=startDateInput%> required>
+							<input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" <%=startDateInput%> required>
 						</div>
 						<div class="form-group">
 							<label for="enddate">End Date</label>
-							<input type="date" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
+							<input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
 						</div>
 						<div class="form-group">
 							<label for="choices"> Choice of App Categories </label>
