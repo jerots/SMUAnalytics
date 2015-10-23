@@ -56,6 +56,9 @@ public class BasicAppCatAction extends HttpServlet {
             if (endDate == null) {
                 errors.add("You have entered an invalid end date!");
             }
+			if (startDate.after(endDate)){
+				errors.add("Your start date should be before your end date!");
+			}
 
             BasicAppController bacCtrl = new BasicAppController();
             

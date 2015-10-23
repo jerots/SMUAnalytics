@@ -74,6 +74,7 @@ public class TopkAppAction extends HttpServlet {
                     errors += ", invalid enddate";
                 }
             }
+			
             //All the values are from the same select place. It only changes based on the report selected
             String selected = request.getParameter("choices");
             //Checks school/appcategory (Actually this is chosen)

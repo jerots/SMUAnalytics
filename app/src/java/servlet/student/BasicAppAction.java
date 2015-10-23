@@ -64,6 +64,9 @@ public class BasicAppAction extends HttpServlet {
 			if (endDate == null) {
 				errors.add("You have entered an invalid end date!");
 			}
+			if (startDate.after(endDate)){
+				errors.add("Your start date should be before your end date!");
+			}
 
 			ArrayList<String> demoList = new ArrayList<String>();
 
