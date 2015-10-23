@@ -109,56 +109,97 @@ public class TopkController {
         return resultList;
     }
 
-    public ArrayList<HashMap<String, String>> getTopkStudents(String entry, String cat, String strDate, String endDate) {
+    //This method gets the students with most usage based on AppUsage time given an AppCategory.
+    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, String strDate, String endDate, String errors){
         AppUsageDAO aDao = new AppUsageDAO();
+        //This hashmap stores the link between appid and appcategory
+        HashMap<Integer, String> link = new HashMap<>();
         //This hashmap stores the link between macadd and student name
-        HashMap<String, String> link = new HashMap<>();
-        //Retrieve the results to be passed back
-        ArrayList<AppUsage> aList = aDao.getStudentsByCategory(link, cat, strDate, endDate);
-        //Stores the current time associated with the student. We use a TreeMap to find the highest number.
+        HashMap<String, String> linkMac = new HashMap<>();
+        //Retrieve the results to be passed back 
+        ArrayList<AppUsage> aList= aDao.getStudentsByCategory(link, linkMac, strDate, endDate);
+        //Stores the current time associated with the student. TreeMap to find the highest number.
         TreeMap<Long, String> userTime = new TreeMap<>();
-
+        //Ordered by appId. This is to collect the apps that are currently being used by the user.
+        HashMap<Integer, Long> storage = new HashMap<>();
+        //Stores the app that is currently being tracked.
         Iterator<AppUsage> iter = aList.iterator();
-
-        //changes the String entry into an int
-        int topK = Utility.parseInt(entry);
-
-        //current time. Long as it is in millisecs
-        long time = -1;
         //prev time
         long prevTime = -1;
-        //time difference between prevTime and time
-        long diff = -1;
+        //tracks the appId
+        int appId = 0;
         //This is the total time thus far for the same appId
-        long total = -1;
-        //Current appid being processed
+        long total = 0;
+        //Current macaddress being processed
         String macAdd = null;
-        //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered.
-        while (iter.hasNext()) {
+        //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered. 
+        while(iter.hasNext()){
             AppUsage aUsage = iter.next();
             //Converts to date from timestamp
             Date appDate = Utility.parseDate(aUsage.getTimestamp());
-            if (macAdd == null || !aUsage.getMacAddress().equals(macAdd)) {
-                //This means that it is not the first instance
-                if (macAdd != null) {
-                    //Before reset, stores into TreeSet the current data values. Time is stored before macAdd so that it can be sorted
-                    userTime.put(total, macAdd);
+            //This takes the date (Date) inside the system and places it into a date object
+            long time = appDate.getTime();
+            //Instantiates when it is a new app and ensures that is is not a new app
+            if(appId <= 0 || prevTime > time){
+                //Instantiates for first time running.
+                if(appId <= 0){
+                    appId = aUsage.getAppId();
+                    macAdd = aUsage.getMacAddress();
                 }
-                //Resets total if it is a new appId. sets the prevTime immedaitely so that the diff is 0;
-                macAdd = aUsage.getMacAddress();
-                total = -1;
                 prevTime = appDate.getTime();
             }
-            //This takes the date (Date) inside the system and places it into a date object
-            time = appDate.getTime();
-            diff = time - prevTime;
+            long diff = time - prevTime;
             //If the difference is more than 120s, sets as 10s
-            if (diff > 120000) {
+            if(diff > 120000){
                 diff = 10000;
             }
             total += diff;
-            //This is a duplicate if it entered the if loop.
             prevTime = time;
+            String currentMacAdd = aUsage.getMacAddress();
+            if(aUsage.getAppId() != appId || !macAdd.equals(currentMacAdd)){
+                //This means it is not the first instance
+                //Before reset, stores into TreeSet the current data values. Time is stored before appId so that it can be sorted
+                storage.put(appId, total);
+                total = 0;
+                //Now checks the treemap whether it exists this new appId. However, it is a new macAdd, then makes sure that macAdd is reset.
+                if(currentMacAdd.equals(macAdd)){ //This is for the first condition pass. 
+                    if(storage.containsKey(appId)){
+                        total = storage.get(appId);
+                    }
+                    //Here starts pulling out the appId to make sure that they are of the right category
+                }else{
+                    Iterator<Integer> iterId = storage.keySet().iterator();
+                    //This is to track userTotal
+                    long userTotal = 0;
+                    while(iterId.hasNext()){
+                        int iterAppId = iterId.next();
+                        if(link.get(iterAppId).equals(cat)){ //This means they are of the right category
+                            userTotal += storage.get(iterAppId);
+                        }
+                    }
+                    userTime.put(userTotal, macAdd);
+                    macAdd = currentMacAdd;
+                    //Resets the storage
+                    storage = new HashMap<>();
+                }
+                //Resets total if it is a new appId. sets the prevTime immedaitely so that the diff is 0;
+                appId = aUsage.getAppId();
+                prevTime = appDate.getTime();
+            }
+            if(!iter.hasNext()){
+                total += 10000;
+                storage.put(appId, total);
+                Iterator<Integer> iterId = storage.keySet().iterator();
+                //This is to track userTotal
+                long userTotal = 0;
+                while(iterId.hasNext()){
+                    int iterAppId = iterId.next();
+                    if(link.get(iterAppId).equals(cat)){ //This means they are of the right category
+                        userTotal += storage.get(iterAppId);
+                    }
+                }
+                userTime.put(userTotal, macAdd);
+            }
         }
         //Resets previous time
         prevTime = 0;
@@ -169,27 +210,35 @@ public class TopkController {
         //This keeps track of the rank
         int num = 0;
         //ArrayList to store the variables and return
-        ArrayList<HashMap<String, String>> uList = null;
+        ArrayList<HashMap<String, String>> uList = new ArrayList<>();
         //This final portion goes through the treeset and takes the biggest top-K
-        while (vIter.hasNext() && topK > 0) {
+        while(vIter.hasNext() && topK >0){
             macAdd = vIter.next();
-            time = kIter.next();
-            String name = link.get(macAdd);
-
-            if (time != prevTime) {
+            //Time now tracks the current time associated with the appid. Both iterators should have the same size
+            long time = kIter.next();
+            //This will immedaitely go to the appId/App hashmap to retrieve the appname associated
+            String name = linkMac.get(macAdd);
+            if(time != prevTime){
+                //prevTime now tracks to compare
                 prevTime = time;
+                //Gets the size of the prev arraylist
                 int size = uList.size();
+                //Adds current size to num
                 num = size;
             }
-
+            //Stashes all the information into a hashmap, for JSON
             HashMap<String, String> kDetails = new HashMap<>();
             kDetails.put("rank", String.valueOf(num + 1));
             kDetails.put("name", name);
             kDetails.put("mac-address", macAdd);
-            kDetails.put("duration", String.valueOf(time));
-
+            kDetails.put("duration", String.valueOf(time/1000));
             uList.add(kDetails);
             topK--;
+        }
+        if(uList.size() < topK){
+            errors += "not enough data";
+        }else if(uList.isEmpty()){
+            errors += "there is no data";
         }
         return uList;
     }
