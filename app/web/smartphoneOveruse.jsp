@@ -51,7 +51,14 @@
                                 <li><a href="basicapp-diurnal.jsp">Diurnal Report</a></li>
                             </ul>
                         </li>
-                        <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
+                                <li><a href="topkstudent.jsp">Top-k students with most app usage (give an app category)</a></li>
+                                <li><a href="topkschool.jsp">Top-k schools with most app usage (give an app category) </a></li>
+                            </ul>
+                        </li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
                         <li><a href="#">Social Activeness</a></li>
@@ -66,8 +73,8 @@
             </div><!-- /.container-fluid -->
         </nav>
         <!--END OF NAV BAR-->
-        
-        
+
+
         <!--START OF CONTENT-->
         <%
             String time = (String) request.getAttribute("time");
@@ -107,40 +114,38 @@
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
                 </div>
-                        
+
                 <div class="theme-div theme-content" style="width:60%">
                     <%
 
                         TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
-                        
+
                         if (result != null) {
                             out.print("Overuse results: ");
 
-                            out.print(result.get("overuseindex")+"<br>");
+                            out.print(result.get("overuseindex") + "<br>");
 
                             out.print("Usage results: ");
-                            out.print(result.get("usage")+"<br>");
+                            out.print(result.get("usage") + "<br>");
 
                             out.print("Gaming Usage results: ");
-                            out.print(result.get("gaming")+"<br>");
-                            
-                            
+                            out.print(result.get("gaming") + "<br>");
+
                             out.print("Access Frequency results: ");
                             out.print(result.get("frequency"));
 
-
                         }
-                        
-     
+
+
                     %>
 
                 </div>
 
             </div>
-                    
+
         </div>
         <!--END OF CONTENT-->
 
-  <%@include file="import-js.jsp" %>
+        <%@include file="import-js.jsp" %>
     </body>
 </html>

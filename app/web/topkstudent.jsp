@@ -60,7 +60,7 @@
                             </ul>
                         </li>
                         <!--<li class="active"><a href="#">Basic App Usage</a></li>-->
-                        <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
+                   
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">

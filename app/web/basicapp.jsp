@@ -79,7 +79,14 @@
                             </ul>
                         </li>
                         <!--<li class="active"><a href="#">Basic App Usage</a></li>-->
-                        <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
+                                <li><a href="topkstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                <li><a href="topkschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                            </ul>
+                        </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
                         <li><a href="#">Social Activeness</a></li>

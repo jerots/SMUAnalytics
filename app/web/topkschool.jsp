@@ -1,16 +1,13 @@
 <%-- 
-    Document   : topkschool
-    Created on : Oct 22, 2015, 8:07:29 PM
-    Author     : Shuwen
+    Document   : top-kreport
+    Created on : 17-Oct-2015, 00:06:45
+    Author     : Boyofthefuture
 --%>
 
-<%@page import="dao.Utility"%>
-<%@page import="dao.AppDAO"%>
-<%@page import="entity.App"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="java.util.TreeMap"%>
 <%@page import="java.util.HashMap"%>
-<%@page import="entity.Breakdown"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="dao.Utility"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="entity.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -23,16 +20,7 @@
         <%@include file="import-css.jsp" %>
     </head>
     <body>
-        <%            User user = (User) session.getAttribute("user");
-            String startdate = request.getParameter("startdate");
-            if (startdate == null) {
-                startdate = "";
-            }
-            String enddate = request.getParameter("enddate");
-            if (enddate == null) {
-                enddate = "";
-            }
-
+        <%			User user = (User) session.getAttribute("user");
 
         %>	
         <!--NAVBAR-->
@@ -61,19 +49,17 @@
                                 <li><a href="basicapp-diurnal.jsp">Diurnal Report</a></li>
                             </ul>
                         </li>
-                        <!--<li class="active"><a href="#">Basic App Usage</a></li>-->
-                        <li><a href="#">Top-K App Usage <span class="sr-only">(current)</span></a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
-                                <li><a href="topkstudent.jsp">Top-k students with most app usage (give an app category)</a></li>
-                                <li><a href="topkschool.jsp">Top-k schools with most app usage (give an app category) </a></li>
+                                <li><a href="topkstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                <li><a href="topkschool">Top-k schools with most app usage (given an app category)</a></li>
                             </ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
-                        <li><a href="#">Social Activeness</a></li>
+                        <li><a href="activeness.jsp">Social Activeness</a></li>
 
                     </ul>
 
@@ -86,43 +72,129 @@
         </nav>
         <!--END OF NAV BAR-->
         <!--START OF CONTENT-->
+        <%
+            String select = request.getParameter("choice");
+            String startDate = request.getParameter("startdate");
+            String endDate = request.getParameter("enddate");
+
+            String startDateInput = "";
+            String endDateInput = "";
+            if (startDate != null) {
+                startDateInput = "value='" + startDate + "'";
+            }
+            if (endDate != null) {
+                endDateInput = "value='" + endDate + "'";
+            }
+            ArrayList<String> categories = Utility.getCategories();
+        %>
+
+
         <div class="theme-container container">
             <div class="row">
                 <div class="theme-div" style="width:37%">
-                    <form action="BasicAppCatAction">
+                    <form action="TopKServlet" method="POST">
+                        <div class="form-group"></div>
                         <div class="form-group">
-                            <label for="date">Start Date</label>
-                            <input type="date" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
+                            <label for="entries">Number of Top Results</label>
+                            <input type="number" name="entries" min="1" max="10" value="3" class="form-control" id="entries">
                         </div>
                         <div class="form-group">
-                            <label for="date">End Date</label>
-                            <input type="date" class="form-control" id="enddate" name="enddate" value="<%=enddate%>" required>
+                            <label for="startdate">Start Date</label>
+                            <input type="date" class="form-control" id="startdate" name="startdate" <%=startDateInput%> required>
                         </div>
-                            <%
-                                ArrayList<String> schools = Utility.getSchoolist();
-
-                            %>
-                            <div class="form-group">
-                                <label for="schools">School</label>
-                                <select class="form-control" name="category">
-                                    <%                                    for (String s : schools) {
-                                    %>
-                                    <option class='form-control' id='category' name='<%= s%>' value='<%= s%>' ><%= s%></option>
-                                    <%
+                        <div class="form-group">
+                            <label for="enddate">End Date</label>
+                            <input type="date" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
+                        </div>
+                        <div class="form-group">
+                            <label for="choices"> Choice of App Categories </label>
+                            <select class="form-control" name="choices">
+                                <%
+                                    for (String category : categories) {
+                                        String categoryCode = "";
+                                        if (category.equals(select)) {
+                                            categoryCode = "selected";
                                         }
-                                    %>
-                                </select>
-
-                            </div>
-
+                                        out.println("<option value=" + category + " " + categoryCode + ">" + category + "</option>");
+                                    }
+                                %>
+                            </select>
+                        </div>
+                        <input type="hidden" value="appschools" name="category">
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
                 </div>
                 <div class="theme-div theme-content" style="width:60%">
-                    <!----
+                    <h4><b> Top-K Report</b> </h4> <hr>
+                    <%
+                        ArrayList<HashMap<String, String>> values = (ArrayList<HashMap<String, String>>) request.getAttribute("catvalues");
+                        String error = (String) request.getAttribute("error");
+                        String errors = (String) request.getAttribute("errors");
+                        if (error != null && error.length() > 0) {
+                            out.println("<h1 style='color:red'>Error!</h1>");
+                            out.println("<h3 style='color:red'>" + error + "</h3>");
+                        } else if (values != null) { //Checks this because in case of category refresh.
+                            out.println("<h1>Result</h1>");
+                            //This prints the type of table
+                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
 
-ERRRROR STUFF
---->
+                            out.println("<td><b>Rank (for schools with most app usage)</b></td><td><b>School</b></td><td><b>App usage Time</b></td></tr>");
+                            for (int i = 0; i < values.size(); i += 0) {
+                                //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
+                                HashMap<String, String> indiv = values.get(i);
+                                int rank = Utility.parseInt(indiv.get("rank"));
+                                //Gets ready the schools to add on.
+                                String names = null;
+                                //Gets the school to convert to its formal name
+                                String name = indiv.get("school");
+                                switch (name) {
+                                    case "socsc":
+                                        names = "Social Science";
+                                        break;
+                                    case "law":
+                                        names = "Law";
+                                        break;
+                                    case "sis":
+                                        names = "Information Systems";
+                                        break;
+                                    case "accountancy":
+                                        names = "Accountancy";
+                                        break;
+                                    case "economics":
+                                        names = "Economics";
+                                        break;
+                                    case "business":
+                                        names = "Business";
+                                        break;
+                                }
+                                String duration = indiv.get("duration");
+                                out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
+                                Iterator<HashMap<String, String>> iter = values.iterator();
+                                //Removes the first line that has already been stored so that it is always checking with later ranks
+                                iter.next();
+                                iter.remove();
+                                while (iter.hasNext()) {
+                                    HashMap<String, String> other = iter.next();
+                                    if (Utility.parseInt(other.get("rank")) == rank) {
+                                        names += ", " + other.get("name");
+                                    } else {
+                                        break; //breaks out of this while loop if the ranks are not equivalent anymore.
+                                    }
+                                    iter.remove();
+                                }
+                                out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
+                                out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
+                            }
+                        }
+                        if (errors != null && errors.length() > 0) {
+                            out.println("<br>");
+                            out.println("<h1 style='color:red'>Error!</h1>");
+                            out.println("<h3 style='color:red'>" + error + "</h3>");
+                        }
+
+                    %>
+                    <p>
+                    <P><p>
                 </div>
 
             </div>
