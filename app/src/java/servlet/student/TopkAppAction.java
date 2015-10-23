@@ -5,7 +5,7 @@
  */
 package servlet.student;
 
-import controller.TopkAppController;
+import controller.TopkController;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class TopkAppAction extends HttpServlet {
             //Gets the start and end dates as necessary.
             String startDate = request.getParameter("startdate");
             String endDate = request.getParameter("enddate");
-            TopkAppController ctrl = new TopkAppController();
+            TopkController ctrl = new TopkController();
 
             //Delcares the values to return. Declares both in case of 
             ArrayList<HashMap<String, String>> catValues = null;

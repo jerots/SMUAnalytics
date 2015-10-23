@@ -18,7 +18,7 @@ import java.util.TreeMap;
  *
  * @author ASUS-PC
  */
-public class TopkAppController {
+public class TopkController {
 
     public ArrayList<HashMap<String, String>> getTopKApp(String entry, String school, String strDate, String endDate) {
 

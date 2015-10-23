@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.HeatmapController;
-import controller.TopkAppController;
+import controller.TopkController;
 import dao.UserDAO;
 import dao.Utility;
 import entity.LocationUsage;
@@ -161,7 +161,7 @@ public class TopkSchool extends HttpServlet {
 
             //PASSES ALL VALIDATION, proceed to report generation
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            TopkAppController ctrl = new TopkAppController();
+            TopkController ctrl = new TopkController();
             ArrayList<HashMap<String, String>> uList = ctrl.getTopkSchool(k, school, startDateStr, endDateStr);
 
             output.addProperty("status", "success");
