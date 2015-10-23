@@ -87,7 +87,7 @@
         <div class="theme-container container">
             <div class="row">
                 <div class="theme-div" style="width:37%">
-                    <form action="BasicAppCatAction">
+                    <form action="TopkAppAction">
                         <div class="form-group">
                             <label for="date">k</label>
                             <input type="text" class="form-control" id="k" name="k" value="<%=startdate%>">

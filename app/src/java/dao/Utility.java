@@ -16,9 +16,10 @@ import java.util.Date;
  */
 public final class Utility {
 
-    private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
+    private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 
     static {
         loadSchools();
@@ -26,24 +27,24 @@ public final class Utility {
     }
 
     public static Date parseDate(String date) {
-        date = date.replace("\"","");
+        date = date.replace("\"", "");
         if (date != null && date.length() > 0) {
-            try {                
+            try {
                 return df.parse(date);
             } catch (ParseException e) {
             }
         }
         return null;
     }
-    
-    public static String formatDate(Date date){
-        if(date != null){
+
+    public static String formatDate(Date date) {
+        if (date != null) {
             return df.format(date);
         }
         return null;
     }
-    
-    public static boolean checkDate(String str){
+
+    public static boolean checkDate(String str) {
         return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
     }
 
@@ -64,7 +65,7 @@ public final class Utility {
 
     public static String parseString(String input) {
         String str = input.trim();
-        str = str.replace("\"","");
+        str = str.replace("\"", "");
         if (str != null && str.length() > 0) {
             return str;
         }
@@ -99,11 +100,11 @@ public final class Utility {
         int position = backEmail.indexOf(".");
         return (schoolList.contains(backEmail.substring(0, position)) && backEmail.substring(position).equals(".smu.edu.sg"));
     }
-    
-     public static boolean checkCategory(String string) {
+
+    public static boolean checkCategory(String string) {
         String str = string.toLowerCase();
         return categories.contains(str);
-     }
+    }
 
     public static void loadSchools() {
         schoolList = new ArrayList<>();
@@ -129,16 +130,35 @@ public final class Utility {
         categories.add("games");
         categories.add("others");
     }
-    
-    public static ArrayList<String> getCategories(){
+
+    public static ArrayList<String> getCategories() {
         return categories;
     }
-    
-    public static ArrayList<String> getSchoolist(){
+
+    public static ArrayList<String> getSchoolist() {
         return schoolList;
     }
 
-    public static long secondsBetweenDates(Date startDate, Date endDate){
+    public static long secondsBetweenDates(Date startDate, Date endDate) {
         return (endDate.getTime() - startDate.getTime()) / 1000;
     }
+
+    public static boolean checkOnlyDate(String str) {
+        return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
+    }
+
+    public static Date parseOnlyDate(String date) {
+        date = date.replace("\"", "");
+        if (date != null && date.length() > 0) {
+            try {
+                return sdf.parse(date);
+            } catch (ParseException e) {
+            }
+        }
+        return null;
+    }
+    
+    public static boolean checkSchools(String school){
+         return schoolList.contains(school);
+     }
 }
