@@ -138,4 +138,7 @@ public final class Utility {
         return schoolList;
     }
 
+    public static long secondsBetweenDates(Date startDate, Date endDate){
+        return (endDate.getTime() - startDate.getTime()) / 1000;
+    }
 }
