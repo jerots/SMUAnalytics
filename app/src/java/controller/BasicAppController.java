@@ -8,6 +8,7 @@ package controller;
 import dao.AppDAO;
 import dao.AppUsageDAO;
 import dao.UserDAO;
+import dao.Utility;
 import entity.AppUsage;
 import entity.Breakdown;
 import entity.User;
@@ -48,7 +49,6 @@ public class BasicAppController {
 		if (userList == null) {
 			userList = auDAO.retrieveUsers(startDate, endDate);
 		}
-		System.out.println("USERLIST SIZE " + userList.size());
 		for (int i = 0; i < userList.size(); i++) {
 			User currUser = userList.get(i);
 
@@ -71,7 +71,7 @@ public class BasicAppController {
 				if (newTime.before(nextDay)) {
 					beforeAppeared = true;
 					//difference between app usage timing
-					long difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+					long difference = Utility.secondsBetweenDates(oldTime,newTime);
 
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
@@ -84,7 +84,7 @@ public class BasicAppController {
 
 				} else {  // NEW TIMING AFTER NEXT DAY
 					if (beforeAppeared) {
-						totalSeconds += (nextDay.getTime() - oldTime.getTime()) / 1000;
+						totalSeconds += Utility.secondsBetweenDates(oldTime, newTime);
 
 					}
 					nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
@@ -95,7 +95,7 @@ public class BasicAppController {
 			}
 
 			if (oldTime.before(nextDay)) {
-				long difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
+				long difference = Utility.secondsBetweenDates(oldTime,nextDay);
 				if (difference <= 120) {
 					totalSeconds += difference;
 				} else {
@@ -398,7 +398,7 @@ public class BasicAppController {
 					beforeAppeared = true;
 
 					//difference = usage time of the oldTime appId
-					double difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+					double difference = Utility.secondsBetweenDates(oldTime, newTime);
 
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
@@ -423,7 +423,7 @@ public class BasicAppController {
 
 				} else {  // NEW TIMING AFTER NEXT HOUR
 					if (beforeAppeared) {
-						double diff = (nextDay.getTime() - oldTime.getTime()) / 1000;
+						double diff = Utility.secondsBetweenDates(oldTime, nextDay);
 						//add time to the appid
 						if (appResult.containsKey(appId)) {
 							double value = appResult.get(appId);
@@ -443,7 +443,7 @@ public class BasicAppController {
 			int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
 			if (oldTime.before(nextDay)) {
-				double difference = (nextDay.getTime() - oldTime.getTime()) / 1000;
+				double difference = Utility.secondsBetweenDates(oldTime, nextDay);
 				//add the time difference to last appId
 				if (difference <= 120) {
 					if (appResult.containsKey(lastAppId)) {
@@ -562,7 +562,7 @@ public class BasicAppController {
 
 					//calculate usageTime and add to secondsThisHour
 					//difference between app usage timing
-					long difference = (newTime.getTime() - oldTime.getTime()) / 1000;
+					long difference = Utility.secondsBetweenDates(oldTime, newTime);
 
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
@@ -580,7 +580,7 @@ public class BasicAppController {
 				if (auList.size() > 0) {
 					Date lastTime = auList.get(auList.size() - 1).getDate();
 
-					long difference = endHour.getTime() - lastTime.getTime() / 1000;
+					long difference = Utility.secondsBetweenDates(lastTime, endHour);
 
 					if (difference > 10) {
 						difference = 10;
