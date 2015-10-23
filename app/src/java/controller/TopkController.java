@@ -20,93 +20,113 @@ import java.util.TreeMap;
  */
 public class TopkController {
 
-    public ArrayList<HashMap<String, String>> getTopKApp(String entry, String school, String strDate, String endDate) {
+    public ArrayList<HashMap<String, String>> getTopKApp(int topK, String school, String strDate, String endDate, String errors) {
 
-        ArrayList<HashMap<String, String>> resultList = new ArrayList<>();
-        AppUsageDAO aDao = new AppUsageDAO();
-
+       AppUsageDAO aDao = new AppUsageDAO();
+        //Stores the current time associated with the appid. TreeMap to find the highest number.
         TreeMap<Long, Integer> appTime = new TreeMap<>();
-
+        //This hashmap is for appId/appName associate (appId is the primary key so must do this)
         HashMap<Integer, String> hMap = new HashMap<>();
-
+        //Retrieve the results to be passed back. The method ONLY gets the apps based on school. This method still has to sort and find the top-K.
         ArrayList<AppUsage> aList = aDao.getAppsBySchool(hMap, school, strDate, endDate);
-
         Iterator<AppUsage> iter = aList.iterator();
-        //changes the String entry into an int
-        int topK = Utility.parseInt(entry);
-
-        //current time. Long as it is in millisecs
-        long time = -1;
+        //Ordered by appId.
+        HashMap<Integer, Long> storage = new HashMap<>();
+        
         //prev time
         long prevTime = -1;
-        //time difference between prevTime and time
-        long diff = -1;
         //This is the total time thus far for the same appId
         long total = 0;
         //Current appid being processed
         int appId = 0;
         //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered.
-        while (iter.hasNext()) {
+        while(iter.hasNext()){
             AppUsage aUsage = iter.next();
             //Converts to date from string
             Date appDate = Utility.parseDate(aUsage.getTimestamp());
-            if (aUsage.getAppId() != appId) {
-                //This means it is not the first instance
-                if (appId != 0) {
-                    //Before reset, stores into TreeSet the current data values. Time is stored before appId so that it can be sorted
-                    appTime.put(total, appId);
-                }
-                //Resets total if it is a new appId. sets the prevTime immedaitely so that the diff is 0;
-                appId = aUsage.getAppId();
-                total = 0;
-                prevTime = appDate.getTime();
-
-            }
             //This takes the date (Date) inside the system and places it into a date object
-            time = appDate.getTime();
-            diff = time - prevTime;
+            long time = appDate.getTime();
+            //When prevTime is more than time, it signals that it is a new user.
+            if(appId <= 0 || prevTime > time){
+                //Instantiates for first time running.
+                appId = aUsage.getAppId();
+                prevTime = appDate.getTime();
+            }
+            //WE TAKE THE DIFFERENCE FIRST. Why? Because no matter what is the next app, we take the diff first then we will check whether to continue.
+            
+            //time difference between prevTime and time
+            long diff = time - prevTime;
             //If the difference is more than 120s, sets as 10s
-            if (diff > 120000) {
+            if(diff > 120000){
                 diff = 10000;
             }
             total += diff;
+            //This is a duplicate if it entered the if loop.
             prevTime = time;
+            if(aUsage.getAppId() != appId){
+                //This means it is not the first instance
+                //Before reset, stores into TreeSet the current data values. Time is stored before appId so that it can be sorted
+                storage.put(appId, total);
+                //Now checks the treemap whether it exists this new appId
+                total = 0;
+                if(storage.containsKey(appId)){
+                    total = storage.get(appId);
+                }
+                //Resets total if it is a new appId. sets the prevTime immedaitely so that the diff is 0;
+                appId = aUsage.getAppId();
+                prevTime = appDate.getTime();
+            }
+            if(!iter.hasNext()){
+                total += 10000;
+                storage.put(appId, total);
+            }
         }
-
+        //Finally, changes the treeset over. Method for this in utility. They are together in the same place no matter how you iterate.
+        Iterator<Integer> swapKey = storage.keySet().iterator();
+        Iterator<Long> swapValue = storage.values().iterator();
+        while(swapKey.hasNext()){
+            appTime.put(swapValue.next(), swapKey.next());
+        }
+        //Resets previous time
         prevTime = 0;
-
+        //This one is to keep track of the keys (time)
         Iterator<Long> kIter = appTime.descendingMap().keySet().iterator();
-
+        //Converts to iterator to go through values
         Iterator<Integer> vIter = appTime.descendingMap().values().iterator();
-
+        //This keeps track of the rank
         int num = 0;
-
-        ArrayList<HashMap<String, String>> returnList = null;
-
-        while (vIter.hasNext() && topK > 0) {
+        //ArrayList to store the variables and return
+        ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
+        //This final portion goes through the treeset and takes the biggest top-K
+        while(vIter.hasNext() && topK > 0){
             appId = vIter.next();
-
-            time = kIter.next();
-
+            //Time now tracks the current time associated with the appid. Both iterators should have the same size
+            long time = kIter.next();
+            //This will immedaitely go to the appId/appName hashmap to retrieve the appname associated
             String appName = hMap.get(appId);
-            System.out.println(appId + " " + time);
-            if (time != prevTime) {
-
+            if(time != prevTime){
+                //prevTime now tracks to compare
                 prevTime = time;
-
+                //Gets the size of the prev arraylist
                 int size = returnList.size();
-
+                //Adds current size to num
                 num = size;
             }
+            //Stashes all the information into a hashmap, for JSON
             HashMap<String, String> kDetails = new HashMap<>();
             kDetails.put("rank", String.valueOf(num + 1));
             kDetails.put("app-name", appName);
-            kDetails.put("duration", String.valueOf(time));
-
+            kDetails.put("duration", String.valueOf(time/1000));
+            
             returnList.add(kDetails);
             topK--;
         }
-        return resultList;
+        if(returnList.size() < topK){
+            errors += "not enough data";
+        }else if(returnList.isEmpty()){
+            errors += "there is no data";
+        }
+        return returnList;
     }
 
     //This method gets the students with most usage based on AppUsage time given an AppCategory.

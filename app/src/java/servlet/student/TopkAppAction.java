@@ -100,7 +100,7 @@ public class TopkAppAction extends HttpServlet {
                 switch (selection){
                         case "schoolapps":
                             //This parameter is only for the school function
-                            catValues = ctrl.getTopkSchool(entry, selected, startDate, endDate);
+                             catValues = ctrl.getTopKApp(topK, selected, startDate, endDate, error);
                             break;
                         case "appstudents":
                             //This parameter is only for those who select App Category and return Students

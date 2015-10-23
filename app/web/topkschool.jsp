@@ -54,7 +54,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
                                 <li><a href="topkstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                <li><a href="topkschool">Top-k schools with most app usage (given an app category)</a></li>
+                                <li><a href="topkschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
                             </ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
@@ -92,7 +92,7 @@
         <div class="theme-container container">
             <div class="row">
                 <div class="theme-div" style="width:37%">
-                    <form action="TopKServlet" method="POST">
+                    <form action="TopkAppAction" method="POST">
                         <div class="form-group"></div>
                         <div class="form-group">
                             <label for="entries">Number of Top Results</label>
