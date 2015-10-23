@@ -499,7 +499,6 @@ public class AppUsageDAO {
         return aList;
     }
 
-
     public ArrayList<AppUsage> getStudentsByCategory(HashMap<Integer, String> priK, HashMap<String, String> priKMac, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
@@ -510,7 +509,7 @@ public class AppUsageDAO {
                 + "AND au.macaddress = u.macaddress\n"
                 + "AND a.appid = au.appid\n"
                 + "ORDER BY u.macaddress, timestamp;";
-        
+
         //Cannot send in category as must minus from the previous amount.
         try {
             Connection conn = ConnectionManager.getConnection();
@@ -538,23 +537,22 @@ public class AppUsageDAO {
         return aList;
     }
 
-    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priK, String category, String start, String end) {
+    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<Integer, String> priK, HashMap<String, String> priKSch, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
-        String sql = "SELECT timestamp, u.email, u.macaddress, a.appid"
-                + "FROM appusage au, user u, app a"
-                + "WHERE au.macaddress = u.macaddress"
-                + "AND timestamp >= STR_TO_DATE('?','%Y-%m-%d %H:%i:%s')"
-                + "AND timestamp <= STR_TO_DATE('?','%Y-%m-%d %H:%i:%s')"
-                + "AND a.appid = au.appid"
-                + "AND appcategory = ?"
-                + "ORDER BY CASE"
-                + "WHEN u.email LIKE '%sis%' THEN 1"
-                + "WHEN u.email LIKE '%economics%' THEN 2"
-                + "WHEN u.email LIKE '%business%' THEN 3"
-                + "WHEN u.email LIKE '%accountancy%' THEN 4"
-                + "WHEN u.email LIKE '%law%' THEN 5"
-                + "WHEN u.email LIKE '%socsc%' THEN 6"
+        String sql = "SELECT timestamp, u.macaddress, a.appid, appcategory, email\n"
+                + "FROM appusage au, user u, app a\n"
+                + "WHERE au.macaddress = u.macaddress\n"
+                + "AND timestamp >= ?\n"
+                + "AND timestamp <= ?\n"
+                + "AND a.appid = au.appid\n"
+                + "ORDER BY CASE\n"
+                + "WHEN u.email LIKE '%accountancy%' THEN 1\n"
+                + "WHEN u.email LIKE '%economics%' THEN 2\n"
+                + "WHEN u.email LIKE '%business%' THEN 3\n"
+                + "WHEN u.email LIKE '%sis%' THEN 4\n"
+                + "WHEN u.email LIKE '%law%' THEN 5\n"
+                + "WHEN u.email LIKE '%socsc%' THEN 6\n"
                 + "end,macaddress, timestamp;";
 
         try {
@@ -562,18 +560,20 @@ public class AppUsageDAO {
             PreparedStatement pStmt = conn.prepareStatement(sql);
             pStmt.setString(1, start);
             pStmt.setString(2, end);
-            pStmt.setString(3, category);
 
             ResultSet rs = pStmt.executeQuery();
-
+            //Need to retrieve category as you must take the first time of every new app to be accurate
             while (rs.next()) {
                 String timeStamp = rs.getString(1);
-                String email = rs.getString(2);
-                String macAdd = rs.getString(3);
-                int appId = rs.getInt(4);
+                String macAdd = rs.getString(2);
+                int appId = rs.getInt(3);
+                String category = rs.getString(4);
+                String email = rs.getString(5);
+                String school = Utility.getSchool(email);
 
-                aList.add(new AppUsage(macAdd, timeStamp, appId));
-                priK.put(macAdd, email);
+                aList.add(new AppUsage(timeStamp, macAdd, appId));
+                priK.put(appId, category);
+                priKSch.put(macAdd, school);
             }
 
         } catch (SQLException e) {

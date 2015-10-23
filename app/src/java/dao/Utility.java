@@ -21,10 +21,10 @@ public final class Utility {
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 
-	static {
-		loadSchools();
-		loadCategories();
-	}
+    static {
+        loadSchools();
+        loadCategories();
+    }
 
     public static Date parseDate(String date) {
         date = date.replace("\"", "");
@@ -48,18 +48,17 @@ public final class Utility {
         return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
     }
 
+    public static int parseInt(String str) {
+        int num = -1;
+        try {
+            num = Integer.parseInt(str);
 
+        } catch (NumberFormatException e) {
 
-	public static int parseInt(String str) {
-		int num = -1;
-		try {
-			num = Integer.parseInt(str);
+        }
+        return num;
+    }
 
-		} catch (NumberFormatException e) {
-
-		}
-		return num;
-	}
     public static String parseString(String input) {
         String str = input.trim();
         str = str.replace("\"", "");
@@ -69,9 +68,9 @@ public final class Utility {
         return null;
     }
 
-	public static boolean checkHexadecimal(String str) {
-		return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
-	}
+    public static boolean checkHexadecimal(String str) {
+        return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
+    }
 
     public static boolean checkEmail(String str) {
         String[] split = str.split("@");
@@ -98,14 +97,14 @@ public final class Utility {
         return categories.contains(str);
     }
 
-	public static boolean checkPassword(String str) {
-		for (int i = 0; i < str.length(); i++) {
-			if (Character.isWhitespace(str.charAt(i))) {
-				return false;
-			}
-		}
-		return str.length() >= 8;
-	}
+    public static boolean checkPassword(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return str.length() >= 8;
+    }
 
     public static void loadCategories() {
         categories = new ArrayList<>();
@@ -130,24 +129,20 @@ public final class Utility {
         return schoolList;
     }
 
+    public static void loadSchools() {
+        schoolList = new ArrayList<>();
+        schoolList.add("business");
+        schoolList.add("accountancy");
+        schoolList.add("sis");
+        schoolList.add("economics");
+        schoolList.add("law");
+        schoolList.add("socsc");
+    }
 
-	public static void loadSchools() {
-		schoolList = new ArrayList<>();
-		schoolList.add("business");
-		schoolList.add("accountancy");
-		schoolList.add("sis");
-		schoolList.add("economics");
-		schoolList.add("law");
-		schoolList.add("socsc");
-	}
+    public static long secondsBetweenDates(Date startDate, Date endDate) {
 
-
-
-
-	public static long secondsBetweenDates(Date startDate, Date endDate) {
-
-		return (endDate.getTime() - startDate.getTime()) / 1000;
-	}
+        return (endDate.getTime() - startDate.getTime()) / 1000;
+    }
 
     public static boolean checkOnlyDate(String str) {
         return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
@@ -163,8 +158,12 @@ public final class Utility {
         }
         return null;
     }
-    
-    public static boolean checkSchools(String school){
-         return schoolList.contains(school);
-     }
+
+    public static boolean checkSchools(String school) {
+        return schoolList.contains(school);
+    }
+
+    public static String getSchool(String email) {
+        return email.substring(email.indexOf("@") + 1, email.indexOf(".", email.indexOf("@")));
+    }
 }
