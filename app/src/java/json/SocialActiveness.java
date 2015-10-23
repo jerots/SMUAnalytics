@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.SocialActivenessController;
 import dao.UserDAO;
+import dao.Utility;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -95,7 +96,7 @@ public class SocialActiveness extends HttpServlet {
 				} else {
 					SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
 					Date dateFormatted = sdf.parse(date, new ParsePosition(0));
-					if (dateFormatted == null) {
+					if (dateFormatted == null || !Utility.checkDate(date)) {
 						errors.add("invalid startdate");
 					}
 				}

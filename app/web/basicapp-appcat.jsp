@@ -88,11 +88,11 @@
                     <form action="BasicAppCatAction">
                         <div class="form-group">
                             <label for="date">Start Date</label>
-                            <input type="date" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
                         </div>
                         <div class="form-group">
                             <label for="date">End Date</label>
-                            <input type="date" class="form-control" id="enddate" name="enddate" value="<%=enddate%>" required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="enddate" name="enddate" value="<%=enddate%>" required>
                         </div>
 
 
@@ -118,7 +118,7 @@
                         if (catList != null) {
                             if (catList.size() <= 0) {
                                 out.println("<h1>Result</h1>");
-                                out.println("Invalid Date. Please select your desired date again.");
+                                out.println("No records found. Please select another day.");
                                 return;
                             }
                             Iterator<String> iter = catList.keySet().iterator();

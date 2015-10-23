@@ -1,9 +1,3 @@
-<%-- 
-    Document   : top-kreport
-    Created on : 17-Oct-2015, 00:06:45
-    Author     : Boyofthefuture
---%>
-
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.HashMap"%>
@@ -100,11 +94,11 @@
                         </div>
                         <div class="form-group">
                             <label for="startdate">Start Date</label>
-                            <input type="date" class="form-control" id="startdate" name="startdate" <%=startDateInput%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" <%=startDateInput%> required>
                         </div>
                         <div class="form-group">
                             <label for="enddate">End Date</label>
-                            <input type="date" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
                         </div>
                         <div class="form-group">
                             <label for="choices"> Choice of App Categories </label>

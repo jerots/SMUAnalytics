@@ -117,7 +117,7 @@
                     <form action="HeatmapAction" method="GET">
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input type="date" class="form-control" id="date" name="date" <%=dateCode%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="date" <%=dateCode%> required>
                         </div>
                         <div class="form-group">
                             <label for="date">Time</label>

@@ -48,7 +48,7 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
                                         <li><a href="topkstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                        <li><a href="topkschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                                        <li><a href="topkschool.jsp">Top-k schools with most app usage (given an app categorfy)</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
@@ -66,6 +66,7 @@
                 </nav>
 		<!--END OF NAV BAR-->
         <!--START OF CONTENT-->
+
 		<%
 			String select = request.getParameter("choice");
                         String startDate = request.getParameter("startdate");
@@ -82,7 +83,6 @@
                         
                         ArrayList<String> schoolList = Utility.getSchoolist();
 		%>
-
 
 		<div class="theme-container container">
 			<div class="row">

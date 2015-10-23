@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.JsonArray;
 import dao.UserDAO;
+import dao.Utility;
 import entity.User;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -121,7 +122,7 @@ public class UsageHeatmap extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(date, new ParsePosition(0));
-                    if (dateFormatted == null) {
+                    if (dateFormatted == null || !Utility.checkDate(date)) {
                         errors.add("invalid date");
                     }
                 }

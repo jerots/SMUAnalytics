@@ -374,7 +374,6 @@ public class BasicAppController {
 
 		userList = auDAO.retrieveUsers(startDate, endDate);
 
-		System.out.println("userList size: " + userList.size());
 		for (int i = 0; i < userList.size(); i++) {
 
 			User currUser = userList.get(i);
@@ -484,7 +483,6 @@ public class BasicAppController {
 				String key = iter.next();
 				//EACH CATEGORY
 				ArrayList<Integer> innerList = appCategoryList.get(key);
-				System.out.println("Category: " + key);
 				double totCatTime = 0.0;
 				for (int j = 0; j < innerList.size(); j++) {
 					int appid = innerList.get(j);
