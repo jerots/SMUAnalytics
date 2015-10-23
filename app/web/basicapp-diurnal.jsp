@@ -89,7 +89,7 @@
                     <form action="BasicAppDiurnalAction">
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
                         </div>
                         <div class="form-group">
                             <label for="year">Year</label>

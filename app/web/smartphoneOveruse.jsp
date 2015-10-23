@@ -96,7 +96,7 @@
                     <form action="SmartphoneOveruse" method="GET">
                         <div class="form-group">
                             <label for="date">Start Date</label>
-                            <input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="date" name="startDate" <%=dateCode%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="startDate" <%=dateCode%> required>
                         </div>
                         <div class="form-group">
                             <label for="date">Start Time</label>
@@ -104,7 +104,7 @@
                         </div>
                         <div class="form-group">
                             <label for="date">End Date</label>
-                            <input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" <%=dateCode%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" <%=dateCode%> required>
                         </div>
                         <div class="form-group">
                             <label for="date">End Time</label>
