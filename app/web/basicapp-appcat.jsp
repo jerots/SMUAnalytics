@@ -118,7 +118,7 @@
                         if (catList != null) {
                             if (catList.size() <= 0) {
                                 out.println("<h1>Result</h1>");
-                                out.println("Invalid Date. Please select your desired date again.");
+                                out.println("No records found. Please select another day.");
                                 return;
                             }
                             Iterator<String> iter = catList.keySet().iterator();
