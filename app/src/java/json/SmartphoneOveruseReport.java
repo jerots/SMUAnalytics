@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import controller.HeatmapController;
 import controller.SmartphoneOveruseController;
 import dao.UserDAO;
+import dao.Utility;
 import entity.LocationUsage;
 import entity.User;
 import is203.JWTException;
@@ -99,7 +100,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(startDateStr, new ParsePosition(0));
-                    if (dateFormatted == null) {
+                    if (dateFormatted == null || !Utility.checkDate(startDateStr)) {
                         errors.add("invalid startdate");
                     }
                 }
@@ -116,7 +117,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(endDateStr, new ParsePosition(0));
-                    if (dateFormatted == null) {
+                    if (dateFormatted == null || !Utility.checkDate(endDateStr)) {
                         errors.add("invalid enddate");
                     }
                 }

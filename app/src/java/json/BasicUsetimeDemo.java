@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
 import dao.UserDAO;
+import dao.Utility;
 import entity.Breakdown;
 import entity.User;
 import is203.JWTException;
@@ -99,7 +100,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
-                    if (dateFormatted == null) {
+                    if (dateFormatted == null || !Utility.checkDate(startdate)) {
                         errors.add("invalid startdate");
                     }
                 }
@@ -116,7 +117,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(enddate, new ParsePosition(0));
-                    if (dateFormatted == null) {
+                    if (dateFormatted == null || !Utility.checkDate(enddate)) {
                         errors.add("invalid enddate");
                     }
                 }

@@ -77,11 +77,11 @@
 						</div>
 						<div class="form-group">
 							<label for="startDate">Start Date</label>
-							<input type="date" class="form-control" id="startDate" name="startdate" value="<%=startdate%>" required>
+							<input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="startDate" name="startdate" value="<%=startdate%>" required>
 						</div>
 						<div class="form-group">
 							<label for="endDate">End Date</label>
-							<input type="date" class="form-control" id="endDate" name="enddate" value="<%=enddate%>" required>
+							<input type="date" min="1950-01-01" max="2050-01-01" class="form-control" id="endDate" name="enddate" value="<%=enddate%>" required>
 						</div>
 
 						<input type="submit" class="btn btn-default" value="Delete location data">
