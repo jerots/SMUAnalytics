@@ -465,7 +465,8 @@ public class AppUsageDAO {
 
     public ArrayList<AppUsage> getAppsBySchool(HashMap<Integer, String> priK, String school, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
-
+        
+        //This has been changed to take into account that the next update is calculated as well.
         try {
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT timestamp, appname, a.appid, u.macaddress\n"
@@ -475,13 +476,13 @@ public class AppUsageDAO {
                     + "AND au.macaddress = u.macaddress\n"
                     + "AND a.appid = au.appid\n"
                     + "AND u.email LIKE ? \n"
-                    + "ORDER BY appid, timestamp;");
+                    + "ORDER BY u.macaddress, timestamp;");
 
             ps.setString(1, start);
             ps.setString(2, end);
             ps.setString(3, "%" + school + "%");
-            ResultSet rs = ps.executeQuery();
 
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String timestamp = rs.getString(1);
                 String appName = rs.getString(2);
@@ -495,7 +496,6 @@ public class AppUsageDAO {
 
         } catch (SQLException e) {
         }
-
         return aList;
     }
 
@@ -509,7 +509,7 @@ public class AppUsageDAO {
                 + "AND au.macaddress = u.macaddress\n"
                 + "AND a.appid = au.appid\n"
                 + "ORDER BY u.macaddress, timestamp;";
-
+        
         //Cannot send in category as must minus from the previous amount.
         try {
             Connection conn = ConnectionManager.getConnection();
