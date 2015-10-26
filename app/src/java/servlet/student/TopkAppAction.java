@@ -45,32 +45,34 @@ public class TopkAppAction extends HttpServlet {
             //This is the choice selection of which of the 3 option the user wants to be processed.
             String selection = request.getParameter("category");
             //Gets the start and end dates as necessary.
-            String startDate = request.getParameter("startdate");
-            String endDate = request.getParameter("enddate");
+            String startdate = request.getParameter("startdate");
+            String enddate = request.getParameter("enddate");
+			Date startDate = null;
+			Date endDate = null;
             TopkController ctrl = new TopkController();
             //This Error means NOTHING ELSE is printed
             String errors = "";
             //This error means that data is still printed
             String error = "";
-            //Checks startDate
-            if(startDate == null){
+            //Checks startdate
+            if(startdate == null){
                 errors += ", invalid startdate";
-            }else if (startDate.length() == 0) {
+            }else if (startdate.length() == 0) {
                 errors += ", invalid startdate";
             } else {
-                Date dateFormatted = Utility.parseOnlyDate(startDate);
-                if (dateFormatted == null || Utility.checkOnlyDate(startDate)) {
+                startDate = Utility.parseOnlyDate(startdate);
+                if (startDate == null || Utility.checkOnlyDate(startdate)) {
                     errors += ", invalid startdate";
                 }
             }
-            //Checks endDate
-            if(endDate == null){
+            //Checks enddate
+            if(enddate == null){
                 errors += ", invalid enddate";
-            }else if (endDate.length() == 0) {
+            }else if (enddate.length() == 0) {
                 errors += ", invalid enddate";
             } else {
-                Date dateFormatted = Utility.parseOnlyDate(endDate);
-                if (dateFormatted == null || Utility.checkOnlyDate(endDate)) {
+                endDate = Utility.parseOnlyDate(enddate);
+                if (endDate == null || Utility.checkOnlyDate(enddate)) {
                     errors += ", invalid enddate";
                 }
             }
@@ -92,6 +94,9 @@ public class TopkAppAction extends HttpServlet {
             if(topK > 10 || topK < 1){
                 errors += ", invalid k";
             }
+			if (startDate != null && endDate != null && startDate.after(endDate)){
+				errors += ", your start date should be before your end date!";
+			}
             
             //Delcares the values to return. Declares both in case of 
             ArrayList<HashMap<String, String>> catValues = null;
@@ -101,15 +106,15 @@ public class TopkAppAction extends HttpServlet {
                 switch (selection){
                         case "schoolapps":
                             //This parameter is only for the school function
-                             catValues = ctrl.getTopKApp(topK, selected, startDate, endDate, error);
+                             catValues = ctrl.getTopKApp(topK, selected, startdate, enddate, error);
                             break;
                         case "appstudents":
                             //This parameter is only for those who select App Category and return Students
-                            catValues = ctrl.getTopkStudents(topK, selected, startDate, endDate, error);
+                            catValues = ctrl.getTopkStudents(topK, selected, startdate, enddate, error);
                             break;
                         default:
                             //This parameter is only for those who select App Category and return School
-                            catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);                         
+                            catValues = ctrl.getTopkSchool(topK, selected, startdate, enddate, error);                         
                             break;
                 } 
             }else{
