@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import controller.TopkController;
+import controller.TopKController;
 import dao.Utility;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Boyofthefuture
  */
-@WebServlet(name = "TopK", urlPatterns = {"/json/top-k-most-used-apps"})
-public class TopkApp extends HttpServlet {
+@WebServlet(name = "TopKSchool", urlPatterns = {"/json/top-k-most-used-schools"})
+public class TopKSchool extends HttpServlet {
  
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -144,13 +144,12 @@ public class TopkApp extends HttpServlet {
                 return;
             }
              
-            TopkController ctrl = new TopkController();
+            TopKController ctrl = new TopKController();
              
             //This error string is just passed in, but is meant for the UI and not the JSON.
             String error = "";
- 
-            //This parameter is only for the school function
-            ArrayList<HashMap<String, String>>  catValues = ctrl.getTopKApp(topK, selected, startDate, endDate, error);
+            //This parameter is only for those who select App Category and return School
+            /*ArrayList<HashMap<String, String>> catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
              
             if(catValues != null){
                 Iterator<HashMap<String, String>> iter = catValues.iterator();
@@ -167,7 +166,7 @@ public class TopkApp extends HttpServlet {
                 }
                 output.add("results", param);
                 out.println(gson.toJson(output));
-            }
+            }*/
         }
     }
  

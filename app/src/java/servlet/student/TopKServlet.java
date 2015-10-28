@@ -5,7 +5,7 @@
  */
 package servlet.student;
 
-import controller.TopkController;
+import controller.TopKController;
 import dao.Utility;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author ASUS-PC
+ * @author Boyofthefuture
  */
-@WebServlet(name = "TopkAppAction", urlPatterns = {"/TopkAppAction"})
-public class TopkAppAction extends HttpServlet {
+@WebServlet(name = "TopKServlet", urlPatterns = {"/TopKServlet"})
+public class TopKServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,7 +35,7 @@ public class TopkAppAction extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -45,38 +45,44 @@ public class TopkAppAction extends HttpServlet {
             //This is the choice selection of which of the 3 option the user wants to be processed.
             String selection = request.getParameter("category");
             //Gets the start and end dates as necessary.
-            String startdate = request.getParameter("startdate");
-            String enddate = request.getParameter("enddate");
-			Date startDate = null;
-			Date endDate = null;
-            TopkController ctrl = new TopkController();
+            String startDate = request.getParameter("startdate");
+            String endDate = request.getParameter("enddate");
+            TopKController ctrl = new TopKController();
             //This Error means NOTHING ELSE is printed
             String errors = "";
             //This error means that data is still printed
             String error = "";
-            //Checks startdate
-            if(startdate == null){
+            //Checks startDate
+            //Places this outside to compare dates later
+            Date dateFormattedStart = null;
+            if(startDate == null){
                 errors += ", invalid startdate";
-            }else if (startdate.length() == 0) {
+            }else if (startDate.length() == 0) {
                 errors += ", invalid startdate";
             } else {
-                startDate = Utility.parseOnlyDate(startdate);
-                if (startDate == null || Utility.checkOnlyDate(startdate)) {
+                dateFormattedStart = Utility.parseOnlyDate(startDate);
+                if (dateFormattedStart == null && Utility.formatOnlyDate(dateFormattedStart) != null) {
                     errors += ", invalid startdate";
                 }
             }
-            //Checks enddate
-            if(enddate == null){
+            //Checks endDate
+            //Places this outside to compare dates later
+            Date dateFormattedEnd = null;
+            if(endDate == null){
                 errors += ", invalid enddate";
-            }else if (enddate.length() == 0) {
+            }else if (endDate.length() == 0) {
                 errors += ", invalid enddate";
             } else {
-                endDate = Utility.parseOnlyDate(enddate);
-                if (endDate == null || Utility.checkOnlyDate(enddate)) {
+                dateFormattedEnd = Utility.parseOnlyDate(endDate);
+                if (dateFormattedEnd == null && Utility.formatOnlyDate(dateFormattedEnd) != null) {
                     errors += ", invalid enddate";
                 }
             }
-			
+            //Finally, makes sure the start date if after to add error, as if it is before or similar, no error
+            if(dateFormattedStart.after(dateFormattedEnd)){
+                errors += ", end date is after start date";
+            }
+            
             //All the values are from the same select place. It only changes based on the report selected
             String selected = request.getParameter("choices");
             //Checks school/appcategory (Actually this is chosen)
@@ -94,34 +100,31 @@ public class TopkAppAction extends HttpServlet {
             if(topK > 10 || topK < 1){
                 errors += ", invalid k";
             }
-			if (startDate != null && endDate != null && startDate.after(endDate)){
-				errors += ", your start date should be before your end date!";
-			}
             
             //Delcares the values to return. Declares both in case of 
             ArrayList<HashMap<String, String>> catValues = null;
+            
             //If all checks are passed:
             if(errors.length() == 0){
                 //The switch case divides the chosen choice into the three categories as necessary
                 switch (selection){
                         case "schoolapps":
                             //This parameter is only for the school function
-                             catValues = ctrl.getTopKApp(topK, selected, startdate, enddate, error);
+                            catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
                             break;
                         case "appstudents":
                             //This parameter is only for those who select App Category and return Students
-                            catValues = ctrl.getTopkStudents(topK, selected, startdate, enddate, error);
+                            catValues = ctrl.getTopkStudents(topK, selected, startDate, endDate, error);
                             break;
                         default:
                             //This parameter is only for those who select App Category and return School
-                            catValues = ctrl.getTopkSchool(topK, selected, startdate, enddate, error);                         
+                            catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
                             break;
                 } 
             }else{
             //Need to substring for multiple errors
-                error = error.substring(2, error.length());
+               errors = errors.substring(2);
             }
-
             request.setAttribute("catvalues", catValues);
             request.setAttribute("choice", selected);
             request.setAttribute("error", errors);
@@ -131,21 +134,22 @@ public class TopkAppAction extends HttpServlet {
             switch (selection){
                 case "schoolapps":
                     //This parameter is only for the school function
-                    rd = request.getRequestDispatcher("topkapp.jsp");
+                    rd = request.getRequestDispatcher("top-kreport.jsp");
                     break;
                 case "appstudents":
                     //This parameter is only for those who select App Category and return Students
-                    rd = request.getRequestDispatcher("topkstudent.jsp");
+                    rd = request.getRequestDispatcher("top-kstudent.jsp");
                     break;
                 default:
                     //This parameter is only for those who select App Category and return School
-                    rd = request.getRequestDispatcher("topkschool.jsp");
+                    rd = request.getRequestDispatcher("top-kschool.jsp");
                     break;
             } 
             rd.forward(request, response);
         }
+    }
 
-   }// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *

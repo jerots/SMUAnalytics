@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 package json;
- 
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import controller.TopkController;
+import controller.TopKController;
 import dao.Utility;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -26,14 +26,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
- 
+
 /**
  *
  * @author Boyofthefuture
  */
-@WebServlet(name = "TopkSchool", urlPatterns = {"/json/top-k-most-used-schools"})
-public class TopkSchool extends HttpServlet {
- 
+@WebServlet(name = "TopK", urlPatterns = {"/json/top-k-most-used-apps"})
+public class TopK extends HttpServlet {
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -50,11 +50,11 @@ public class TopkSchool extends HttpServlet {
            Gson gson = new GsonBuilder().setPrettyPrinting().create();
            JsonObject output = new JsonObject();
            JsonArray errors = new JsonArray();
-            
+           
             String token = request.getParameter("token");
             String startdate = request.getParameter("startdate");
             String enddate = request.getParameter("enddate");
- 
+
             //TOKEN VALIDATION
             if (token == null) {
                 errors.add("missing token");
@@ -67,24 +67,24 @@ public class TopkSchool extends HttpServlet {
                         //failed
                         errors.add("invalid token");
                     }
- 
+
                 } catch (JWTException e) {
                     //failed
                     errors.add("invalid token");
                 }
- 
+
             }
-             
+            
             //Gets the number of (top) K that the individual wants displayed
             String entry = request.getParameter("entries");
-             
+            
             //This is the choice selection of which of the 3 option the user wants to be processed.
             String selection = request.getParameter("category");
             //Gets the start and end dates as necessary.
             String startDate = request.getParameter("startdate");
             String endDate = request.getParameter("endDate");
             output.addProperty("status", "success");
-             
+            
             //START DATE VALIDATION
             if (startdate == null) {
                 errors.add("missing startdate");
@@ -100,7 +100,7 @@ public class TopkSchool extends HttpServlet {
                     }
                 }
             }
- 
+
             //END DATE VALIDATION
             if (enddate == null) {
                 errors.add("missing enddate");
@@ -129,13 +129,13 @@ public class TopkSchool extends HttpServlet {
                     errors.add("invalid app category");
                 }
             }
-             
-             
+            
+            
             int topK = Utility.parseInt(entry);
             if(topK > 10 || topK < 1){
                 errors.add("invalid k");
             }
-             
+            
             //PRINT ERROR AND EXIT IF ERRORS EXIST
             if (errors.size() > 0) {
                 output.addProperty("status", "error");
@@ -143,14 +143,15 @@ public class TopkSchool extends HttpServlet {
                 out.println(gson.toJson(output));
                 return;
             }
-             
-            TopkController ctrl = new TopkController();
-             
+            
+            TopKController ctrl = new TopKController();
+            
             //This error string is just passed in, but is meant for the UI and not the JSON.
             String error = "";
-            //This parameter is only for those who select App Category and return School
-            ArrayList<HashMap<String, String>> catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
-             
+
+            //This parameter is only for the school function
+            ArrayList<HashMap<String, String>>  catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
+            
             if(catValues != null){
                 Iterator<HashMap<String, String>> iter = catValues.iterator();
                 JsonArray param = new JsonArray();
@@ -169,7 +170,7 @@ public class TopkSchool extends HttpServlet {
             }
         }
     }
- 
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -184,7 +185,7 @@ public class TopkSchool extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
- 
+
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -198,7 +199,7 @@ public class TopkSchool extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
- 
+
     /**
      * Returns a short description of the servlet.
      *
@@ -208,5 +209,5 @@ public class TopkSchool extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
- 
+
 }

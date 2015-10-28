@@ -1,6 +1,6 @@
 package entity;
 
-public class Location {
+public class Location implements Comparable<Location>{
 
     private int locationId;
     private String semanticPlace;
@@ -26,4 +26,28 @@ public class Location {
         this.semanticPlace = semanticPlace;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + this.locationId;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Location other = (Location) obj;
+        return this.locationId != other.locationId;
+    }
+    
+    //NOT IMPLEMENTED
+    @Override
+    public int compareTo(Location o) {
+        return this.compareTo(o);
+    } 
 }

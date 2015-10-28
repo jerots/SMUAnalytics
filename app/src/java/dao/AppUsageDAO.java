@@ -463,7 +463,7 @@ public class AppUsageDAO {
         return result;
     }
 
-    public ArrayList<AppUsage> getAppsBySchool(HashMap<Integer, String> priK, String school, String start, String end) {
+    public ArrayList<AppUsage> getAppsBySchool(String school, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
         
         //This has been changed to take into account that the next update is calculated as well.
@@ -489,8 +489,7 @@ public class AppUsageDAO {
                 int appId = rs.getInt(3);
                 String macAdd = rs.getString(4);
 
-                aList.add(new AppUsage(timestamp, macAdd, appId));
-                priK.put(appId, appName);
+                aList.add(new AppUsage(timestamp, macAdd, new App(appId, appName, null)));
             }
             ConnectionManager.close(conn, ps);
 
@@ -499,7 +498,7 @@ public class AppUsageDAO {
         return aList;
     }
 
-    public ArrayList<AppUsage> getStudentsByCategory(HashMap<Integer, String> priK, HashMap<String, String> priKMac, String start, String end) {
+    public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priKMac, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
         String sql = "SELECT timestamp, u.name, u.macaddress, a.appid, a.appcategory\n"
@@ -526,8 +525,7 @@ public class AppUsageDAO {
                 int appId = rs.getInt(4);
                 String category = rs.getString(5);
 
-                aList.add(new AppUsage(timeStamp, macAdd, appId));
-                priK.put(appId, category);
+                aList.add(new AppUsage(timeStamp, macAdd, new App(appId, null, category)));
                 priKMac.put(macAdd, name);
             }
 
@@ -537,7 +535,7 @@ public class AppUsageDAO {
         return aList;
     }
 
-    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<Integer, String> priK, HashMap<String, String> priKSch, String start, String end) {
+    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priKSch, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
         String sql = "SELECT timestamp, u.macaddress, a.appid, appcategory, email\n"
@@ -571,8 +569,7 @@ public class AppUsageDAO {
                 String email = rs.getString(5);
                 String school = Utility.getSchool(email);
 
-                aList.add(new AppUsage(timeStamp, macAdd, appId));
-                priK.put(appId, category);
+                aList.add(new AppUsage(timeStamp, macAdd, new App(appId, null, category)));
                 priKSch.put(macAdd, school);
             }
 

@@ -11,7 +11,7 @@ package entity;
  *
  * @author ASUS-PC
  */
-public class App {
+public class App implements Comparable<App>{
     private int appId;
     private String appName;
     private String appCategory;
@@ -46,5 +46,29 @@ public class App {
     public void setAppCategory(String appCategory) {
         this.appCategory = appCategory;
     }
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final App other = (App) obj;
+        return this.appId == other.appId;
+    }
+
+    @Override
+    //NOT IMPLEMENTED
+    public int compareTo(App o) {
+        return this.compareTo(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.appId;
+        return hash;
+    }
 }
