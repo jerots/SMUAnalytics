@@ -90,29 +90,28 @@ public class TopKController {
             }
             prevTime = time;
         }
-        
-        //Do outside the while loop for the final addition
-        diff = endDateTime - prevTime;
-        if(diff > 120000){
-            diff = 10000;
+        if(macAdd != null){
+            //Do outside the while loop for the final addition
+            diff = endDateTime - prevTime;
+            if(diff > 120000){
+                diff = 10000;
+            }
+            total += diff;
+            storage.put(app, total);
         }
-        total += diff;
-        storage.put(app, total);
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
         HashMap<String, String> kDetails = new HashMap<>();
-        int num = Integer.MAX_VALUE;
        //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(storage.values());
         Collections.sort(valuesArr);
         int kFound = 1;
-        while(topK >= kFound && num > 0){
+        while(topK >= kFound && kFound <= valuesArr.size()){
             Iterator<App> intIter = storage.keySet().iterator();
             while(intIter.hasNext()){
                 app = intIter.next();
                 long time = storage.get(app); 
-                num = valuesArr.size() - kFound;
-                if(time == valuesArr.get(num)){ 
+                if(time == valuesArr.get(valuesArr.size() - kFound)){ 
                     kDetails.put("rank", String.valueOf(kFound));
                     kDetails.put("app-name", app.getAppName());
                     kDetails.put("duration", String.valueOf(time/1000));
@@ -197,41 +196,36 @@ public class TopKController {
             app = aUsage.getApp();
             prevTime = time;
         }
-        //Places outside so dont have to keep checking. Method for last item
-        //Ensures that it is also the number of seconds from end of day
-        diff = endDateTime - prevTime;
-        if(diff > 120000){
-            diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
+        if(macAdd != null){
+            //Places outside so dont have to keep checking. Method for last item
+            //Ensures that it is also the number of seconds from end of day
+            diff = endDateTime - prevTime;
+            if(diff > 120000){
+                diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
+            }
+            if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                userTotal += diff;
+            }
+            userTime.put(macAdd, userTotal);
         }
-        if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
-            userTotal += diff;
-        }
-        userTime.put(macAdd, userTotal);
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
         HashMap<String, String> kDetails = new HashMap<>();
-        int num = Integer.MAX_VALUE;
        //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(userTime.values());
         Collections.sort(valuesArr);
         int kFound = 1;
-        while(topK >= kFound && num > 0){
+        while(topK >= kFound && kFound <= valuesArr.size()){
             Iterator<String> userIter = userTime.keySet().iterator();
             while(userIter.hasNext()){
                 macAdd = userIter.next();
-                long time = userTime.get(macAdd); 
-                num = valuesArr.size() - kFound;
-                if(time == valuesArr.get(num)){ 
+                long time = userTime.get(macAdd);  
+                if(time == valuesArr.get(valuesArr.size() - kFound)){ 
                     String name = linkMac.get(macAdd);
                     kDetails.put("rank", String.valueOf(kFound));
                     kDetails.put("name", name);
                     kDetails.put("mac-address", macAdd);
                     kDetails.put("duration", String.valueOf(time/1000));
-                    System.out.println(String.valueOf(kFound));
-                    System.out.println(name);
-                    System.out.println(macAdd);
-                    System.out.println(String.valueOf(time/1000));
-                    
                     returnList.add(kDetails);
                     kDetails = new HashMap<>();
                 }
@@ -319,31 +313,31 @@ public class TopKController {
             app = aUsage.getApp();
             prevTime = time;
         }
-        //handles the last instance
-        //Ensures that it is also the number of seconds from end of day
-        diff = endDateTime - prevTime;
-        if(diff > 120000){
-            diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
+        if(macAdd != null){
+            //handles the last instance
+            //Ensures that it is also the number of seconds from end of day
+            diff = endDateTime - prevTime;
+            if(diff > 120000){
+                diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
+            }
+            if(app.getAppCategory().equals(cat)){ //This means they are of the right category
+                schoolTotal += diff;
+            }
+            schoolTime.put(school, schoolTotal);
         }
-        if(app.getAppCategory().equals(cat)){ //This means they are of the right category
-            schoolTotal += diff;
-        }
-        schoolTime.put(school, schoolTotal);
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
         HashMap<String, String> kDetails = new HashMap<>();
-        int num = Integer.MAX_VALUE;
        //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(schoolTime.values());
         Collections.sort(valuesArr);
         int kFound = 1;
-        while(topK >= kFound && num > 0){
+        while(topK >= kFound && kFound <= valuesArr.size()){
             Iterator<String> schIter = schoolTime.keySet().iterator();
             while(schIter.hasNext()){
                 school = schIter.next();
                 long time = schoolTime.get(school); 
-                num = valuesArr.size() - kFound;
-                if(time == valuesArr.get(num)){ 
+                if(time == valuesArr.get(valuesArr.size() - kFound)){ 
                     kDetails.put("rank", String.valueOf(kFound));
                     kDetails.put("school", school);
                     kDetails.put("duration", String.valueOf(time/1000));
