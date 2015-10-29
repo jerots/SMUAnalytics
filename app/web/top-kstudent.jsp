@@ -53,13 +53,13 @@
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-                                        <li><a href="#">Top-k students with most app usage (given an app category)</a></li>
+                                        <li><a href="top-kstudent">Top-k students with most app usage (given an app category)</a></li>
                                         <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                                 <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
-                                <li><a href="activeness.jsp">Social Activeness</a></li>
+                                <li><a href="socialActiveness.jsp">Social Activeness</a></li>
 
                             </ul>
 
@@ -76,15 +76,20 @@
 			String select = request.getParameter("choice");
                         String startDate = request.getParameter("startdate");
                         String endDate = request.getParameter("enddate");
+                        String entry = request.getParameter("entries");
                         
                         String startDateInput = "";
                         String endDateInput = "";
+                        String entries = "value='3'";
                         if(startDate != null){
                             startDateInput = "value='" + startDate + "'";
                         }
                         if(endDate != null){
                             endDateInput = "value='" + endDate + "'";
-                        }                    
+                        }   
+                        if(entry != null){
+                            entries = "value='" + entry + "'";
+                        }
                         ArrayList<String> categories = Utility.retrieveCategories();   
 		%>
 
@@ -96,7 +101,7 @@
                                             <div class="form-group"></div>
                                                 <div class="form-group">
 							<label for="entries">Number of Top Results</label>
-                                                        <input type="number" name="entries" min="1" max="10" value="3" class="form-control" id="entries">
+                                                        <input type="number" name="entries" min="1" max="10" <%=entries%> class="form-control" id="entries">
 						</div>
 						<div class="form-group">
 							<label for="startdate">Start Date</label>
@@ -107,8 +112,8 @@
 							<input type="date" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
 						</div>
 						<div class="form-group">
-							<label for="choices"> Choice of App Categories </label>
-                                                        <select class="form-control" name="choices">
+							<label for="choice"> Choice of App Categories </label>
+                                                        <select class="form-control" name="choice">
                                                               <%
                                                         for(String category: categories){
                                                             String categoryCode = "";
@@ -139,38 +144,37 @@
                                                 out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
                                                 //Note that the value will never get larger than 0 so it is fine to keep iterating without adding.
                                                 out.println("<td><b>Rank (for students with most app usage)</b></td><td><b>Student Names</b></td><td><b>Mac Address</b></td><td><b>App usage Time</b></td></tr>");
-                                                for(int i = 0; i < values.size(); i+= 0){
+                                                for(int i = 0; i < values.size(); i++){
                                                     //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
                                                     HashMap<String, String> indiv = values.get(i);
                                                     int rank = Utility.parseInt(indiv.get("rank"));
-                                                    //Gets ready the names and macadd to add on.
+                                                    //Gets ready the Student names/Mac-add to add on.
                                                     String names = indiv.get("name");
                                                     String macAdd = indiv.get("mac-address");
                                                     String duration = indiv.get("duration");
                                                     out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
-                                                    Iterator<HashMap<String, String>> iter = values.iterator();
-                                                    //Removes the first line that has already been stored so that it is always checking with later ranks
-                                                    iter.next();
-                                                    iter.remove();
-                                                    while(iter.hasNext()){
-                                                        HashMap<String, String> other = iter.next();
+                                                    for(int j = i + 1; j < values.size(); j++){
+                                                        HashMap<String, String> other = values.get(j);
                                                         if(Utility.parseInt(other.get("rank")) == rank){
                                                             names += ", " + other.get("name");
-                                                            macAdd += ", " + other.get("mac-address");
+                                                            macAdd += ", " + other.get("app-name");
+                                                            i++;
                                                         }else{
-                                                            break; //breaks out of this while loop if the ranks are not equivalent anymore.
+                                                            break;
                                                         }
-                                                        iter.remove();
                                                     }
                                                     out.println("<td>" + names + "</td>"); //Prints the concatenated Studentnames
                                                     out.println("<td>" + macAdd + "</td>"); //Prints the concatenated macAddresses
                                                     out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
                                                 }
-                                            }
-                                            if(errors != null && errors.length() >0){
-                                                out.println("<br>");
-                                                out.println("<h1 style='color:red'>Error!</h1>");
-                                                out.println("<h3 style='color:red'>" + error + "</h3>");
+                                                if(errors != null && errors.length() >0){
+                                                    out.println("<br><br>");
+                                                    out.println("<h3 style='color:red'>Warning:</h3>");
+                                                    out.println("<h3 style='color:red'>" + errors + "</h3>");
+                                                }
+                                            }else{
+                                                out.println("<h1>Result</h1>");
+                                                out.println("You have not entered any input.");
                                             }
                                                 
                                         %>

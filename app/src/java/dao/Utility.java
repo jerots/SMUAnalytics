@@ -17,7 +17,7 @@ import java.util.Date;
 public final class Utility {
 
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
 
@@ -91,10 +91,10 @@ public final class Utility {
         return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
     }
 
-    public static String parseString(String input) {
-        String str = input.trim();
-        str = str.replace("\"","");
+    public static String parseString(String str) {
         if (str != null && str.length() > 0) {
+            String input = str.trim();
+            str = input.replace("\"","");
             return str;
         }
         return null;
@@ -129,9 +129,14 @@ public final class Utility {
         return (schoolList.contains(backEmail.substring(0, position)) && backEmail.substring(position).equals(".smu.edu.sg"));
     }
     
-     public static boolean checkCategory(String string) {
-        String str = string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase();
-        return categories.contains(str);
+     public static boolean checkCategory(String chk) {
+        String check = parseString(chk);
+        System.out.println(check);
+        if(check != null){
+            String str = check.substring(0, 1).toUpperCase() + check.substring(1).toLowerCase();
+            return categories.contains(str);
+        }
+        return false;
      }
      
      public static ArrayList<String> retrieveSchools(){
@@ -142,8 +147,26 @@ public final class Utility {
          return categories;
      }
      
+     public static ArrayList<String> compareSchools(ArrayList<String> schools){
+         ArrayList<String> missing = new ArrayList<>();
+         for(String s: schoolList){
+            if(!schools.contains(s)){
+                System.out.println(s);
+                missing.add(s);
+            }
+         }
+         for(String s: schools){
+             System.out.println(s);
+         }
+         return missing;
+     }
+     
      public static boolean checkSchools(String school){
-         return schoolList.contains(school);
+         String sch = parseString(school);
+         if(sch != null){
+            return schoolList.contains(sch);
+         }
+         return false;
      }
      
      public static String getSchool(String email){

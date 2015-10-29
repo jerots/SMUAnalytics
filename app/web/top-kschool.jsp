@@ -13,6 +13,26 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <%@include file="protect-user.jsp" %>
+<%! //Swaps the school name for printing
+    public String getSchoolName(String name){
+        switch(name){
+            case "socsc":
+                return "Social Sciences"; 
+            case "law":
+                return "Law";
+            case "sis":
+                return "Information Systems";
+            case "accountancy":
+                return "Accountancy";
+            case "economics":
+                return "Economics";
+            case "business":
+                return "Business";
+        }
+        return null;
+    }
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -54,12 +74,12 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
                                         <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                        <li><a href="#">Top-k schools with most app usage (given an app category)</a></li>
+                                        <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                                 <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
-                                <li><a href="activeness.jsp">Social Activeness</a></li>
+                                <li><a href="socialActiveness.jsp">Social Activeness</a></li>
 
                             </ul>
 
@@ -76,15 +96,20 @@
 			String select = request.getParameter("choice");
                         String startDate = request.getParameter("startdate");
                         String endDate = request.getParameter("enddate");
+                        String entry = request.getParameter("entries");
                         
                         String startDateInput = "";
                         String endDateInput = "";
+                        String entries = "value='3'";
                         if(startDate != null){
                             startDateInput = "value='" + startDate + "'";
                         }
                         if(endDate != null){
                             endDateInput = "value='" + endDate + "'";
                         }                      
+                        if(entry != null){
+                            entries = "value='" + entry + "'";
+                        }
                         ArrayList<String> categories = Utility.retrieveCategories();    
 		%>
 
@@ -96,7 +121,7 @@
                                             <div class="form-group"></div>
                                                 <div class="form-group">
 							<label for="entries">Number of Top Results</label>
-                                                        <input type="number" name="entries" min="1" max="10" value="3" class="form-control" id="entries">
+                                                        <input type="number" name="entries" min="1" max="10" <%=entries%> class="form-control" id="entries">
 						</div>
 						<div class="form-group">
 							<label for="startdate">Start Date</label>
@@ -107,8 +132,8 @@
 							<input type="date" class="form-control" id="enddate" name="enddate" <%=endDateInput%> required>
 						</div>
 						<div class="form-group">
-							<label for="choices"> Choice of App Categories </label>
-                                                        <select class="form-control" name="choices">
+							<label for="choice"> Choice of App Categories </label>
+                                                        <select class="form-control" name="choice">
                                                               <%
                                                                     for(String category: categories){
                                                                         String categoryCode = "";
@@ -134,108 +159,60 @@
                                                 out.println("<h1 style='color:red'>Error!</h1>");
                                                 out.println("<h3 style='color:red'>" + error + "</h3>");
                                             }else if(values != null){ //Checks this because in case of category refresh.
-                                                boolean socsc = false;
-                                                boolean law = false;
-                                                boolean sis = false;
-                                                boolean account = false;
-                                                boolean economics = false;
-                                                boolean business = false;
+                                                ArrayList<String> schoolList = new ArrayList<>();
+                                                String names = "";
                                                 out.println("<h1>Result</h1>");
                                                 //This prints the type of table
                                                 out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
 
                                                 out.println("<td><b>Rank (for schools with most app usage)</b></td><td><b>School</b></td><td><b>App usage Time</b></td></tr>");
-                                                for(int i = 0; i < values.size(); i+= 0){
+                                                for(int i = 0; i < values.size(); i++){
                                                     //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
                                                     HashMap<String, String> indiv = values.get(i);
                                                     int rank = Utility.parseInt(indiv.get("rank"));
                                                     //Gets ready the schools to add on.
-                                                    String names = null;
-                                                    //Gets the school to convert to its formal name
-                                                    String name = indiv.get("school");
-                                                    switch(name){
-                                                        case "socsc":
-                                                            names = "Social Sciences"; 
-                                                            socsc = true;
-                                                            break;
-                                                        case "law":
-                                                            names = "Law";
-                                                            law = true;
-                                                            break;
-                                                        case "sis":
-                                                            names = "Information Systems";
-                                                            sis = true;
-                                                            break;
-                                                        case "accountancy":
-                                                            names = "Accountancy";
-                                                            account = true;
-                                                            break;
-                                                        case "economics":
-                                                            names = "Economics";
-                                                            economics = true;
-                                                            break;
-                                                        case "business":
-                                                            names = "Business";
-                                                            business = true;
-                                                            break;
-                                                    }
+                                                    names = getSchoolName(indiv.get("school"));
+                                                    schoolList.add(indiv.get("school"));
                                                     String duration = indiv.get("duration");
                                                     out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
-                                                    Iterator<HashMap<String, String>> iter = values.iterator();
-                                                    //Removes the first line that has already been stored so that it is always checking with later ranks
-                                                    iter.next();
-                                                    iter.remove();
-                                                    while(iter.hasNext()){
-                                                        HashMap<String, String> other = iter.next();
+                                                    for(int j = i + 1; j < values.size(); j++){
+                                                        HashMap<String, String> other = values.get(j);
                                                         if(Utility.parseInt(other.get("rank")) == rank){
-                                                            names += ", " + other.get("name");
+                                                            names += ", " + getSchoolName(other.get("school"));
+                                                            schoolList.add(other.get("school")); //this is to check for schools with 0
+                                                            i++;
                                                         }else{
-                                                            break; //breaks out of this while loop if the ranks are not equivalent anymore.
+                                                            break;
                                                         }
-                                                        iter.remove();
+                                                    }
+                                                    if(Utility.parseInt(duration) != 0 || Utility.parseInt(entry) == values.size()|| values.size() == 6){
+                                                        out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
+                                                        out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
+                                                    }
+                                                }
+                                                //Check is any school has been left out
+                                                ArrayList<String> missing = Utility.compareSchools(schoolList);
+                                                if(missing.size() != 0 && Utility.parseInt(entry) > values.size()){
+                                                    //if the last school is 0, it is still hanging.
+                                                    for(String sch: missing){
+                                                        if(names.length() != 0){
+                                                            names += ", " + getSchoolName(sch);
+                                                        }else{
+                                                            out.println("<tr><td>" + (values.size() + 1) + "</td>");
+                                                            names = getSchoolName(sch);
+                                                        }
                                                     }
                                                     out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
-                                                    out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
-                                                }
-                                                //THE FINAL PART HERE IS FOR CONSISTENCY. IF THE SCHOOL HAS NOT BEEN PRINTED, IT WILL BE PRINTED.
-                                                if(!socsc || !law || !sis || !account || !economics || !business){
-                                                    //Get the final part of the arraylist to check if the value is the same
-                                                    HashMap<String, String> indiv = values.get(values.size()-1);
-                                                    int rank = values.size() + 1;
-                                                    //Checking if it is the same value of 0
-                                                    if(Utility.parseInt(indiv.get("duration")) == 0){
-                                                        rank = Utility.parseInt(indiv.get("rank"));
-                                                    }
-                                                    out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
-                                                    //Adds all the concat of names
-                                                    String names = "";
-                                                    if(!socsc){
-                                                        names += ", Social Sciences";
-                                                    }
-                                                    if(!law){
-                                                        names += ", Law";
-                                                    }
-                                                    if(!sis){
-                                                        names += ", Information Systems";
-                                                    }
-                                                    if(!account){
-                                                        names += ", Accountancy";
-                                                    }
-                                                    if(!economics){
-                                                        names += ", Economics";
-                                                    }
-                                                    if(!business){
-                                                        names += ", Business";
-                                                    }
-                                                    String name = names.substring(2);
-                                                    out.println("<td>" + name + "</td>"); //Prints the concatenated Schoolnames
                                                     out.println("<td>" + 0 + "</td></tr>"); //Prints the app usage time
                                                 }
-                                            }
-                                            if(errors != null && errors.length() >0){
-                                                out.println("<br>");
-                                                out.println("<h1 style='color:red'>Error!</h1>");
-                                                out.println("<h3 style='color:red'>" + error + "</h3>");
+                                                if(errors != null && errors.length() >0){
+                                                    out.println("<br><br>");
+                                                    out.println("<h3 style='color:red'>Warning:</h3>");
+                                                    out.println("<h3 style='color:red'>" + errors + "</h3>");
+                                                }
+                                            }else{
+                                                out.println("<h1>Result</h1>");
+                                                out.println("You have not entered any input.");
                                             }
                                                 
                                         %>
