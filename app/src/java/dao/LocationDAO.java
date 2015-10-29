@@ -1,11 +1,11 @@
 package dao;
 
+import com.csvreader.CsvReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.opencsv.CSVReader;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -16,18 +16,17 @@ public class LocationDAO {
     public LocationDAO() {
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> locationIdList) throws IOException, SQLException {
+    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> locationIdList) throws IOException, SQLException {
         String sql = "insert into location (locationid, semanticplace) values(?,?) ON DUPLICATE KEY UPDATE semanticplace = "
                 + "VALUES(semanticplace);";
         PreparedStatement stmt = conn.prepareStatement(sql);
         int index = 2;
-
-        String[] arr = null;
-        while ((arr = reader.readNext()) != null) {
+        reader.readHeaders();
+        while (reader.readRecord()) {
             //retrieving per row
             boolean err = false;
 
-            int locationId = Utility.parseInt(arr[0]);
+            int locationId = Utility.parseInt(reader.get("location-id"));
             if (locationId <= 0) {
                 String errorMsg = errMap.get(index);
                 if (errorMsg == null) {
@@ -38,7 +37,7 @@ public class LocationDAO {
                 err = true;
             }
 
-            String semanticPl = Utility.parseString(arr[1]);
+            String semanticPl = Utility.parseString(reader.get("semantic-place"));
             if (semanticPl == null) {
                 String errorMsg = errMap.get(index);
                 if (errorMsg == null) {
@@ -75,7 +74,7 @@ public class LocationDAO {
         
         int[] updateCounts = stmt.executeBatch();
         conn.commit();
-
+        stmt.close();
         return updateCounts;
     }
 

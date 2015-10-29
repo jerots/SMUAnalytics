@@ -1,5 +1,6 @@
 package dao;
 
+import com.csvreader.CsvReader;
 import entity.*;
 
 import java.io.IOException;
@@ -7,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.opencsv.CSVReader;
 import java.sql.BatchUpdateException;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -25,15 +25,14 @@ public class AppUsageDAO {
         duplicate = new TreeMap<>();
     }
 
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException, SQLException {
+    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException, SQLException {
         int index = 2;
         String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
                 + " = VALUES(appid);";
         PreparedStatement stmt = conn.prepareStatement(sql);
+        reader.readHeaders();
 
-        String[] arr = null;
-
-        while ((arr = reader.readNext()) != null) {
+        while (reader.readRecord()) {
             //retrieving per row
             boolean err = false;
             String errorMsg = errMap.get(index);
@@ -41,7 +40,7 @@ public class AppUsageDAO {
                 errorMsg = "";
             }
             //check timestamp
-            String date = Utility.parseString(arr[0]);
+            String date = Utility.parseString(reader.get("timestamp"));
             if (date == null || !Utility.checkDate(date)) {
                 err = true;
 
@@ -50,7 +49,7 @@ public class AppUsageDAO {
             }
 
             //check macAdd
-            String macAdd = Utility.parseString(arr[1]);
+            String macAdd = Utility.parseString(reader.get("mac-address"));
             if (macAdd == null) {
                 errorMsg += ",mac add cannot be blank";
                 err = true;
@@ -63,7 +62,7 @@ public class AppUsageDAO {
             }
 
             //check appid
-            int appId = Utility.parseInt(arr[2]);
+            int appId = Utility.parseInt(reader.get("app-id"));
             if (appId <= 0) {
                 errorMsg += ",app id cannot be blank";
                 err = true;
@@ -92,11 +91,11 @@ public class AppUsageDAO {
         }
         int[] updatedRecords = stmt.executeBatch();
         conn.commit();
-
+        stmt.close();
         return updatedRecords;
     }
 
-    public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
+    public int add(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
         int updateCounts = 0;
         try {
             Connection conn = ConnectionManager.getConnection();
@@ -107,14 +106,13 @@ public class AppUsageDAO {
             String query = null;
             PreparedStatement pStmt = null;
             ResultSet rs = null;
-
-            String[] arr = null;
-            while ((arr = reader.readNext()) != null) {
+            reader.readHeaders();
+            while (reader.readRecord()) {
                 //retrieving per row
                 boolean err = false;
 
                 //check timestamp
-                String date = Utility.parseString(arr[0]);
+                String date = Utility.parseString(reader.get("timestamp"));
                 if (date == null || !Utility.checkDate(date)) {
                     err = true;
                     String errorMsg = errMap.get(index);
@@ -126,7 +124,7 @@ public class AppUsageDAO {
                 }
 
                 //check macAdd
-                String macAdd = Utility.parseString(arr[1]);
+                String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {
@@ -161,7 +159,7 @@ public class AppUsageDAO {
                     pStmt.close();
                 }
                 //check appid
-                int appId = Utility.parseInt(arr[2]);
+                int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {

@@ -105,16 +105,13 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(128) COLLATE utf8_bin NOT NULL,
   `email` varchar(128) COLLATE utf8_bin NOT NULL,
   `gender` char(1) COLLATE utf8_bin NOT NULL,
+  `cca` varchar(63) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`macaddress`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Dumping data for table `user`
 --
-
-INSERT INTO `user` (`macaddress`, `name`, `password`, `email`, `gender`) VALUES
-('macadd', 'jeremy', '321', 'jeremyong.2014@sis.smu.edu.sg', 'M'),
-('macadd2', 'zhihui', '321', 'zhtan.2014@business.smu.edu.sg', 'F');
 
 --
 -- Constraints for dumped tables
