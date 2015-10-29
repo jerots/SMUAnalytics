@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import controller.TopKController;
+import controller.TopkReportController;
 import dao.Utility;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -144,7 +144,7 @@ public class TopKSchool extends HttpServlet {
                 return;
             }
              
-            TopKController ctrl = new TopKController();
+            TopkReportController ctrl = new TopkReportController();
              
             //This error string is just passed in, but is meant for the UI and not the JSON.
             String error = "";
