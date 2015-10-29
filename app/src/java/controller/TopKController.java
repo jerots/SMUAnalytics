@@ -203,7 +203,7 @@ public class TopKController {
             if(diff > 120000){
                 diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
             }
-            if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
+            if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
                 userTotal += diff;
             }
             userTime.put(macAdd, userTotal);
@@ -289,7 +289,7 @@ public class TopKController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
             }else{
@@ -298,7 +298,7 @@ public class TopKController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
                 //This can only occur when the individual changes

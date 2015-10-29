@@ -79,12 +79,12 @@ public class TopKServlet extends HttpServlet {
                 }
             }
             //Finally, makes sure the start date if after to add error, as if it is before or similar, no error
-            if(dateFormattedStart.after(dateFormattedEnd)){
+            if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
                 errors += ", end date is after start date";
             }
             
             //All the values are from the same select place. It only changes based on the report selected
-            String selected = request.getParameter("choices");
+            String selected = request.getParameter("choice");
             //Checks school/appcategory (Actually this is chosen)
             if(selection.equals("schoolapps")){
                 if(!Utility.checkSchools(selected)){
@@ -110,7 +110,7 @@ public class TopKServlet extends HttpServlet {
                 switch (selection){
                         case "schoolapps":
                             //This parameter is only for the school function
-                            catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
+                            catValues = ctrl.getTopkApp(topK, selected, startDate, endDate, error);
                             break;
                         case "appstudents":
                             //This parameter is only for those who select App Category and return Students
@@ -129,20 +129,21 @@ public class TopKServlet extends HttpServlet {
             request.setAttribute("choice", selected);
             request.setAttribute("error", errors);
             request.setAttribute("errors", error);
+            request.setAttribute("entries", entry);
             RequestDispatcher rd = null;
             //Divides back into where the request came from.
             switch (selection){
                 case "schoolapps":
                     //This parameter is only for the school function
-                    rd = request.getRequestDispatcher("top-kreport.jsp");
+                    rd = request.getRequestDispatcher("topkapp.jsp");
                     break;
                 case "appstudents":
                     //This parameter is only for those who select App Category and return Students
-                    rd = request.getRequestDispatcher("top-kstudent.jsp");
+                    rd = request.getRequestDispatcher("topkstudent.jsp");
                     break;
                 default:
                     //This parameter is only for those who select App Category and return School
-                    rd = request.getRequestDispatcher("top-kschool.jsp");
+                    rd = request.getRequestDispatcher("topkschool.jsp");
                     break;
             } 
             rd.forward(request, response);
