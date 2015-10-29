@@ -481,8 +481,8 @@ public class AppUsageDAO {
                     + "AND u.email LIKE ? \n"
                     + "ORDER BY u.macaddress, timestamp;");
 
-            ps.setString(1, start);
-            ps.setString(2, end);
+            ps.setString(1, start + " 00:00:00");
+            ps.setString(2, end + " 23:59:59");
             ps.setString(3, "%" + school + "%");
 
             ResultSet rs = ps.executeQuery();
