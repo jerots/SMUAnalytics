@@ -22,14 +22,14 @@
     </head>
     <body>
         <%            User user = (User) session.getAttribute("user");
-            String startdate = request.getParameter("startdate");
-            if (startdate == null) {
-                startdate = "";
-            }
-            String enddate = request.getParameter("enddate");
-            if (enddate == null) {
-                enddate = "";
-            }
+			String startdate = request.getParameter("startdate");
+			if (startdate == null) {
+				startdate = "";
+			}
+			String enddate = request.getParameter("enddate");
+			if (enddate == null) {
+				enddate = "";
+			}
 
 
         %>	
@@ -63,10 +63,10 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
-                                <li><a href="topkstudent.jsp">Top-k students with most app usage (give an app category)</a></li>
-                                <li><a href="topkschool.jsp">Top-k schools with most app usage (give an app category) </a></li>
-                            </ul>
+								<li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
+								<li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+								<li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+							</ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
@@ -96,20 +96,20 @@
                             <select name="yearfilter" class="form-control">
                                 <option value="NA">- Year Filter -</option>
                                 <%
-                                    UserDAO userDAO = new UserDAO();
-                                    String yearFilter = request.getParameter("yearfilter");
-                                    if (yearFilter == null) {
-                                        yearFilter = "";
-                                    }
-                                    ArrayList<String> years = userDAO.getYears();
-                                    for (String year : years) {
-                                        String code = "";
-                                        if (year.equals(yearFilter)) {
-                                            code = "selected";
-                                        }
-                                        out.println("<option value='" + year + "' " + code + ">" + year + "</option>");
+									UserDAO userDAO = new UserDAO();
+									String yearFilter = request.getParameter("yearfilter");
+									if (yearFilter == null) {
+										yearFilter = "";
+									}
+									ArrayList<String> years = userDAO.getYears();
+									for (String year : years) {
+										String code = "";
+										if (year.equals(yearFilter)) {
+											code = "selected";
+										}
+										out.println("<option value='" + year + "' " + code + ">" + year + "</option>");
 
-                                    }
+									}
 
                                 %>
 
@@ -120,18 +120,18 @@
                             <select name="genderfilter" class="form-control">
                                 <option value="NA">- Gender Filter -</option>
                                 <%                                    String genderFilter = request.getParameter("genderfilter");
-                                    if (genderFilter == null) {
-                                        genderFilter = "";
-                                    }
-                                    ArrayList<String> genders = userDAO.getGenders();
-                                    for (String gender : genders) {
-                                        String code = "";
-                                        if (gender.equals(genderFilter)) {
-                                            code = "selected";
-                                        }
-                                        out.println("<option value='" + gender + "' " + code + " >" + gender + "</option>");
+									if (genderFilter == null) {
+										genderFilter = "";
+									}
+									ArrayList<String> genders = userDAO.getGenders();
+									for (String gender : genders) {
+										String code = "";
+										if (gender.equals(genderFilter)) {
+											code = "selected";
+										}
+										out.println("<option value='" + gender + "' " + code + " >" + gender + "</option>");
 
-                                    }
+									}
 
                                 %>
                             </select>
@@ -141,18 +141,18 @@
                             <select name="schoolfilter" class="form-control">
                                 <option value="NA">- School Filter -</option>
                                 <%                                    String schoolFilter = request.getParameter("schoolfilter");
-                                    if (schoolFilter == null) {
-                                        schoolFilter = "";
-                                    }
-                                    ArrayList<String> schools = userDAO.getSchools();
-                                    for (String school : schools) {
-                                        String code = "";
-                                        if (school.equals(schoolFilter)) {
-                                            code = "selected";
-                                        }
-                                        out.println("<option value='" + school + "' " + code + ">" + school + "</option>");
+									if (schoolFilter == null) {
+										schoolFilter = "";
+									}
+									ArrayList<String> schools = userDAO.getSchools();
+									for (String school : schools) {
+										String code = "";
+										if (school.equals(schoolFilter)) {
+											code = "selected";
+										}
+										out.println("<option value='" + school + "' " + code + ">" + school + "</option>");
 
-                                    }
+									}
 
                                 %>
                             </select>
@@ -166,42 +166,42 @@
                 <div class="theme-div theme-content" style="width:60%">
                     <%	ArrayList<String> errors = (ArrayList<String>) request.getAttribute("errors");
 
-                        //IF THERE IS ERROR, PRINT
-                        if (errors != null) {
-                            out.println("<h1 class=errorMsg>Error!</h1>");
-                            out.println("<ul>");
-                            for (String error : errors) {
-                                out.println("<li>" + error + "</li>");
-                            }
-                            out.println("</ul>");
-                            return;
-                        }
-                        ArrayList<HashMap<String, Breakdown>> breakdownList = (ArrayList<HashMap<String, Breakdown>>) request.getAttribute("result");
+						//IF THERE IS ERROR, PRINT
+						if (errors != null) {
+							out.println("<h1 class=errorMsg>Error!</h1>");
+							out.println("<ul>");
+							for (String error : errors) {
+								out.println("<li>" + error + "</li>");
+							}
+							out.println("</ul>");
+							return;
+						}
+						ArrayList<HashMap<String, Breakdown>> breakdownList = (ArrayList<HashMap<String, Breakdown>>) request.getAttribute("result");
 
-                        if (breakdownList != null) {
-                            if (breakdownList.size() <= 0) {
-                                out.println("<h1>Result</h1>");
-                                out.println("Invalid Date. Please select your desired date again.");
-                                return;
-                            }
-                            out.println("<table class='table'>");
-                            out.println("<tr><th>Timing (24 hours)</th><th>Duration</th></tr>");
+						if (breakdownList != null) {
+							if (breakdownList.size() <= 0) {
+								out.println("<h1>Result</h1>");
+								out.println("Invalid Date. Please select your desired date again.");
+								return;
+							}
+							out.println("<table class='table'>");
+							out.println("<tr><th>Timing (24 hours)</th><th>Duration</th></tr>");
 
-                            for (HashMap<String, Breakdown> map : breakdownList) {
+							for (HashMap<String, Breakdown> map : breakdownList) {
 
-                                if (map.get("period") != null) {
-                                    out.println("<tr><td>" + map.get("period").getMessage() + "</td>");
-                                }
-                                if (map.get("duration") != null) {
-                                    out.println("<td>" + map.get("duration").getMessage() + "</td></tr>");
-                                }
-                            }
-                            out.println("</table>");
-                        } else {
-                            //NO REPORT AND NO ERROR
-                            out.println("<h1>Result</h1>");
-                            out.println("You have not entered any input.");
-                        }
+								if (map.get("period") != null) {
+									out.println("<tr><td>" + map.get("period").getMessage() + "</td>");
+								}
+								if (map.get("duration") != null) {
+									out.println("<td>" + map.get("duration").getMessage() + "</td></tr>");
+								}
+							}
+							out.println("</table>");
+						} else {
+							//NO REPORT AND NO ERROR
+							out.println("<h1>Result</h1>");
+							out.println("You have not entered any input.");
+						}
                     %>
                 </div>
 

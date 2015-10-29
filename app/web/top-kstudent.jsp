@@ -97,7 +97,7 @@
 		<div class="theme-container container">
 			<div class="row">
 				<div class="theme-div" style="width:37%">
-					<form action="TopKServlet" method="POST">
+					<form action="TopKAction" method="POST">
                                             <div class="form-group"></div>
                                                 <div class="form-group">
 							<label for="entries">Number of Top Results</label>

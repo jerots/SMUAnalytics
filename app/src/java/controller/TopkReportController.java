@@ -21,7 +21,7 @@ import java.util.TreeMap;
  *
  * @author ASUS-PC
  */
-public class TopKController {
+public class TopkReportController {
     //This method gets the top few Apps based on AppUsage time given a school, and their rank.
     public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, String strDate, String endDate, String errors){
         AppUsageDAO aDao = new AppUsageDAO();

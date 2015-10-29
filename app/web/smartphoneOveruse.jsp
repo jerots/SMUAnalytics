@@ -54,10 +54,10 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
-                                <li><a href="topkstudent.jsp">Top-k students with most app usage (give an app category)</a></li>
-                                <li><a href="topkschool.jsp">Top-k schools with most app usage (give an app category) </a></li>
-                            </ul>
+                                <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
+								<li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+								<li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+							</ul>
                         </li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
@@ -77,16 +77,16 @@
 
         <!--START OF CONTENT-->
         <%
-            String time = (String) request.getAttribute("time");
-            String date = (String) request.getAttribute("date");
-            String dateCode = "";
-            if (date != null) {
-                dateCode = "value='" + date + "'";
-            }
-            String timeCode = "";
-            if (time != null) {
-                timeCode = "value='" + time + "'";
-            }
+			String time = (String) request.getAttribute("time");
+			String date = (String) request.getAttribute("date");
+			String dateCode = "";
+			if (date != null) {
+				dateCode = "value='" + date + "'";
+			}
+			String timeCode = "";
+			if (time != null) {
+				timeCode = "value='" + time + "'";
+			}
         %>
 
 
@@ -102,7 +102,7 @@
                             <label for="date">End Date</label>
                             <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" <%=dateCode%> required>
                         </div>
-                        
+
 
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
@@ -111,26 +111,26 @@
                 <div class="theme-div theme-content" style="width:60%">
                     <%
 
-                        TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
+						TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
 
-                        if (result != null) {
-                            out.print("Overuse results: ");
+						if (result != null) {
+							out.print("Overuse results: ");
 
-                            out.print(result.get("overuse-index") + "<br>");
+							out.print(result.get("overuse-index") + "<br>");
 
-                            out.print("Usage results: ");
-                            out.print(result.get("usage-category") + "<br>");
+							out.print("Usage results: ");
+							out.print(result.get("usage-category") + "<br>");
 							out.print(result.get("usage-duration") + "<br>");
 
-                            out.print("Gaming Usage results: ");
-                            out.print(result.get("gaming-category") + "<br>");
+							out.print("Gaming Usage results: ");
+							out.print(result.get("gaming-category") + "<br>");
 							out.print(result.get("gaming-duration") + "<br>");
 
-                            out.print("Access Frequency results: ");
-                            out.print(result.get("accessfrequency-category") + "<br>");
+							out.print("Access Frequency results: ");
+							out.print(result.get("accessfrequency-category") + "<br>");
 							out.print(result.get("accessfrequency") + "<br>");
 
-                        }
+						}
 
 
                     %>

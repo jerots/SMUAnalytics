@@ -55,7 +55,7 @@
                                         <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
                                         <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
                                         <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
-                                    </ul>
+                                   </ul>
                                 </li>
                                 <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                                 <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>

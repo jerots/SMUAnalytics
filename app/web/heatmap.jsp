@@ -54,10 +54,10 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="topkapp.jsp">Top-k most used apps (given a school)</a></li>
-                                <li><a href="topkstudent.jsp">Top-k students with most app usage (give an app category)</a></li>
-                                <li><a href="topkschool.jsp">Top-k schools with most app usage (give an app category) </a></li>
-                            </ul>
+                                 <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
+                                        <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                        <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                                   </ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li class="active"><a href="#">Smartphone Usage Heatmap</a></li>
