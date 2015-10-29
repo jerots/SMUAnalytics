@@ -116,7 +116,7 @@
                         if (result != null) {
                             out.print("Overuse results: ");
 
-                            out.print(result.get("overuseindex") + "<br>");
+                            out.print(result.get("overuse-index") + "<br>");
 
                             out.print("Usage results: ");
                             out.print(result.get("usage-category") + "<br>");
