@@ -166,7 +166,7 @@
                         } else {
                             Iterator<String> iter = heatmap.keySet().iterator();
                             out.println("<table class='table'>");
-                            out.println("<tr><th>Place</th><th>Density</th><th>Number of people using smartphone</th></tr>");
+                            out.println("<tr><th>Place</th><th>Density</th><th>Number of people using smartphone</th><th>Count</th></tr>");
                             while (iter.hasNext()) {
                                 String loc = iter.next();
                                 int numUsers = heatmap.get(loc).size();
@@ -195,6 +195,7 @@
                                 out.println("<td>" + loc + "</td>");
                                 out.println("<td>" + density + "</td>");
                                 out.println("<td>" + desc + "</td>");
+								out.println("<td>" + numUsers + "</td>");
 
                                 out.println("</tr>");
                             }

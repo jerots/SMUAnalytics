@@ -398,6 +398,49 @@ public class LocationUsageDAO {
 		return result;
 	}
 
+	public HashMap<String,LocationUsage> retrieveByFloor(java.util.Date date, String floor) {
+		HashMap<String,LocationUsage> result = new HashMap<String,LocationUsage>();
+		try {
+			String sql = "select * \n"
+					+ "    from appusage au, locationusage lu,location l \n"
+					+ "    where au.macaddress = lu.macaddress\n"
+					+ "    and lu.locationid = l.locationid \n"
+					+ "    and semanticplace like ?\n"
+					+ "    AND lu.timestamp >= ? and lu.timestamp <= ?\n"
+					+ "    and au.timestamp >= ? and au.timestamp <= ?\n"
+					+ "    order by lu.macaddress, lu.timestamp;";
+
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+
+			Date before = new java.sql.Date(date.getTime() - (15 * 60 * 1000));
+			Date after = new java.sql.Date(date.getTime());
+			ps.setString(1, "SMUSIS" + floor + "%");
+			ps.setString(2, Utility.formatDate(before)); //15 minutes before
+			ps.setString(3, Utility.formatDate(after));
+			ps.setString(4, Utility.formatDate(before)); //15 minutes before
+			ps.setString(5, Utility.formatDate(after));
+			
+
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				Timestamp timestamp = rs.getTimestamp(4);
+				String macAddress = rs.getString(5);
+				int locationId = rs.getInt(6);
+				String semanticplace = rs.getString(8);
+				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, locationId, new Location(locationId, semanticplace));
+				result.put(macAddress, curr);
+
+			}
+			ConnectionManager.close(conn, ps, rs);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
 	public ArrayList<LocationUsage> retrieveByUser(String macAdd, java.util.Date startDate, java.util.Date endDate) {
 
 		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
@@ -435,7 +478,7 @@ public class LocationUsageDAO {
 
 	}
 
-	public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress , ArrayList<LocationUsage> totalAUList) {
+	public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress, ArrayList<LocationUsage> totalAUList) {
 
 		try {
 			String sql = "select * from locationusage\n"

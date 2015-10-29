@@ -7,14 +7,28 @@ import java.util.Date;
 public class LocationUsage {
 
 	private String timestamp;
-	private String macAddress;//user obj
-	private int locationId;//location obj
+	private String macAddress;//user
+	private int locationId;//location
+	private Location location;
 
 	public LocationUsage(String timestamp, String macAddress, int locationId) {
 		this.timestamp = timestamp;
 		this.macAddress = macAddress;
 		this.locationId = locationId;
+		location = null;
 	}
+
+	public LocationUsage(String timestamp, String macAddress, int locationId, Location location) {
+		this.timestamp = timestamp;
+		this.macAddress = macAddress;
+		this.locationId = locationId;
+		this.location = location;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+	
 
 	public String getTimestamp() {
 		return timestamp;
