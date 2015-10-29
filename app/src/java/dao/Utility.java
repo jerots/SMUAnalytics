@@ -177,6 +177,15 @@ public final class Utility {
         return (endDate.getTime() - startDate.getTime()) / 1000;
     }
      
+	 public static long daysBetweenDates(Date startDate, Date endDate){
+		 return (endDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24 + 1 ;
+	 }
+	 
+	 public static Date getNextHour(Date startDate){
+		 
+		 return new Date(startDate.getTime() + (1000 * 60 * 60 * 24));
+	 }
+	 
     public static ArrayList<String> getSchoolList(){
         return schoolList;
     }

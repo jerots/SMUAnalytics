@@ -99,17 +99,10 @@
                             <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="startDate" <%=dateCode%> required>
                         </div>
                         <div class="form-group">
-                            <label for="date">Start Time</label>
-                            <input type="text" class="form-control" id="time" name="startTime" <%=timeCode%> placeholder="HH:MM:SS (24h)" required>
-                        </div>
-                        <div class="form-group">
                             <label for="date">End Date</label>
                             <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" <%=dateCode%> required>
                         </div>
-                        <div class="form-group">
-                            <label for="date">End Time</label>
-                            <input type="text" class="form-control" id="time" name="endTime" <%=timeCode%> placeholder="HH:MM:SS (24h)" required>
-                        </div>
+                        
 
                         <input type="submit" class="btn btn-default" value="Generate">
                     </form>
@@ -126,13 +119,16 @@
                             out.print(result.get("overuseindex") + "<br>");
 
                             out.print("Usage results: ");
-                            out.print(result.get("usage") + "<br>");
+                            out.print(result.get("usage-category") + "<br>");
+							out.print(result.get("usage-duration") + "<br>");
 
                             out.print("Gaming Usage results: ");
-                            out.print(result.get("gaming") + "<br>");
+                            out.print(result.get("gaming-category") + "<br>");
+							out.print(result.get("gaming-duration") + "<br>");
 
                             out.print("Access Frequency results: ");
-                            out.print(result.get("frequency"));
+                            out.print(result.get("accessfrequency-category") + "<br>");
+							out.print(result.get("accessfrequency") + "<br>");
 
                         }
 

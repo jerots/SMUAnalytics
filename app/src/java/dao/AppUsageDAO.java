@@ -311,8 +311,9 @@ public class AppUsageDAO {
 
             Connection conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * from appusage where "
+            PreparedStatement ps = conn.prepareStatement("SELECT * from appusage au, app a where "
                     + "timestamp >= ? AND timestamp <= ? "
+					+ "AND au.appid = a.appid "
                     + "AND macaddress = ? order by timestamp");
             ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
             ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
@@ -325,7 +326,9 @@ public class AppUsageDAO {
                 String timestamp = rs.getString(1);
                 String macaddress = rs.getString(2);
                 int appid = rs.getInt(3);
-                result.add(new AppUsage(timestamp, macaddress, appid));
+				String appName = rs.getString(5);
+				String appCat = rs.getString(6);
+                result.add(new AppUsage(timestamp, macaddress, appid, new App(appid,appName, appCat)));
 
             }
             ConnectionManager.close(conn, ps, rs);
@@ -469,7 +472,7 @@ public class AppUsageDAO {
         //This has been changed to take into account that the next update is calculated as well.
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT timestamp, appname, a.appid, u.macaddress\n"
+            PreparedStatement ps = conn.prepareStatement("SELECT timestamp, appname, a.appid, u.macaddress, appcategory\n"
                     + "FROM appusage au, user u, app a\n"
                     + "WHERE timestamp >= ?\n"
                     + "AND timestamp <= ?\n"
@@ -488,8 +491,9 @@ public class AppUsageDAO {
                 String appName = rs.getString(2);
                 int appId = rs.getInt(3);
                 String macAdd = rs.getString(4);
+				String appCat = rs.getString(5);
 
-                aList.add(new AppUsage(timestamp, macAdd, new App(appId, appName, null)));
+                aList.add(new AppUsage(timestamp, macAdd, appId, new App(appId, appName, appCat)));
             }
             ConnectionManager.close(conn, ps);
 
@@ -501,7 +505,7 @@ public class AppUsageDAO {
     public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priKMac, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
-        String sql = "SELECT timestamp, u.name, u.macaddress, a.appid, a.appcategory\n"
+        String sql = "SELECT timestamp, u.name, u.macaddress, a.appid, a.appcategory, appname\n"
                 + "FROM appusage au, user u, app a\n"
                 + "WHERE timestamp >= ?\n"
                 + "AND timestamp <= ?\n"
@@ -524,8 +528,9 @@ public class AppUsageDAO {
                 String macAdd = rs.getString(3);
                 int appId = rs.getInt(4);
                 String category = rs.getString(5);
+				String appName = rs.getString(6);
 
-                aList.add(new AppUsage(timeStamp, macAdd, new App(appId, null, category)));
+                aList.add(new AppUsage(timeStamp, macAdd, appId, new App(appId, appName, category)));
                 priKMac.put(macAdd, name);
             }
 
@@ -538,7 +543,7 @@ public class AppUsageDAO {
     public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priKSch, String start, String end) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
-        String sql = "SELECT timestamp, u.macaddress, a.appid, appcategory, email\n"
+        String sql = "SELECT timestamp, u.macaddress, a.appid, appcategory, email, appname\n"
                 + "FROM appusage au, user u, app a\n"
                 + "WHERE au.macaddress = u.macaddress\n"
                 + "AND timestamp >= ?\n"
@@ -568,8 +573,9 @@ public class AppUsageDAO {
                 String category = rs.getString(4);
                 String email = rs.getString(5);
                 String school = Utility.getSchool(email);
+				String appName = rs.getString(6);
 
-                aList.add(new AppUsage(timeStamp, macAdd, new App(appId, null, category)));
+                aList.add(new AppUsage(timeStamp, macAdd, appId, new App(appId, appName, category)));
                 priKSch.put(macAdd, school);
             }
 
