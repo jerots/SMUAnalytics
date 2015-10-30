@@ -272,7 +272,6 @@ public class AppUsageDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
         }finally {
             ConnectionManager.close(conn, ps, rs);
         }
@@ -344,7 +343,6 @@ public class AppUsageDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
         }finally {
             ConnectionManager.close(conn, ps, rs);
         }
@@ -390,12 +388,14 @@ public class AppUsageDAO {
     public ArrayList<User> retrieveUserByDemo(Date startHour, Date endHour, String[] demoArr) {
 
         ArrayList<User> result = new ArrayList<User>();
-
+Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
 
-            Connection conn = ConnectionManager.getConnection();
+             conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u \n"
+             ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u \n"
                     + "where au.macaddress = u.macaddress\n"
                     + "AND timestamp >= ? AND timestamp < ?\n"
                     + "AND email like ? \n"
@@ -427,7 +427,7 @@ public class AppUsageDAO {
                 ps.setString(5, "%@" + school + ".smu.edu.sg");
             }
 
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             while (rs.next()) {
                 String macAdd = rs.getString(1);
@@ -440,7 +440,9 @@ public class AppUsageDAO {
             }
 
         } catch (SQLException e) {
-        }
+        } finally {
+			ConnectionManager.close(conn, ps, rs);
+		}
 
         return result;
     }
@@ -448,12 +450,14 @@ public class AppUsageDAO {
     public ArrayList<AppUsage> retrieveByAppCat(Date startHour, Date endHour, String macAdd, String appCat) {
 
         ArrayList<AppUsage> result = new ArrayList<AppUsage>();
-
+Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
 
-            Connection conn = ConnectionManager.getConnection();
+             conn = ConnectionManager.getConnection();
 
-            PreparedStatement ps = conn.prepareStatement("select * from appusage au, app a\n"
+             ps = conn.prepareStatement("select * from appusage au, app a\n"
                     + "WHERE au.appid = a.appid\n"
                     + "AND timestamp >= ? AND timestamp <= ? \n"
                     + "AND appcategory = ? \n"
@@ -465,7 +469,7 @@ public class AppUsageDAO {
             ps.setString(3, appCat);
             ps.setString(4, macAdd);
 
-            ResultSet rs = ps.executeQuery();
+             rs = ps.executeQuery();
 
             while (rs.next()) {
                 String timestamp = rs.getString(1);
@@ -476,7 +480,9 @@ public class AppUsageDAO {
             ConnectionManager.close(conn, ps, rs);
 
         } catch (SQLException e) {
-        }
+        } finally {
+			ConnectionManager.close(conn, ps, rs);
+		}
         
         return result;
     }
