@@ -5,12 +5,12 @@
  */
 package dao;
 
+import com.csvreader.CsvReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.opencsv.CSVReader;
 import entity.*;
 import java.sql.BatchUpdateException;
 import java.sql.ResultSet;
@@ -34,15 +34,14 @@ public class LocationUsageDAO {
 		locationList = new TreeMap<>();
 	}
 
-	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException, SQLException {
+	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException, SQLException {
 		int index = 2;
 
 		String sql = "insert into locationusage values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
 				+ "VALUES(locationid);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-
-		String[] arr = null;
-		while ((arr = reader.readNext()) != null) {
+                reader.readHeaders();
+		while (reader.readRecord()) {
 			//retrieving per row
 			boolean err = false;
 			String errorMsg = errMap.get(index);
@@ -50,14 +49,14 @@ public class LocationUsageDAO {
 				errorMsg = "";
 			}
 			//check timestamp
-			String date = Utility.parseString(arr[0]);
+			String date = Utility.parseString(reader.get("timestamp"));
 			if (date == null || !Utility.checkDate(date)) {
 				errorMsg += ",invalid timestamp";
 				err = true;
 			}
 
 			//check macAdd
-			String macAdd = Utility.parseString(arr[1]);
+			String macAdd = Utility.parseString(reader.get("mac-address"));
 			if (macAdd == null) {
 				errorMsg += ",mac address cannot be blank";
 				err = true;
@@ -68,7 +67,7 @@ public class LocationUsageDAO {
 			}
 
 			//check appid
-			int locationId = Utility.parseInt(arr[2]);
+			int locationId = Utility.parseInt(reader.get("location-id"));
 			if (locationId <= 0) {
 				errorMsg += ",location id cannot be blank";
 				err = true;
@@ -107,11 +106,11 @@ public class LocationUsageDAO {
 
 		int[] updateCounts = stmt.executeBatch();
 		conn.commit();
-
+                stmt.close();
 		return updateCounts;
 	}
 
-	public int add(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
+	public int add(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int updateCounts = 0;
 
 		Connection conn = ConnectionManager.getConnection();
@@ -119,14 +118,13 @@ public class LocationUsageDAO {
 		int index = 2;
 		String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-
-		String[] arr = null;
-		while ((arr = reader.readNext()) != null) {
+                reader.readHeaders();
+		while (reader.readRecord()) {
 			//retrieving per row
 			boolean err = false;
 
 			//check timestamp
-			String date = Utility.parseString(arr[0]);
+			String date = Utility.parseString(reader.get("timestamp"));
 			if (date == null || !Utility.checkDate(date)) {
 				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
@@ -138,7 +136,7 @@ public class LocationUsageDAO {
 			}
 
 			//check macAdd
-			String macAdd = Utility.parseString(arr[1]);
+			String macAdd = Utility.parseString(reader.get("mac-address"));
 			if (macAdd == null) {
 				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
@@ -158,7 +156,7 @@ public class LocationUsageDAO {
 			}
 
 			//check appid
-			int locationId = Utility.parseInt(arr[2]);
+			int locationId = Utility.parseInt(reader.get("location-id"));
 			if (locationId == -1) {
 				String errorMsg = errMap.get(index);
 				if (errorMsg == null) {
@@ -249,24 +247,24 @@ public class LocationUsageDAO {
 		return updateCounts;
 	}
 
-	public int[] delete(CSVReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
+	public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int[] toReturn = new int[2];
 		int index = 2; //counts the row of the record.
 		int notFound = 0;
 		int found = 0;
 		try {
-
+                    
 			Connection conn = ConnectionManager.getConnection();
 			conn.setAutoCommit(false);
 			String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-			String[] arr = null;
-			while ((arr = reader.readNext()) != null) {
+                        reader.readHeaders();
+			while (reader.readRecord()) {
 				//retrieving per row
 				boolean err = false;
 
 				//check timestamp
-				String date = Utility.parseString(arr[0]);
+				String date = Utility.parseString(reader.get("timestamp"));
 				if (date == null || !Utility.checkDate(date)) {
 					String errorMsg = errMap.get(index);
 					if (errorMsg == null) {
@@ -278,7 +276,7 @@ public class LocationUsageDAO {
 				}
 
 				//check macAdd
-				String macAdd = Utility.parseString(arr[1]);
+				String macAdd = Utility.parseString(reader.get("mac-address"));
 				if (macAdd == null) {
 					String errorMsg = errMap.get(index);
 					if (errorMsg == null) {
@@ -332,9 +330,6 @@ public class LocationUsageDAO {
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			conn.setAutoCommit(false);
-//			System.out.println(startDate);
-//			System.out.println(endDate);
-//			System.out.println(macAdd);
 			String sql = "delete from locationusage where timestamp BETWEEN ? AND ?"
 					+ " AND macaddress = ?;";
 			PreparedStatement stmt = conn.prepareStatement(sql);

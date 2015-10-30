@@ -1,12 +1,11 @@
 package dao;
 
+import com.csvreader.CsvReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.opencsv.CSVReader;
-import entity.Admin;
 import entity.App;
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -23,16 +22,17 @@ import java.util.TreeMap;
  */
 public class AppDAO {
 
-	public int[] insert(CSVReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> appIdList) throws IOException, SQLException {
+	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> appIdList) throws IOException, SQLException {
 		String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-		String[] arr = null;
+                //Reads the headers to decide where to go!
+                reader.readHeaders();
 		//index starts at 2 because the headers count as a row.
 		int index = 2;
-		while ((arr = reader.readNext()) != null) {
+		while (reader.readRecord()) {
 			boolean err = false;
 
-			int appId = Utility.parseInt(arr[0]);
+			int appId = Utility.parseInt(reader.get("app-id"));
 			if (appId <= 0) {
 
 				String errorMsg = errMap.get(index);
@@ -45,7 +45,7 @@ public class AppDAO {
 				err = true;
 			}
 
-			String name = Utility.parseString(arr[1]);
+			String name = Utility.parseString(reader.get("app-name"));
 			name = name.replace("\"", "");
 			if (name == null) {
 
@@ -58,7 +58,7 @@ public class AppDAO {
 				err = true;
 			}
 
-			String cat = Utility.parseString(arr[2]);
+			String cat = Utility.parseString(reader.get("app-category"));
 			cat = cat.replace("\"", "");
 
 			if (cat == null) {
@@ -99,7 +99,7 @@ public class AppDAO {
 
 		int[] updatedRecords = stmt.executeBatch();
 		conn.commit();
-
+                stmt.close();
 		return updatedRecords;
 	}
 

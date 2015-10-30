@@ -5,6 +5,7 @@
  */
 package dao;
 
+import com.csvreader.CsvReader;
 import entity.User;
 import java.io.IOException;
 import java.sql.Connection;
@@ -12,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.opencsv.CSVReader;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -59,18 +59,17 @@ public class UserDAO {
 	
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
-    public int[] insert(CSVReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String,String> macList) throws IOException, SQLException {
-        String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
+    public int[] insert(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String,String> macList) throws IOException, SQLException {
+        String sql = "insert into user values(?,?,?,?,?,?);";
         PreparedStatement stmt = conn.prepareStatement(sql);
-
-        String arr[];
+        reader.readHeaders();
         int index = 2;
-        while ((arr = reader.readNext()) != null) {
+        while (reader.readRecord()) {
             //retrieving per row
             boolean err = false;
 
             String errorMsg = userMap.get(index);
-            String macAdd = Utility.parseString(arr[0]);
+            String macAdd = Utility.parseString(reader.get("mac-address"));
             if (macAdd == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "mac add cannot be blank");
@@ -89,7 +88,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String name = Utility.parseString(arr[1]);
+            String name = Utility.parseString(reader.get("name"));
 
             if (name == null) {
                 if (errorMsg == null) {
@@ -100,7 +99,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String password = Utility.parseString(arr[2]);
+            String password = Utility.parseString(reader.get("password"));
             if (password == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "password cannot be blank");
@@ -119,7 +118,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String email = Utility.parseString(arr[3]);
+            String email = Utility.parseString(reader.get("email"));
             if (email == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "email cannot be blank");
@@ -137,7 +136,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String g = Utility.parseString(arr[4]);
+            String g = Utility.parseString(reader.get("gender"));
             if (g == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "gender cannot be blank");
@@ -157,44 +156,60 @@ public class UserDAO {
                 }
                 err = true;
             }
+            
+            String cca = Utility.parseString(reader.get("cca"));
+            if(cca == null){
+                if(errorMsg == null){
+                    userMap.put(index, "cca cannot be blank");
+                }else{
+                    userMap.put(index, errorMsg + "," + "cca cannot be blank");
+                }
+            }else if(cca.length() > 63){
+                if(errorMsg == null){
+                    userMap.put(index, "cca record too long");
+                }else{
+                    userMap.put(index, errorMsg + "," + "cca record too long");
+                }
+            }
 
             if (!err) {
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
-				macList.put(macAdd,"");
+		macList.put(macAdd,"");
 				
 //				System.out.println(name);
                 stmt.setString(2, name);
                 stmt.setString(3, password);
                 stmt.setString(4, email);
                 stmt.setString(5, gender);
+                stmt.setString(6, cca);
                 stmt.addBatch();
             }
             index++;
         }
 
         int[] updateCounts = stmt.executeBatch();
+        System.out.println(updateCounts.length);
         conn.commit();
-
+        stmt.close();
         return updateCounts;
     }
 	
-	
-	 public int[] add(CSVReader reader, TreeMap<Integer, String> userMap) throws IOException, SQLException {
+    public int[] add(CsvReader reader, TreeMap<Integer, String> userMap) throws IOException, SQLException {
         Connection conn = ConnectionManager.getConnection();
 		 conn.setAutoCommit(false);
-        String sql = "insert into user (macaddress, name, password, email, gender) values(?,?,?,?,?);";
+        String sql = "insert into user values(?,?,?,?,?,?);";
         PreparedStatement stmt = conn.prepareStatement(sql);
-
-        String arr[];
+        reader.readHeaders();
+        
         int index = 2;
-        while ((arr = reader.readNext()) != null) {
+        while (reader.readRecord()) {
             //retrieving per row
             boolean err = false;
 
             String errorMsg = userMap.get(index);
-            String macAdd = Utility.parseString(arr[0]);
+            String macAdd = Utility.parseString(reader.get("mac-address"));
             if (macAdd == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "mac add cannot be blank");
@@ -213,7 +228,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String name = Utility.parseString(arr[1]);
+            String name = Utility.parseString(reader.get("name"));
 
             if (name == null) {
                 if (errorMsg == null) {
@@ -224,7 +239,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String password = Utility.parseString(arr[2]);
+            String password = Utility.parseString(reader.get("password"));
             if (password == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "password cannot be blank");
@@ -243,7 +258,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String email = Utility.parseString(arr[3]);
+            String email = Utility.parseString(reader.get("email"));
             if (email == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "email cannot be blank");
@@ -261,7 +276,7 @@ public class UserDAO {
                 err = true;
             }
 
-            String g = Utility.parseString(arr[4]);
+            String g = Utility.parseString(reader.get("gender"));
             if (g == null) {
                 if (errorMsg == null) {
                     userMap.put(index, "gender cannot be blank");
@@ -281,17 +296,31 @@ public class UserDAO {
                 }
                 err = true;
             }
+            
+            String cca = Utility.parseString(reader.get("cca"));
+            if(cca == null){
+                if(errorMsg == null){
+                    userMap.put(index, "cca cannot be blank");
+                }else{
+                    userMap.put(index, errorMsg + "," + "cca cannot be blank");
+                }
+            }else if(cca.length() > 63){
+                if(errorMsg == null){
+                    userMap.put(index, "cca record too long");
+                }else{
+                    userMap.put(index, errorMsg + "," + "cca record too long");
+                }
+            }
 
             if (!err) {
                 //add to list
                 //insert into tables
                 stmt.setString(1, macAdd);
-				
-//				System.out.println(name);
                 stmt.setString(2, name);
                 stmt.setString(3, password);
                 stmt.setString(4, email);
                 stmt.setString(5, gender);
+                stmt.setString(6, cca);
                 stmt.addBatch();
             }
             index++;
@@ -299,7 +328,7 @@ public class UserDAO {
 
         int[] updateCounts = stmt.executeBatch();
         conn.commit();
-
+        stmt.close();
         //closing
         reader.close();
         return updateCounts;

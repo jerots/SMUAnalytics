@@ -5,11 +5,9 @@
  */
 package controller;
 
-import com.opencsv.CSVReader;
-import dao.AppDAO;
+import com.csvreader.CsvReader;
 import dao.AppUsageDAO;
 import dao.ConnectionManager;
-import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import dao.UserDAO;
 import java.io.BufferedReader;
@@ -35,7 +33,7 @@ public class AddBatchController {
 		InputStream fileContent = filePart.getInputStream();
 		ZipEntry entry = null;
 
-		CSVReader reader = null;
+		CsvReader reader = null;
 		
 		// initialise the number of rows updated
 		int userUpdated = 0;
@@ -60,8 +58,7 @@ public class AddBatchController {
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				String fileName = entry.getName();
 				if (fileName.equals("demographics.csv")) {
-					reader = new CSVReader(br);
-					reader.readNext();
+					reader = new CsvReader(br);
 					int[] updatedRecords = uDao.add(reader, userErrMap);
 
 					for (int i : updatedRecords) {
@@ -85,8 +82,7 @@ public class AddBatchController {
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				String fileName = entry.getName();
 				if (fileName.equals("app.csv")) {
-					reader = new CSVReader(br);
-					reader.readNext();
+					reader = new CsvReader(br);
 					auUpdated = auDao.add(reader, auErrMap);
 
 				} else {
@@ -107,8 +103,7 @@ public class AddBatchController {
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				String fileName = entry.getName();
 				if (fileName.equals("location.csv")) {
-					reader = new CSVReader(br);
-					reader.readNext();
+					reader = new CsvReader(br);
 
 					luUpdated = luDao.add(reader, luErrMap);
 
@@ -131,8 +126,7 @@ public class AddBatchController {
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				String fileName = entry.getName();
 				if (fileName.equals("location-delete.csv")) {
-					reader = new CSVReader(br);
-					reader.readNext();
+					reader = new CsvReader(br);
 					int[] updatedRecords = luDao.delete(reader, delErrMap);
 //                    for (int i : updatedRecords) {
 //						System.out.println(i);
