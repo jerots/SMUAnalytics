@@ -15,11 +15,26 @@ public class App implements Comparable<App>{
     private int appId;
     private String appName;
     private String appCategory;
-
+    private App app;
+    
     public App(int appId, String appName, String appCategory) {
         this.appId = appId;
         this.appName = appName;
         this.appCategory = appCategory;
+    }
+    
+    public App(App app, String appName, String appCategory) {
+        this.app = app;
+        this.appName = appName;
+        this.appCategory = appCategory;
+    }
+
+    public void setApp(App app) {
+        this.app = app;
+    }
+
+    public App getApp() {
+        return app;
     }
 
     public int getAppId() {

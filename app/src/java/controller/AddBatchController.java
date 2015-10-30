@@ -30,6 +30,7 @@ public class AddBatchController {
 	public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
 			TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
 		Connection conn = ConnectionManager.getConnection();
+                conn.setAutoCommit(false);
 		InputStream fileContent = filePart.getInputStream();
 		ZipEntry entry = null;
 
@@ -54,23 +55,17 @@ public class AddBatchController {
 		InputStreamReader isr = new InputStreamReader(zipInputStream);
 		BufferedReader br = new BufferedReader(isr);
 		entry = null;
-		try {
-			while ((entry = zipInputStream.getNextEntry()) != null) {
-				String fileName = entry.getName();
-				if (fileName.equals("demographics.csv")) {
-					reader = new CsvReader(br);
-					int[] updatedRecords = uDao.add(reader, userErrMap);
-
-					for (int i : updatedRecords) {
-						userUpdated += i;
-					}
-				} else {
-					zipInputStream.closeEntry();
-				}
-			}
-		} catch (IOException e) {
-//            e.printStackTrace();
-		}
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                        String fileName = entry.getName();
+                        if (fileName.equals("demographics.csv")) {
+                                reader = new CsvReader(br);
+                                int[] updatedRecords = uDao.add(reader, userErrMap, conn);
+                                userUpdated = updatedRecords.length;
+                                break;
+                        } else {
+                                zipInputStream.closeEntry();
+                        }
+                }
 
 		//app.csv
 		fileContent = filePart.getInputStream();
@@ -78,20 +73,16 @@ public class AddBatchController {
 		isr = new InputStreamReader(zipInputStream);
 		br = new BufferedReader(isr);
 		entry = null;
-		try {
-			while ((entry = zipInputStream.getNextEntry()) != null) {
-				String fileName = entry.getName();
-				if (fileName.equals("app.csv")) {
-					reader = new CsvReader(br);
-					auUpdated = auDao.add(reader, auErrMap);
-
-				} else {
-					zipInputStream.closeEntry();
-				}
-			}
-		} catch (IOException e) {
-//            e.printStackTrace();
-		}
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                        String fileName = entry.getName();
+                        if (fileName.equals("app.csv")) {
+                                reader = new CsvReader(br);
+                                auUpdated = auDao.add(reader, auErrMap, conn);
+                                break;
+                        } else {
+                                zipInputStream.closeEntry();
+                        }
+                }
 
 		//locationUsage
 		fileContent = filePart.getInputStream();
@@ -99,22 +90,16 @@ public class AddBatchController {
 		isr = new InputStreamReader(zipInputStream);
 		br = new BufferedReader(isr);
 		entry = null;
-		try {
-			while ((entry = zipInputStream.getNextEntry()) != null) {
-				String fileName = entry.getName();
-				if (fileName.equals("location.csv")) {
-					reader = new CsvReader(br);
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("location.csv")) {
+                            reader = new CsvReader(br);
+                            luUpdated = luDao.add(reader, luErrMap, conn);
 
-					luUpdated = luDao.add(reader, luErrMap);
-
-				} else {
-					zipInputStream.closeEntry();
-				}
-
-			}
-		} catch (IOException e) {
-//            e.printStackTrace();
-		}
+                    } else {
+                            zipInputStream.closeEntry();
+                    }
+                }
 
 		//location-delete.csv
 		fileContent = filePart.getInputStream();
@@ -122,24 +107,16 @@ public class AddBatchController {
 		isr = new InputStreamReader(zipInputStream);
 		br = new BufferedReader(isr);
 		entry = null;
-		try {
-			while ((entry = zipInputStream.getNextEntry()) != null) {
-				String fileName = entry.getName();
-				if (fileName.equals("location-delete.csv")) {
-					reader = new CsvReader(br);
-					int[] updatedRecords = luDao.delete(reader, delErrMap);
-//                    for (int i : updatedRecords) {
-//						System.out.println(i);
-//                        delUpdated+= i;
-//                    }
-					delUpdated = updatedRecords[0];
-				} else {
-					zipInputStream.closeEntry();
-				}
-			}
-		} catch (IOException e) {
-//            e.printStackTrace();
-		}
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    String fileName = entry.getName();
+                    if (fileName.equals("location-delete.csv")) {
+                            reader = new CsvReader(br);
+                            int[] updatedRecords = luDao.delete(reader, delErrMap, conn);
+                            delUpdated = updatedRecords[0];
+                    } else {
+                            zipInputStream.closeEntry();
+                    }
+                }
 		
 		ConnectionManager.close(conn);
 

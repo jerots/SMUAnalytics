@@ -50,7 +50,6 @@ public class BootstrapController {
 			InitDAO.truncateTable(conn);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 
 		// initialise the number of rows updated
@@ -86,18 +85,10 @@ public class BootstrapController {
 				//returns number of successfully entered entries
 				//success >= 0;
 				//unsuccess: anything other than a number;
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-				//count how many 1 = success
-				for (int i : updatedRecords) {
-					appUpdated += i;
-				}
+				int[] updatedRecords = {};
+				updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
+				//count how many 1 = success. Sets updated records to empty so that in case theres nothing, the updated records return NOTHING.
+                                appUpdated = updatedRecords.length;
 				break;
 
 			} else {
@@ -117,17 +108,9 @@ public class BootstrapController {
 			if (fileName.equals("demographics.csv")) {
 				userUpdated = 0;
 				reader = new CsvReader(br);
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-                                
-				for (int i : updatedRecords) {
-					userUpdated += i;
-				}
+				int[] updatedRecords = {};
+				updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
+				userUpdated = updatedRecords.length;
 				break;
 			} else {
 				zipInputStream.closeEntry();
@@ -147,17 +130,8 @@ public class BootstrapController {
 				auUpdated = 0;
 				reader = new CsvReader(br);
 				
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-//				for (int i : updatedRecords) {
-//					auUpdated++;
-//				}
+				int[] updatedRecords = {};
+				updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
 				auUpdated = updatedRecords.length;
 				break;
 			} else {
@@ -178,17 +152,8 @@ public class BootstrapController {
 				locUpdated = 0;
 				reader = new CsvReader(br);
 				
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-//				for (int i : updatedRecords) {
-//					locUpdated++;
-//				}
+				int[] updatedRecords = {};
+                                updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
 				locUpdated = updatedRecords.length;
 				break;
 			} else {
@@ -209,17 +174,8 @@ public class BootstrapController {
 				luUpdated = 0;
 				reader = new CsvReader(br);
 				
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-//				for (int i : updatedRecords) {
-//					luUpdated++;
-//				}
+				int[] updatedRecords = {};
+				updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
 				luUpdated = updatedRecords.length;
 				break;
 			} else {
@@ -241,18 +197,9 @@ public class BootstrapController {
 				delUpdated = 0;
 				reader = new CsvReader(br);
 				
-				int[] updatedRecords = null;
-				try {
-					updatedRecords = luDao.delete(reader, delErrMap);
-
-				} catch (SQLException e) {
-
-				}
-//                    for (int i : updatedRecords) {
-//						System.out.println(i);
-//                        delUpdated+= i;
-//                    }
-				delUpdated = updatedRecords[0];
+				int[] updatedRecords = {};
+				updatedRecords = luDao.delete(reader, delErrMap, conn);
+                                delUpdated = updatedRecords[0];
 				break;
 			} else {
 				zipInputStream.closeEntry();

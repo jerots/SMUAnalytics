@@ -4,10 +4,24 @@ public class Location implements Comparable<Location>{
 
     private int locationId;
     private String semanticPlace;
+    private Location location;
 
     public Location(int locationId, String semanticPlace) {
         this.locationId = locationId;
         this.semanticPlace = semanticPlace;
+    }
+    
+    public Location(Location location, String semanticPlace) {
+        this.location = location;
+        this.semanticPlace = semanticPlace;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     public int getLocationId() {

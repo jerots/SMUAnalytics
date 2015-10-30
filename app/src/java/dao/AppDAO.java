@@ -22,9 +22,11 @@ import java.util.TreeMap;
  */
 public class AppDAO {
 
-	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> appIdList) throws IOException, SQLException {
+	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer,String> appIdList) throws IOException {
+            int[] updatedRecords = {};
+            try{
 		String sql = "insert into app values(?,?,?) ON DUPLICATE KEY UPDATE appname = appname, appcategory = appcategory;";
-		PreparedStatement stmt = conn.prepareStatement(sql);
+                PreparedStatement stmt = conn.prepareStatement(sql);
                 //Reads the headers to decide where to go!
                 reader.readHeaders();
 		//index starts at 2 because the headers count as a row.
@@ -97,10 +99,14 @@ public class AppDAO {
 		}
 		//closing
 
-		int[] updatedRecords = stmt.executeBatch();
-		conn.commit();
+		updatedRecords = stmt.executeBatch();
                 stmt.close();
-		return updatedRecords;
+		conn.commit();
+            }catch(SQLException e){
+                
+            }
+                
+            return updatedRecords;
 	}
 
 	public App retrieveAppbyId(int appId) {

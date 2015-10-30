@@ -25,81 +25,84 @@ public class AppUsageDAO {
         duplicate = new TreeMap<>();
     }
 
-    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException, SQLException {
-        int index = 2;
-        String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
-                + " = VALUES(appid);";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        reader.readHeaders();
+    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException {
+        int[] updatedRecords = {};
+        try{
+            int index = 2;
+            String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
+                    + " = VALUES(appid);";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            reader.readHeaders();
 
-        while (reader.readRecord()) {
-            //retrieving per row
-            boolean err = false;
-            String errorMsg = errMap.get(index);
-            if (errorMsg == null) {
-                errorMsg = "";
-            }
-            //check timestamp
-            String date = Utility.parseString(reader.get("timestamp"));
-            if (date == null || !Utility.checkDate(date)) {
-                err = true;
-
-                errorMsg += ",invalid timestamp";
-
-            }
-
-            //check macAdd
-            String macAdd = Utility.parseString(reader.get("mac-address"));
-            if (macAdd == null) {
-                errorMsg += ",mac add cannot be blank";
-                err = true;
-            } else if (!Utility.checkHexadecimal(macAdd)) {
-                errorMsg += ",invalid mac add";
-                err = true;
-            } else if (!macList.containsKey(macAdd)) {
-                errorMsg += ",no matching mac address";
-                err = true;
-            }
-
-            //check appid
-            int appId = Utility.parseInt(reader.get("app-id"));
-            if (appId <= 0) {
-                errorMsg += ",app id cannot be blank";
-                err = true;
-            } else if (!appIdList.containsKey(appId)) {
-                errorMsg += ",invalid app";
-                err = true;
-            }
-
-            if (!err) {
-
-                if (duplicate.containsKey(date + macAdd)) {
-                    errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+            while (reader.readRecord()) {
+                //retrieving per row
+                boolean err = false;
+                String errorMsg = errMap.get(index);
+                if (errorMsg == null) {
+                    errorMsg = "";
                 }
-                duplicate.put(date + macAdd, index);
-                //add to list
-                stmt.setString(1, date);
-                stmt.setString(2, macAdd);
-                stmt.setInt(3, appId);
-                stmt.addBatch();
-                //insert into tables
-            } else {
+                //check timestamp
+                String date = Utility.parseString(reader.get("timestamp"));
+                if (date == null || !Utility.checkDate(date)) {
+                    err = true;
 
-                errMap.put(index, errorMsg.substring(1));
+                    errorMsg += ",invalid timestamp";
+
+                }
+
+                //check macAdd
+                String macAdd = Utility.parseString(reader.get("mac-address"));
+                if (macAdd == null) {
+                    errorMsg += ",mac add cannot be blank";
+                    err = true;
+                } else if (!Utility.checkHexadecimal(macAdd)) {
+                    errorMsg += ",invalid mac add";
+                    err = true;
+                } else if (!macList.containsKey(macAdd)) {
+                    errorMsg += ",no matching mac address";
+                    err = true;
+                }
+
+                //check appid
+                int appId = Utility.parseInt(reader.get("app-id"));
+                if (appId <= 0) {
+                    errorMsg += ",app id cannot be blank";
+                    err = true;
+                } else if (!appIdList.containsKey(appId)) {
+                    errorMsg += ",invalid app";
+                    err = true;
+                }
+
+                if (!err) {
+
+                    if (duplicate.containsKey(date + macAdd)) {
+                        errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+                    }
+                    duplicate.put(date + macAdd, index);
+                    //add to list
+                    stmt.setString(1, date);
+                    stmt.setString(2, macAdd);
+                    stmt.setInt(3, appId);
+                    stmt.addBatch();
+                    //insert into tables
+                } else {
+
+                    errMap.put(index, errorMsg.substring(1));
+                }
+                index++;
             }
-            index++;
+            updatedRecords = stmt.executeBatch();
+            conn.commit();
+            stmt.close();
+        }catch(SQLException e){
+            
         }
-        int[] updatedRecords = stmt.executeBatch();
-        conn.commit();
-        stmt.close();
         return updatedRecords;
     }
 
-    public int add(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
+    public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException, SQLException {
         int updateCounts = 0;
         try {
-            Connection conn = ConnectionManager.getConnection();
-            conn.setAutoCommit(false);
             int index = 2;
             String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -231,7 +234,7 @@ public class AppUsageDAO {
             }
 
             reader.close();
-            ConnectionManager.close(conn, stmt);
+            stmt.close();
 
         } catch (NullPointerException e) {
 //            e.printStackTrace();
@@ -262,7 +265,8 @@ public class AppUsageDAO {
                 String password = rs.getString(3);
                 String email = rs.getString(4);
                 String gender = rs.getString(5);
-                result.add(new User(macAdd, name, password, email, gender));
+                String cca = rs.getString(6);
+                result.add(new User(macAdd, name, password, email, gender, cca));
             }
             ConnectionManager.close(conn, ps, rs);
 
@@ -418,7 +422,8 @@ public class AppUsageDAO {
                 String password = rs.getString(3);
                 String email = rs.getString(4);
                 String genderRes = rs.getString(5);
-                result.add(new User(macAdd, name, password, email, genderRes));
+                String cca = rs.getString(6);
+                result.add(new User(macAdd, name, password, email, genderRes, cca));
             }
             ConnectionManager.close(conn, ps, rs);
 
