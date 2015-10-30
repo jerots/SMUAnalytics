@@ -35,19 +35,23 @@ public class DeleteLocationAction extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			LocationUsageDAO luDao = new LocationUsageDAO();
 
 			String macAdd = request.getParameter("macadd");
 			String startDate = request.getParameter("startdate");
 			String endDate = request.getParameter("enddate");
+                        String locationId = request.getParameter("locationid");
+                        String semanticPl = request.getParameter("semanticplace");
+                        String errors = null;
 
 			DeleteController cntrl = new DeleteController();
-			int deleted = cntrl.delete(macAdd, startDate, endDate);
+			int deleted = cntrl.delete(macAdd, startDate, endDate, locationId, semanticPl, errors);
 			
 			request.setAttribute("macadd", macAdd);
 			request.setAttribute("startdate", startDate);
 			request.setAttribute("enddate", endDate);
-			
+                        request.setAttribute("locationid", locationId);
+                        request.setAttribute("semanticplace", semanticPl);
+                        request.setAttribute("errors", errors);
 			
 			request.setAttribute("rowsDeleted", "" + deleted);
 			RequestDispatcher rd = request.getRequestDispatcher("delete-location.jsp");

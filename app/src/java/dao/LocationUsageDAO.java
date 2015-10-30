@@ -34,8 +34,10 @@ public class LocationUsageDAO {
 		locationList = new TreeMap<>();
 	}
 
-	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException, SQLException {
-		int index = 2;
+	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException {
+            int[] updateCounts = {};
+            try{
+                int index = 2;
 
 		String sql = "insert into locationusage values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
 				+ "VALUES(locationid);";
@@ -66,7 +68,7 @@ public class LocationUsageDAO {
 				err = true;
 			}
 
-			//check appid
+			//check locid
 			int locationId = Utility.parseInt(reader.get("location-id"));
 			if (locationId <= 0) {
 				errorMsg += ",location id cannot be blank";
@@ -104,17 +106,18 @@ public class LocationUsageDAO {
 		}
 		//insert into tables
 
-		int[] updateCounts = stmt.executeBatch();
+		updateCounts = stmt.executeBatch();
 		conn.commit();
                 stmt.close();
-		return updateCounts;
+            }catch(SQLException e){
+                
+            }
+            return updateCounts;
 	}
 
-	public int add(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-		int updateCounts = 0;
-
-		Connection conn = ConnectionManager.getConnection();
-		conn.setAutoCommit(false);
+	public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
+            int updateCounts = 0;
+            try{
 		int index = 2;
 		String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
@@ -242,109 +245,134 @@ public class LocationUsageDAO {
 			}
 		}
 		reader.close();
-		ConnectionManager.close(conn, stmt);
-
+		stmt.close();
+            }catch(SQLException e){
+                
+            }
 		return updateCounts;
 	}
 
-	public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
-		int[] toReturn = new int[2];
-		int index = 2; //counts the row of the record.
-		int notFound = 0;
-		int found = 0;
-		try {
-                    
-			Connection conn = ConnectionManager.getConnection();
-			conn.setAutoCommit(false);
-			String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-                        reader.readHeaders();
-			while (reader.readRecord()) {
-				//retrieving per row
-				boolean err = false;
+	public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException{
+            int[] toReturn = new int[2];
+            int index = 2; //counts the row of the record.
+            int notFound = 0;
+            int found = 0;
+            try {
+                String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                reader.readHeaders();
+                while (reader.readRecord()) {
+                    //retrieving per row
+                    boolean err = false;
 
-				//check timestamp
-				String date = Utility.parseString(reader.get("timestamp"));
-				if (date == null || !Utility.checkDate(date)) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "invalid timestamp");
-					} else {
-						errMap.put(index, errorMsg + "," + "invalid timestamp");
-					}
-					err = true;
-				}
+                    //check timestamp
+                    String date = Utility.parseString(reader.get("timestamp"));
+                    if (date == null || !Utility.checkDate(date)) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "invalid timestamp");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "invalid timestamp");
+                        }
+                        err = true;
+                    }
 
-				//check macAdd
-				String macAdd = Utility.parseString(reader.get("mac-address"));
-				if (macAdd == null) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "mac address cannot be blank");
-					} else {
-						errMap.put(index, errorMsg + "," + "mac address cannot be blank");
-					}
-					err = true;
-				}
-				if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-					String errorMsg = errMap.get(index);
-					if (errorMsg == null) {
-						errMap.put(index, "invalid mac address");
-					} else {
-						errMap.put(index, errorMsg + "," + "invalid mac address");
-					}
-					err = true;
-				}
+                    //check macAdd
+                    String macAdd = Utility.parseString(reader.get("mac-address"));
+                    if (macAdd == null) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "mac address cannot be blank");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "mac address cannot be blank");
+                        }
+                        err = true;
+                    }
+                    if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
+                        String errorMsg = errMap.get(index);
+                        if (errorMsg == null) {
+                            errMap.put(index, "invalid mac address");
+                        } else {
+                            errMap.put(index, errorMsg + "," + "invalid mac address");
+                        }
+                        err = true;
+                    }
 
-				if (!err) {
-					found++;
-					stmt.setString(1, date);
-					stmt.setString(2, macAdd);
-					stmt.addBatch();
-				}
-				if (stmt != null) {
-					int[] updateCounts = stmt.executeBatch();
-					conn.commit();
-					for (int i : updateCounts) {
-						if (i == 0) {
-							notFound++;
-						}
-					}
-				}
-				index++;
-			}
+                    if (!err) {
+                        found++;
+                        stmt.setString(1, date);
+                        stmt.setString(2, macAdd);
+                        stmt.addBatch();
+                    }
+                    if (stmt != null) {
+                        int[] updateCounts = stmt.executeBatch();
+                        conn.commit();
+                        for (int i : updateCounts) {
+                            if (i == 0) {
+                                notFound++;
+                            }
+                        }
+                    }
+                    index++;
+                }
 
-			reader.close();
-			ConnectionManager.close(conn, stmt);
+                reader.close();
+                ConnectionManager.close(conn, stmt);
 
-		} catch (NullPointerException e) {
+            } catch (NullPointerException e) {
 
-		}
-		toReturn[0] = found - notFound; //Valid Records which have successfully deleted rows in the database
-		toReturn[1] = notFound; //Valid Records which are succesful but have not deleted rows in the database
-		return toReturn;
+            } catch (SQLException e) {
+
+            }
+            toReturn[0] = found - notFound; //Valid Records which have successfully deleted rows in the database
+            toReturn[1] = notFound; //Valid Records which are succesful but have not deleted rows in the database
+            return toReturn;
 	}
 
-	public int delete(String macAdd, String startDate, String endDate) throws IOException, SQLException {
-		int updated = 0;
+	public int[] delete(Connection conn, String macAdd, String startDate, String endDate, int locationId, String semanticPlace) throws IOException, SQLException {
+		int[] updated = {};
+                int stringCount = 2;
 		try {
-			Connection conn = ConnectionManager.getConnection();
-			conn.setAutoCommit(false);
-			String sql = "delete from locationusage where timestamp BETWEEN ? AND ?"
-					+ " AND macaddress = ?;";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setString(1, startDate + " 00:00:00");
-			stmt.setString(2, endDate + " 23:59:59");
-			stmt.setString(3, macAdd);
+			String sql = "DELETE FROM locationusage lu, user u, location l WHERE lu.macaddress = u.macaddress AND lu.locationid = l.locationid"
+                                + "AND timestamp >= ?";
+			
+                        if(endDate != null){
+                            sql += "AND timestamp <= ?";
+                        }
+                        if(locationId <= 0){
+                           sql += "AND lu.locationid = ?";
+                        }
+			if(semanticPlace != null){
+                            sql += "AND semanticplace = ?";
+                        }
+                        if(macAdd != null){
+                            sql += "AND u.macaddress = ?";
+                        }
+                        sql += ";";
+                        PreparedStatement stmt = conn.prepareStatement(sql);
+                        stmt.setString(1, startDate);
+                        if(endDate != null){
+                            stmt.setString(stringCount, endDate);
+                            stringCount++;
+                        }
+                        if(locationId <= 0){
+                            stmt.setInt(stringCount, locationId);
+                            stringCount++;
+                        }
+			if(semanticPlace != null){
+                            stmt.setString(stringCount, semanticPlace);
+                            stringCount++;
+                        }
+                        if(macAdd != null){
+                            stmt.setString(stringCount, macAdd);
+                        }
 			stmt.addBatch();
 
-			updated = stmt.executeUpdate();
+			updated = stmt.executeBatch();
 			conn.commit();
 			ConnectionManager.close(conn, stmt);
 
 		} catch (NullPointerException e) {
-			e.printStackTrace();
 		}
 		return updated;
 	}

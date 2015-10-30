@@ -16,18 +16,26 @@
     </head>
     <body>
 		<%			Admin admin = (Admin) session.getAttribute("admin");
-			String macAdd = (String) request.getAttribute("macadd");
-			String startdate = (String) request.getAttribute("startdate");
-			String enddate = (String) request.getAttribute("enddate");
-			if (macAdd == null) {
-				macAdd = "";
-			}
-			if (startdate == null) {
-				startdate = "";
-			}
-			if (enddate == null) {
-				enddate = "";
-			}
+                                        String macAdd = (String) request.getAttribute("macadd");
+                                        String startdate = (String) request.getAttribute("startdate");
+                                        String enddate = (String) request.getAttribute("enddate");
+                                        String locationId = (String) request.getAttribute("locationid");
+                                        String semanticPlace = (String) request.getAttribute("semanticplace");
+                                        if (macAdd == null) {
+                                                macAdd = "";
+                                        }
+                                        if (startdate == null) {
+                                                startdate = "";
+                                        }
+                                        if (enddate == null) {
+                                                enddate = "";
+                                        }
+                                        if (locationId == null) {
+                                                locationId = "";
+                                        }
+                                        if (semanticPlace == null) {
+                                                semanticPlace = "";
+                                        }
 
 		%>	
 		<!--NAVBAR-->
@@ -72,8 +80,8 @@
 						<br/>
 
 						<div class="form-group">
-							<label for="macadd">MAC Address</label>
-							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>" required>
+							<label for="macadd">Mac Address (Optional)</label>
+							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>">
 						</div>
 						<div class="form-group">
 							<label for="startDate">Start Date</label>
@@ -81,7 +89,15 @@
 						</div>
 						<div class="form-group">
 							<label for="endDate">End Date</label>
-							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="endDate" name="enddate" value="<%=enddate%>" required>
+							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="endDate" name="enddate" value="<%=enddate%>">
+						</div>
+                                                <div class="form-group">
+							<label for="locationid">Location Id (Optional)</label>
+							<input type="number" class="form-control" id="locationid" name="locationid" placeholder = "location id" value="<%=locationId%>">
+						</div>
+                                                <div class="form-group">
+							<label for="semanticplace">Semantic Place (Optional)</label>
+							<input type="text" class="form-control" id="semanticplace" name="semanticplace" placeholder = "semantic place" value="<%=semanticPlace%>">
 						</div>
 
 						<input type="submit" class="btn btn-default" value="Delete location data">
@@ -91,12 +107,14 @@
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
-					<%
+					<%      String errors = (String) request.getAttribute("errors");
 						String rowsDel = (String) request.getAttribute("rowsDeleted");
 						String notDel = (String) request.getAttribute("notDeleted");
 						out.println("<h1>Result</h1>");
-
-						if (rowsDel == null) {
+                                                if(errors != null && errors.length() != 0){
+                                                    out.println("<h1 style='color:red'>Error!</h1>");
+                                                    out.println("<h3 style='color:red'>" + errors + "</h3>");
+                                                } else if (rowsDel == null) {
 							out.println("You have not chosen anything to delete");
 						} else {
 							out.println(rowsDel + " location usage records deleted.<br>");
