@@ -101,6 +101,7 @@
                     </form>
                 </div>
                 <div class="theme-div theme-content" style="width:60%">
+                     <h4><b> App Category</b> </h4> <hr>
                     <%	ArrayList<String> errors = (ArrayList<String>) request.getAttribute("errors");
 
 						//IF THERE IS ERROR, PRINT
