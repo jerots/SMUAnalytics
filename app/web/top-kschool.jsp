@@ -185,25 +185,10 @@
                                                             break;
                                                         }
                                                     }
-                                                    if(Utility.parseInt(duration) != 0 || Utility.parseInt(entry) == values.size()|| values.size() == 6){
+                                                    
                                                         out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
                                                         out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
-                                                    }
-                                                }
-                                                //Check is any school has been left out
-                                                ArrayList<String> missing = Utility.compareSchools(schoolList);
-                                                if(missing.size() != 0 && Utility.parseInt(entry) > values.size()){
-                                                    //if the last school is 0, it is still hanging.
-                                                    for(String sch: missing){
-                                                        if(names.length() != 0){
-                                                            names += ", " + getSchoolName(sch);
-                                                        }else{
-                                                            out.println("<tr><td>" + (values.size() + 1) + "</td>");
-                                                            names = getSchoolName(sch);
-                                                        }
-                                                    }
-                                                    out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
-                                                    out.println("<td>" + 0 + "</td></tr>"); //Prints the app usage time
+                                                    
                                                 }
                                                 if(errors != null && errors.length() >0){
                                                     out.println("<br><br>");

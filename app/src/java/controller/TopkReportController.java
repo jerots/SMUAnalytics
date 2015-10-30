@@ -287,7 +287,7 @@ public class TopkReportController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
             }else{
@@ -296,13 +296,15 @@ public class TopkReportController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
                 //This can only occur when the individual changes
                 if(!currentSchool.equals(school)){
                     //Places the school total for tracking
-                    schoolTime.put(school, schoolTotal);
+					if(schoolTotal != 0){
+						schoolTime.put(school, schoolTotal);
+					}
                     school = currentSchool;
                     schoolTotal = 0;
                 }
@@ -321,7 +323,9 @@ public class TopkReportController {
             if(app.getAppCategory().equals(cat)){ //This means they are of the right category
                 schoolTotal += diff;
             }
-            schoolTime.put(school, schoolTotal);
+			if(schoolTotal != 0){
+				schoolTime.put(school, schoolTotal);
+			}
         }
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
