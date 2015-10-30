@@ -50,6 +50,7 @@ public class BasicAppAction extends HttpServlet {
 			String filter1 = request.getParameter("filter1");
 			String filter2 = request.getParameter("filter2");
 			String filter3 = request.getParameter("filter3");
+			String filter4 = request.getParameter("filter4");
 			
 			
 			//VALIDATION
@@ -86,6 +87,13 @@ public class BasicAppAction extends HttpServlet {
 					demoList.add(filter3);
 				} else {
 					errors.add("Your third filter cannot be the same!");
+				}
+			}
+			if (filter4 != null && filter4.length() > 0) {
+				if (!demoList.contains(filter4)) {
+					demoList.add(filter4);
+				} else {
+					errors.add("Your fourth filter cannot be the same!");
 				}
 			}
 			

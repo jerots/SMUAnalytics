@@ -71,7 +71,7 @@ public class BasicAppController {
 				if (newTime.before(nextDay)) {
 					beforeAppeared = true;
 					//difference between app usage timing
-					long difference = Utility.secondsBetweenDates(oldTime,newTime);
+					long difference = Utility.secondsBetweenDates(oldTime, newTime);
 
 					//If difference less than/equal 2 minutes
 					if (difference <= 2 * 60) {
@@ -95,7 +95,7 @@ public class BasicAppController {
 			}
 
 			if (oldTime.before(nextDay)) {
-				long difference = Utility.secondsBetweenDates(oldTime,nextDay);
+				long difference = Utility.secondsBetweenDates(oldTime, nextDay);
 				if (difference <= 120) {
 					totalSeconds += difference;
 				} else {
@@ -155,19 +155,24 @@ public class BasicAppController {
 		UserDAO userDAO = new UserDAO();
 		AppUsageDAO auDAO = new AppUsageDAO();
 		ArrayList<User> userList = auDAO.retrieveUsers(startDate, endDate);
+		
+		System.out.println(userList.size());
 		Breakdown result = new Breakdown();
 
 		ArrayList<String> schools = userDAO.getSchools();
 		ArrayList<String> years = userDAO.getYears();
 		ArrayList<String> genders = userDAO.getGenders();
+		ArrayList<String> ccas = userDAO.getCCAs();
 
 		ArrayList<String> demo1List = new ArrayList<String>();
 		ArrayList<String> demo2List = new ArrayList<String>();
 		ArrayList<String> demo3List = new ArrayList<String>();
+		ArrayList<String> demo4List = new ArrayList<String>();
 
 		String demo1Type = "";
 		String demo2Type = "";
 		String demo3Type = "";
+		String demo4Type = "";
 
 		int demoCount = demoArr.length;
 		if (demoCount > 0) {
@@ -183,6 +188,10 @@ public class BasicAppController {
 				case "year":
 					demo1List = years;
 					demo1Type = "year";
+					break;
+				case "cca":
+					demo1List = ccas;
+					demo1Type = "cca";
 					break;
 			}
 		}
@@ -200,6 +209,10 @@ public class BasicAppController {
 					demo2List = years;
 					demo2Type = "year";
 					break;
+				case "cca":
+					demo2List = ccas;
+					demo2Type = "cca";
+					break;
 			}
 		}
 		if (demoCount > 2) {
@@ -215,6 +228,30 @@ public class BasicAppController {
 				case "year":
 					demo3List = years;
 					demo3Type = "year";
+					break;
+				case "cca":
+					demo3List = ccas;
+					demo3Type = "cca";
+					break;
+			}
+		}
+		if (demoCount > 3) {
+			switch (demoArr[3]) {
+				case "gender":
+					demo4List = genders;
+					demo4Type = "gender";
+					break;
+				case "school":
+					demo4List = schools;
+					demo4Type = "school";
+					break;
+				case "year":
+					demo4List = years;
+					demo4Type = "year";
+					break;
+				case "cca":
+					demo4List = ccas;
+					demo4Type = "cca";
 					break;
 			}
 		}
@@ -247,12 +284,32 @@ public class BasicAppController {
 					ArrayList<User> demo3UserList = filterDemo(demo3, demo3Type, demo2UserList);
 					demo3Map.put(demo3Type, new Breakdown(demo3));
 					demo3Map.put("count", new Breakdown("" + demo3UserList.size()));
+					Breakdown demo3bd = new Breakdown();
+					demo3Map.put("breakdown", demo3bd);
 
 					demo2bd.addInList(demo3Map);
 
-					//generate report if last demo
-					Breakdown demo3report = generateReport(startDate, endDate, demo3UserList);
-					demo3Map.put("breakdown", demo3report);
+//					
+					//For each demo4
+					for (String demo4 : demo4List) {
+						HashMap<String, Breakdown> demo4Map = new HashMap<String, Breakdown>();
+						ArrayList<User> demo4UserList = filterDemo(demo4, demo4Type, demo3UserList);
+						demo4Map.put(demo4Type, new Breakdown(demo4));
+						demo4Map.put("count", new Breakdown("" + demo4UserList.size()));
+
+						demo3bd.addInList(demo4Map);
+
+						if (demoCount == 4) {
+							Breakdown demo4report = generateReport(startDate, endDate, demo4UserList);
+							demo4Map.put("breakdown", demo4report);
+						}
+					}
+
+					if (demoCount == 3) {
+						//generate report if last demo
+						Breakdown demo3report = generateReport(startDate, endDate, demo3UserList);
+						demo3Map.put("breakdown", demo3report);
+					}
 
 				}
 
@@ -292,6 +349,19 @@ public class BasicAppController {
 
 			}
 		}
+		if (demoCount > 3) {
+			ArrayList<HashMap<String, Breakdown>> secondTier = result.getBreakdown();
+			for (HashMap<String, Breakdown> secondMap : secondTier) {
+				ArrayList<HashMap<String, Breakdown>> thirdTier = secondMap.get("breakdown").getBreakdown();
+				for (HashMap<String, Breakdown> thirdMap : thirdTier) {
+					ArrayList<HashMap<String, Breakdown>> fourthTier = thirdMap.get("breakdown").getBreakdown();
+					for (HashMap<String, Breakdown> fourthMap : fourthTier) {
+						generatePercentage(fourthMap.get("breakdown"));
+					}
+				}
+
+			}
+		}
 
 		return result;
 	}
@@ -300,7 +370,6 @@ public class BasicAppController {
 
 		ArrayList<User> toParse = (ArrayList<User>) userList.clone();
 		Iterator<User> iter = toParse.iterator();
-
 		if (demoType.equals("year")) {
 
 			//Filter by 2011,2012,2013,2014,2015
@@ -333,6 +402,18 @@ public class BasicAppController {
 			}
 			return toParse;
 
+		} else if (demoType.equals("cca")){
+			// Filter by CCAs
+			while (iter.hasNext()){
+				User user = iter.next();
+				if (!user.getCca().toLowerCase().equals(demo.toLowerCase())){
+					iter.remove();
+				}
+			}
+			
+			return toParse;
+			
+			
 		}
 		return userList;
 
@@ -545,7 +626,7 @@ public class BasicAppController {
 
 			//for each user
 			for (User user : userList) {
-				
+
 				//retrieve appUsageList
 				ArrayList<AppUsage> auList = auDAO.retrieveByUserHourly(user.getMacAddress(), startHour, endHour);
 

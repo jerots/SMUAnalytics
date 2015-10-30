@@ -252,7 +252,7 @@ public class AppUsageDAO {
 
             conn = ConnectionManager.getConnection();
 
-            ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender from appusage au, user u where "
+            ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender,cca from appusage au, user u where "
                     + "au.macaddress = u.macaddress "
                     + "AND timestamp >= ? AND timestamp <= ? "
                     + "GROUP BY macaddress");
@@ -272,6 +272,7 @@ public class AppUsageDAO {
             }
 
         } catch (SQLException e) {
+			e.printStackTrace();
         }finally {
             ConnectionManager.close(conn, ps, rs);
         }

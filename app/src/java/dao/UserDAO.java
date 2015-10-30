@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -477,5 +478,37 @@ public class UserDAO {
 		}
 		
 		return null;
+	}
+	
+	public ArrayList<String> getCCAs(){
+		ArrayList<String> ccas = new ArrayList<String>();
+		String sql = "select cca from user group by cca;";
+		
+		Connection conn = null;
+		Statement s = null;
+		ResultSet rs = null;
+		try {
+			conn = ConnectionManager.getConnection();
+			s = conn.prepareStatement(sql);
+			
+			
+			rs = s.executeQuery(sql);
+			
+			while (rs.next()) {
+				
+				ccas.add(rs.getString(1));
+			}
+			
+		} catch (SQLException e) {
+			
+		} finally {
+			ConnectionManager.close(conn, s, rs);
+			
+		}
+		
+		return ccas;
+		
+		
+		
 	}
 }

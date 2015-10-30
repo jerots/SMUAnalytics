@@ -81,7 +81,7 @@ public class TopKAction extends HttpServlet {
 
 		//Finally, makes sure the start date if after to add error, as if it is before or similar, no error
 		if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
-			errors += ", end date is after start date";
+			errors += ", start date is after end date";
 		}
 
 		//All the values are from the same select place. It only changes based on the report selected
