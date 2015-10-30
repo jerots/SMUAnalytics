@@ -150,7 +150,7 @@
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
-                                    <h4><b> Top-K Report</b> </h4> <hr>
+                                    <h4><b> Top-K School Report</b> </h4> <hr>
 					<%  
                                             ArrayList<HashMap<String, String>> values = (ArrayList<HashMap<String, String>>) request.getAttribute("catvalues");
                                             String error = (String) request.getAttribute("error");
