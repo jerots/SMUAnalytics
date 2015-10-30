@@ -25,22 +25,22 @@ import java.util.TreeMap;
  * @author ASUS-PC
  */
 public class LocationUsageDAO {
-
+	
 	private TreeMap<String, LocationUsage> locationList;
 	private TreeMap<String, Integer> duplicate;
-
+	
 	public LocationUsageDAO() {
 		duplicate = new TreeMap<>();
 		locationList = new TreeMap<>();
 	}
-
+	
 	public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException, SQLException {
 		int index = 2;
-
+		
 		String sql = "insert into locationusage values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE locationid = "
 				+ "VALUES(locationid);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-                reader.readHeaders();
+		reader.readHeaders();
 		while (reader.readRecord()) {
 			//retrieving per row
 			boolean err = false;
@@ -61,7 +61,7 @@ public class LocationUsageDAO {
 				errorMsg += ",mac address cannot be blank";
 				err = true;
 			} else if (!Utility.checkHexadecimal(macAdd)) {
-
+				
 				errorMsg += ",invalid mac address";
 				err = true;
 			}
@@ -72,19 +72,19 @@ public class LocationUsageDAO {
 				errorMsg += ",location id cannot be blank";
 				err = true;
 			} else if (!locationIdList.containsKey(locationId)) {
-
+				
 				errorMsg += ",invalid location";
 				err = true;
-
+				
 			}
-
+			
 			if (!err) {
 				String key = date + macAdd;
 				Integer exisMac = duplicate.get(key);
 				if (exisMac != null) {
-
+					
 					errMap.put(index, "duplicate row " + exisMac);
-
+					
 				}
 				duplicate.put(key, index);
 				//add to list
@@ -93,7 +93,7 @@ public class LocationUsageDAO {
 				stmt.setInt(3, locationId);
 				stmt.addBatch();
 			} else {
-
+				
 				errMap.put(index, errorMsg.substring(1));
 			}
 			index++;
@@ -106,19 +106,19 @@ public class LocationUsageDAO {
 
 		int[] updateCounts = stmt.executeBatch();
 		conn.commit();
-                stmt.close();
+		stmt.close();
 		return updateCounts;
 	}
-
+	
 	public int add(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int updateCounts = 0;
-
+		
 		Connection conn = ConnectionManager.getConnection();
 		conn.setAutoCommit(false);
 		int index = 2;
 		String sql = "insert into locationusage (timestamp, macaddress, locationid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?);";
 		PreparedStatement stmt = conn.prepareStatement(sql);
-                reader.readHeaders();
+		reader.readHeaders();
 		while (reader.readRecord()) {
 			//retrieving per row
 			boolean err = false;
@@ -168,7 +168,7 @@ public class LocationUsageDAO {
 
 				//IF LOCATION ID NOT BLANK
 			} else {
-
+				
 				String query = "select locationid from location where locationid = ?;";
 				PreparedStatement pStmt = conn.prepareStatement(query);
 				pStmt.setInt(1, locationId);
@@ -201,12 +201,12 @@ public class LocationUsageDAO {
 
 			//row number increased
 			index++;
-
+			
 		}
 
 		//CHECK FOR DUPLICATES IN DATABASE
 		ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>(locationList.values());
-
+		
 		try {
 			for (LocationUsage loc : locList) {
 				stmt.setString(1, loc.getTimestamp());
@@ -223,7 +223,7 @@ public class LocationUsageDAO {
 			//CATCH WHEN THERE IS DUPLICATE
 		} catch (BatchUpdateException e) {
 			int[] updatedArr = e.getUpdateCounts();
-
+			
 			for (int i = 0; i < updatedArr.length; i++) {
 				if (updatedArr[i] == Statement.EXECUTE_FAILED) {
 					// This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
@@ -236,29 +236,29 @@ public class LocationUsageDAO {
 					}
 				}
 				if (updatedArr[i] >= 0) {
-
+					
 					updateCounts += updatedArr[i];
 				}
 			}
 		}
 		reader.close();
 		ConnectionManager.close(conn, stmt);
-
+		
 		return updateCounts;
 	}
-
+	
 	public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap) throws IOException, SQLException {
 		int[] toReturn = new int[2];
 		int index = 2; //counts the row of the record.
 		int notFound = 0;
 		int found = 0;
 		try {
-                    
+			
 			Connection conn = ConnectionManager.getConnection();
 			conn.setAutoCommit(false);
 			String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
 			PreparedStatement stmt = conn.prepareStatement(sql);
-                        reader.readHeaders();
+			reader.readHeaders();
 			while (reader.readRecord()) {
 				//retrieving per row
 				boolean err = false;
@@ -295,7 +295,7 @@ public class LocationUsageDAO {
 					}
 					err = true;
 				}
-
+				
 				if (!err) {
 					found++;
 					stmt.setString(1, date);
@@ -313,44 +313,48 @@ public class LocationUsageDAO {
 				}
 				index++;
 			}
-
+			
 			reader.close();
 			ConnectionManager.close(conn, stmt);
-
+			
 		} catch (NullPointerException e) {
-
+			
 		}
 		toReturn[0] = found - notFound; //Valid Records which have successfully deleted rows in the database
 		toReturn[1] = notFound; //Valid Records which are succesful but have not deleted rows in the database
 		return toReturn;
 	}
-
+	
 	public int delete(String macAdd, String startDate, String endDate) throws IOException, SQLException {
 		int updated = 0;
+		
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			conn.setAutoCommit(false);
 			String sql = "delete from locationusage where timestamp BETWEEN ? AND ?"
 					+ " AND macaddress = ?;";
-			PreparedStatement stmt = conn.prepareStatement(sql);
-
-			stmt.setString(1, startDate + " 00:00:00");
-			stmt.setString(2, endDate + " 23:59:59");
-			stmt.setString(3, macAdd);
-			stmt.addBatch();
-
-			updated = stmt.executeUpdate();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, startDate + " 00:00:00");
+			ps.setString(2, endDate + " 23:59:59");
+			ps.setString(3, macAdd);
+			ps.addBatch();
+			
+			updated = ps.executeUpdate();
 			conn.commit();
-			ConnectionManager.close(conn, stmt);
-
+			ConnectionManager.close(conn, ps);
+			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
 		return updated;
 	}
-
+	
 	public ArrayList<LocationUsage> retrieve(java.util.Date date, String loc) {
 		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
 			String sql = "SELECT timestamp, macaddress, lu.locationid \n"
 					+ "FROM (\n"
@@ -364,37 +368,43 @@ public class LocationUsageDAO {
 					+ "lu.locationid = l.locationid\n"
 					+ "AND semanticplace = ? \n"
 					+ ";";
-
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
+			
+			 conn = ConnectionManager.getConnection();
+			 ps = conn.prepareStatement(sql);
+			
 			Date before = new java.sql.Date(date.getTime() - 900000);
 			Date after = new java.sql.Date(date.getTime());
 			ps.setString(1, Utility.formatDate(before)); //15 minutes before
 			ps.setString(2, Utility.formatDate(after));
 			ps.setString(3, loc);
-
-			ResultSet rs = ps.executeQuery();
-
+			
+			 rs = ps.executeQuery();
+			
 			while (rs.next()) {
 				Timestamp timestamp = rs.getTimestamp(1);
 				String macAddress = rs.getString(2);
 				String locationId = rs.getString(3);
-
+				
 				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, Integer.parseInt(locationId));
 				result.add(curr);
-
+				
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-
+		
 		return result;
 	}
-
-	public HashMap<String,LocationUsage> retrieveByFloor(java.util.Date date, String floor) {
-		HashMap<String,LocationUsage> result = new HashMap<String,LocationUsage>();
+	
+	public HashMap<String, LocationUsage> retrieveByFloor(java.util.Date date, String floor) {
+		HashMap<String, LocationUsage> result = new HashMap<String, LocationUsage>();
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
 		try {
 			String sql = "select * \n"
 					+ "    from appusage au, locationusage lu,location l \n"
@@ -404,10 +414,10 @@ public class LocationUsageDAO {
 					+ "    AND lu.timestamp >= ? and lu.timestamp <= ?\n"
 					+ "    and au.timestamp >= ? and au.timestamp <= ?\n"
 					+ "    order by lu.macaddress, lu.timestamp;";
-
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
+			
+			 conn = ConnectionManager.getConnection();
+			 ps = conn.prepareStatement(sql);
+			
 			Date before = new java.sql.Date(date.getTime() - (15 * 60 * 1000));
 			Date after = new java.sql.Date(date.getTime());
 			ps.setString(1, "SMUSIS" + floor + "%");
@@ -416,9 +426,8 @@ public class LocationUsageDAO {
 			ps.setString(4, Utility.formatDate(before)); //15 minutes before
 			ps.setString(5, Utility.formatDate(after));
 			
-
-			ResultSet rs = ps.executeQuery();
-
+			 rs = ps.executeQuery();
+			
 			while (rs.next()) {
 				Timestamp timestamp = rs.getTimestamp(4);
 				String macAddress = rs.getString(5);
@@ -426,55 +435,62 @@ public class LocationUsageDAO {
 				String semanticplace = rs.getString(8);
 				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, locationId, new Location(locationId, semanticplace));
 				result.put(macAddress, curr);
-
+				
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
-			e.printStackTrace();
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-
+		
 		return result;
 	}
-
+	
 	public ArrayList<LocationUsage> retrieveByUser(String macAdd, java.util.Date startDate, java.util.Date endDate) {
-
+		
 		ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
-
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
 			String sql = " select * from locationusage\n"
 					+ " WHERE macaddress = ? \n"
 					+ " AND timestamp >= ? AND timestamp <= ? \n"
 					+ " ORDER BY timestamp;";
-
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
+			
+			conn = ConnectionManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			
 			ps.setString(1, macAdd);
 			ps.setString(2, new java.sql.Timestamp(startDate.getTime()).toString());
 			ps.setString(3, new java.sql.Timestamp(endDate.getTime()).toString());
-
-			ResultSet rs = ps.executeQuery();
-
+			
+			rs = ps.executeQuery();
+			
 			while (rs.next()) {
 				Timestamp timestamp = rs.getTimestamp(1);
 				String macAddress = rs.getString(2);
 				String locationId = rs.getString(3);
-
+				
 				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, Integer.parseInt(locationId));
 				result.add(curr);
-
+				
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-
+		
 		return result;
-
+		
 	}
-
+	
 	public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress, ArrayList<LocationUsage> totalAUList) {
-
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
 			String sql = "select * from locationusage\n"
 					+ " WHERE timestamp >= ? AND timestamp < ? \n"
@@ -482,31 +498,33 @@ public class LocationUsageDAO {
 					+ " AND macaddress != ? \n"
 					+ " ORDER BY timestamp\n"
 					+ " ;";
-
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
+			
+			conn = ConnectionManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			
 			ps.setString(1, new java.sql.Timestamp(startInLocation.getTime()).toString());
 			ps.setString(2, new java.sql.Timestamp(endInLocation.getTime()).toString());
 			ps.setInt(3, prevLocationId);
 			ps.setString(4, macaddress);
-
-			ResultSet rs = ps.executeQuery();
-
+			
+			rs = ps.executeQuery();
+			
 			while (rs.next()) {
 				Timestamp timestamp = rs.getTimestamp(1);
 				String macAddress = rs.getString(2);
 				String locationId = rs.getString(3);
-
+				
 				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, Integer.parseInt(locationId));
 				totalAUList.add(curr);
-
+				
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-
+		
 	}
-
+	
 }

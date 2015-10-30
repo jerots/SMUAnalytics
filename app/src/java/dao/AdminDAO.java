@@ -17,63 +17,63 @@ import java.sql.SQLException;
  */
 public class AdminDAO {
 	
-	
-	
-	
-	public Admin retrieve(String username, String password){
+	public Admin retrieve(String username, String password) {
 		
 		String sql = "SELECT * FROM admin WHERE username=? AND password=?";
-		
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
+			conn = ConnectionManager.getConnection();
+			ps = conn.prepareStatement(sql);
 			
 			ps.setString(1, username);
 			ps.setString(2, password);
 			
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 			
-			while (rs.next()){
+			while (rs.next()) {
 				
-				return new Admin(rs.getString(1),rs.getString(2));
+				return new Admin(rs.getString(1), rs.getString(2));
 				
 			}
 			
-			ConnectionManager.close(conn,ps);
+			ConnectionManager.close(conn, ps);
 			
-		} catch (SQLException e){
+		} catch (SQLException e) {
 			
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-		
 		
 		return null;
 	}
-        
-        
-        public Admin retrieve(String username){
+	
+	public Admin retrieve(String username) {
 		
 		String sql = "SELECT * FROM admin WHERE username=?";
-		
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
-			Connection conn = ConnectionManager.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
+			conn = ConnectionManager.getConnection();
+			ps = conn.prepareStatement(sql);
 			
 			ps.setString(1, username);
 			
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 			
-			while (rs.next()){
+			while (rs.next()) {
 				
-				return new Admin(rs.getString(1),rs.getString(2));
+				return new Admin(rs.getString(1), rs.getString(2));
 				
 			}
 			
-			ConnectionManager.close(conn,ps);
+		} catch (SQLException e) {
 			
-		} catch (SQLException e){
-			
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
 		}
-		
 		
 		return null;
 	}

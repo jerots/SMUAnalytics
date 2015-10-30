@@ -80,7 +80,7 @@ public class Authenticate extends HttpServlet {
 //			out.println(user);
 			//IF ALL FAIL.
 			result.addProperty("status", "error");
-			result.addProperty("", "invalid username/password");
+			result.addProperty("messages", "invalid username/password");
 			out.println(gson.toJson(result));
 			
 
