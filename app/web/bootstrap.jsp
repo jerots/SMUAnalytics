@@ -243,7 +243,7 @@
                     <P>
                         <%---locationUsageDelete---%>
 
-						<%							int locationDeleteCount = recordMap.get("location-delete.csv");
+						<%		int locationDeleteCount = recordMap.get("location-delete.csv");
 								if (locationDeleteCount > 0) {
 									out.println("<h4><b> LocationUsageDelete</b> </h4><hr>");
 									out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");

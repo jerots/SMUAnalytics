@@ -21,20 +21,28 @@
                                         String enddate = (String) request.getAttribute("enddate");
                                         String locationId = (String) request.getAttribute("locationid");
                                         String semanticPlace = (String) request.getAttribute("semanticplace");
+                                        String startTime = (String) request.getAttribute("starttime");
+                                        String endTime = (String) request.getAttribute("endtime");
                                         if (macAdd == null) {
-                                                macAdd = "";
+                                            macAdd = "";
                                         }
                                         if (startdate == null) {
-                                                startdate = "";
+                                            startdate = "";
                                         }
                                         if (enddate == null) {
-                                                enddate = "";
+                                            enddate = "";
                                         }
                                         if (locationId == null) {
-                                                locationId = "";
+                                            locationId = "";
                                         }
                                         if (semanticPlace == null) {
-                                                semanticPlace = "";
+                                            semanticPlace = "";
+                                        }
+                                        if (startTime == null) {
+                                            startTime = "";
+                                        }
+                                        if (endTime == null) {
+                                            endTime = "";
                                         }
 
 		%>	
@@ -84,12 +92,20 @@
 							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>">
 						</div>
 						<div class="form-group">
-							<label for="startDate">Start Date</label>
-							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startDate" name="startdate" value="<%=startdate%>" required>
+							<label for="startdate">Start Date</label>
+							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
+						</div>
+                                                <div class="form-group">
+							<label for="starttime">Start Time (Optional)</label>
+							<input type="time" class="form-control" id="starttime" name="starttime" placeholder="HH:MM" value="<%=startTime%>">
 						</div>
 						<div class="form-group">
-							<label for="endDate">End Date</label>
-							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="endDate" name="enddate" value="<%=enddate%>">
+							<label for="enddate">End Date (Optional)</label>
+							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="enddate" name="enddate" value="<%=enddate%>">
+						</div>
+                                                <div class="form-group">
+							<label for="endtime">End Time (Optional)</label>
+							<input type="time" class="form-control" id="endtime" name="endtime" placeholder="HH:MM" value="<%=endTime%>">
 						</div>
                                                 <div class="form-group">
 							<label for="locationid">Location Id (Optional)</label>
@@ -109,7 +125,6 @@
 				<div class="theme-div theme-content" style="width:60%">
 					<%      String errors = (String) request.getAttribute("errors");
 						String rowsDel = (String) request.getAttribute("rowsDeleted");
-						String notDel = (String) request.getAttribute("notDeleted");
 						out.println("<h1>Result</h1>");
                                                 if(errors != null && errors.length() != 0){
                                                     out.println("<h1 style='color:red'>Error!</h1>");
@@ -118,7 +133,6 @@
 							out.println("You have not chosen anything to delete");
 						} else {
 							out.println(rowsDel + " location usage records deleted.<br>");
-
 						}
 					%>
 				</div>

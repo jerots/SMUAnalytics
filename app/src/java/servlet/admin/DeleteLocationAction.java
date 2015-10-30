@@ -6,9 +6,8 @@
 package servlet.admin;
 
 import controller.DeleteController;
-import dao.LocationUsageDAO;
+import dao.Utility;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -36,21 +35,25 @@ public class DeleteLocationAction extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 
-			String macAdd = request.getParameter("macadd");
-			String startDate = request.getParameter("startdate");
-			String endDate = request.getParameter("enddate");
-                        String locationId = request.getParameter("locationid");
-                        String semanticPl = request.getParameter("semanticplace");
-                        String errors = null;
+			String macAdd = Utility.parseString(request.getParameter("macadd"));
+			String startDate = Utility.parseString(request.getParameter("startdate"));
+			String endDate = Utility.parseString(request.getParameter("enddate"));
+                        String locationId = Utility.parseString(request.getParameter("locationid"));
+                        String semanticPl = Utility.parseString(request.getParameter("semanticplace"));
+                        String startTime = Utility.parseString(request.getParameter("starttime"));
+                        String endTime = Utility.parseString(request.getParameter("endtime"));
+                        String errors = "";
 
 			DeleteController cntrl = new DeleteController();
-			int deleted = cntrl.delete(macAdd, startDate, endDate, locationId, semanticPl, errors);
+			int deleted = cntrl.delete(macAdd, startDate, endDate, startTime, endTime, locationId, semanticPl, errors);
 			
 			request.setAttribute("macadd", macAdd);
 			request.setAttribute("startdate", startDate);
 			request.setAttribute("enddate", endDate);
                         request.setAttribute("locationid", locationId);
                         request.setAttribute("semanticplace", semanticPl);
+                        request.setAttribute("starttime", startTime);
+                        request.setAttribute("endtime", endTime);
                         request.setAttribute("errors", errors);
 			
 			request.setAttribute("rowsDeleted", "" + deleted);

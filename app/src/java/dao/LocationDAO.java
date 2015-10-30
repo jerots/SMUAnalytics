@@ -147,7 +147,10 @@ public class LocationDAO {
 			ps.setInt(1, locationId);
 			ResultSet rs = ps.executeQuery();
 			
-			return rs.next();
+			boolean check = rs.next();
+                        ps.close();
+                        rs.close();
+                        return check;
 			
 		} catch (SQLException e) {
 		}

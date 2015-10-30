@@ -22,7 +22,7 @@ import java.util.Date;
  */
 public class DeleteController {
   
-    public int delete(String macAdd, String startDate, String endDate, String locId, String semanticPl, String errors) throws SQLException, IOException {
+    public int delete(String macAdd, String startDate, String endDate, String startTime, String endTime, String locId, String semanticPl, String errors) throws SQLException, IOException {
         int deleted = 0;
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
@@ -31,49 +31,62 @@ public class DeleteController {
         
         //Starts the checking here
         //START DATE VALIDATION
-        Date dateFormattedStart = null;
+        Date dateFormattedStart = null;        
         if (startDate == null) {
             errors += ", missing startdate";
             
         } else if (startDate.length() == 0) {
             errors += ", blank startdate";
-            
-        } else {
-            if(startDate.length() == 10){
-                startDate += " 00:00:00";
-            }else{
-                startDate += ":00";
-            }
-            if ((startDate.length() != 19 || !Utility.checkDate(startDate))) { // if they are of the wrong length
+            dateFormattedStart = Utility.parseDate(startDate);
+            if(startDate.length() != 10 || dateFormattedStart == null){
                 errors += ", invalid startdate";
             }else{
-                dateFormattedStart = Utility.parseDate(startDate);
                 startDate = Utility.formatDate(dateFormattedStart);
+                if(startDate == null || !Utility.checkOnlyDate(startDate)){
+                    errors += ", invalid startdate";
+                }
             }
+        } 
+        
+        if(startTime != null && startTime.length() != 0){
+            startDate += " " + startTime + ":00";
+            if ((startDate.length() != 19 || !Utility.checkDate(startDate))) { // if they are of the wrong length
+                errors += ", invalid starttime";
+            }
+        }else{
+            startDate += " 00:00:00";
+        }
+        
+        //END DATE VALIDATION
+        Date dateFormattedEnd = null;
+        if (endDate == null) {
+            errors += ", missing enddate";
+        } else if (endDate.length() == 0) {
+            errors += ", blank enddate";
+            dateFormattedEnd = Utility.parseDate(endDate);
+            if(endDate.length() != 10 || dateFormattedEnd == null){
+                errors += ", invalid enddate";
+            }else{
+                endDate = Utility.formatDate(dateFormattedEnd);
+                if(endDate == null || !Utility.checkOnlyDate(endDate)){
+                    errors += ", invalid enddate";
+                }
+            }
+        } 
+        
+        if(endTime != null && endTime.length() != 0){
+            endDate += " " + endTime + ":00";
+            if ((endDate.length() != 19 || !Utility.checkDate(endDate))) { // if they are of the wrong length
+                errors += ", invalid endtime";
+            }
+        }else{
+            endDate += " 00:00:00";
+        }
+        
+        if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+            errors += ", invalid starttime";
         }
 
-        //END DATE VALIDATION
-        if(endDate != null && endDate.length() != 0){
-            if (endDate.length() == 0) {
-                errors += ", blank enddate";
-                
-            } else {
-                if(endDate.length() == 10){
-                    endDate += " 00:00:00";
-                }else{
-                    endDate += ":00";
-                }
-                if ((endDate.length() != 19 || !Utility.checkDate(endDate))) { // if they are of the wrong length or wrong checkDate
-                    errors += ", invalid enddate";
-                }else{
-                    Date dateFormattedEnd = Utility.parseDate(endDate);
-                    if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
-                        errors += ", invalid startdate";
-                    }
-                    endDate = Utility.formatDate(dateFormattedEnd);
-                }
-            }
-        }
         //MACADDRESS VALIDATION - This one COULD be input as the login person is admin, and therefore not retrieve the user's own macadd like activeness
         if(macAdd != null && macAdd.length() != 0){
             if (!Utility.checkHexadecimal(macAdd)) {

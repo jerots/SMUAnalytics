@@ -267,7 +267,7 @@ public class LocationUsageDAO {
 
 				//check timestamp
 				String date = Utility.parseString(reader.get("timestamp"));
-				if (date == null || !Utility.checkDate(date)) {
+				if (date == null || !Utility.checkDate(date)){
 					String errorMsg = errMap.get(index);
 					if (errorMsg == null) {
 						errMap.put(index, "invalid timestamp");
@@ -337,16 +337,16 @@ public class LocationUsageDAO {
 					+ "AND timestamp >= ?";
 			
 			if (endDate != null) {
-				sql += "AND timestamp <= ?";
+				sql += " AND timestamp < ?";
 			}
 			if (locationId <= 0) {
-				sql += "AND lu.locationid = ?";
+				sql += " AND lu.locationid = ?";
 			}
 			if (semanticPlace != null) {
-				sql += "AND semanticplace = ?";
+				sql += " AND semanticplace = ?";
 			}
 			if (macAdd != null) {
-				sql += "AND u.macaddress = ?";
+				sql += " AND u.macaddress = ?";
 			}
 			sql += ";";
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -465,7 +465,6 @@ public class LocationUsageDAO {
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -505,7 +504,6 @@ public class LocationUsageDAO {
 			}
 			ConnectionManager.close(conn, ps, rs);
 		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
