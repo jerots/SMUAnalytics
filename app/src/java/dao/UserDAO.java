@@ -18,50 +18,47 @@ import java.util.TreeMap;
 
 public class UserDAO {
 
+    private ArrayList<String> schools;
+    private ArrayList<String> years;
+    private ArrayList<String> genders;
 
-	private ArrayList<String> schools;
-	private ArrayList<String> years;
-	private ArrayList<String> genders;
-	
     public UserDAO() {
-		schools = new ArrayList<String>();
-		schools.add("business");
-		schools.add("accountancy");
-		schools.add("sis");
-		schools.add("economics");
-		schools.add("law");
-		schools.add("socsc");
-				
-		years = new ArrayList<String>();
-		years.add("2011");
-		years.add("2012");
-		years.add("2013");
-		years.add("2014");
-		years.add("2015");
-		
-		genders = new ArrayList<String>();
-		genders.add("M");
-		genders.add("F");
+        schools = new ArrayList<String>();
+        schools.add("business");
+        schools.add("accountancy");
+        schools.add("sis");
+        schools.add("economics");
+        schools.add("law");
+        schools.add("socsc");
+
+        years = new ArrayList<String>();
+        years.add("2011");
+        years.add("2012");
+        years.add("2013");
+        years.add("2014");
+        years.add("2015");
+
+        genders = new ArrayList<String>();
+        genders.add("M");
+        genders.add("F");
     }
 
-	public ArrayList<String> getSchools() {
-		return schools;
-	}
+    public ArrayList<String> getSchools() {
+        return schools;
+    }
 
-	public ArrayList<String> getYears() {
-		return years;
-	}
-	
-	public ArrayList<String> getGenders(){
-		return genders;
-	}
-	
-	
+    public ArrayList<String> getYears() {
+        return years;
+    }
+
+    public ArrayList<String> getGenders() {
+        return genders;
+    }
 
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
-    public int[] insert(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String,String> macList) throws IOException {
+    public int[] insert(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String, String> macList) throws IOException {
         int[] updateCounts = {};
-        try{
+        try {
             String sql = "insert into user values(?,?,?,?,?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
@@ -160,17 +157,17 @@ public class UserDAO {
                 }
 
                 String cca = Utility.parseString(reader.get("cca"));
-                if(cca == null){
-                    if(errorMsg == null){
+                if (cca == null) {
+                    if (errorMsg == null) {
                         userMap.put(index, "blank cca");
-                    }else{
+                    } else {
                         userMap.put(index, errorMsg + "," + "cca cannot be blank");
                     }
                     err = true;
-                }else if(cca.length() > 63){
-                    if(errorMsg == null){
+                } else if (cca.length() > 63) {
+                    if (errorMsg == null) {
                         userMap.put(index, "cca record too long");
-                    }else{
+                    } else {
                         userMap.put(index, errorMsg + "," + "cca record too long");
                     }
                     err = true;
@@ -193,15 +190,15 @@ public class UserDAO {
             updateCounts = stmt.executeBatch();
             conn.commit();
             stmt.close();
-        }catch(SQLException e){
-            
+        } catch (SQLException e) {
+
         }
         return updateCounts;
     }
-	
+
     public int[] add(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn) throws IOException {
         int[] updateCounts = {};
-        try{
+        try {
             String sql = "insert into user values(?,?,?,?,?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
@@ -301,17 +298,17 @@ public class UserDAO {
                 }
 
                 String cca = Utility.parseString(reader.get("cca"));
-                if(cca == null){
-                    if(errorMsg == null){
+                if (cca == null) {
+                    if (errorMsg == null) {
                         userMap.put(index, "cca cannot be blank");
-                    }else{
+                    } else {
                         userMap.put(index, errorMsg + "," + "cca cannot be blank");
                     }
                     err = true;
-                }else if(cca.length() > 63){
-                    if(errorMsg == null){
+                } else if (cca.length() > 63) {
+                    if (errorMsg == null) {
                         userMap.put(index, "cca record too long");
-                    }else{
+                    } else {
                         userMap.put(index, errorMsg + "," + "cca record too long");
                     }
                     err = true;
@@ -336,8 +333,8 @@ public class UserDAO {
             stmt.close();
             //closing
             reader.close();
-        }catch(SQLException e){
-            
+        } catch (SQLException e) {
+
         }
         return updateCounts;
     }
@@ -391,7 +388,7 @@ public class UserDAO {
 
         return null;
     }
-	
+
     public User retrieve(String username) {
         String sql = "SELECT * FROM user WHERE email like ?";
 
@@ -415,8 +412,8 @@ public class UserDAO {
 
         return null;
     }
-    
-    public boolean checkMacAdd(Connection conn, String macAdd){
+
+    public boolean checkMacAdd(Connection conn, String macAdd) {
         String sql = "SELECT macaddress FROM user WHERE macaddress = ?";
 
         try {
@@ -425,14 +422,43 @@ public class UserDAO {
             ps.setString(1, macAdd);
 
             ResultSet rs = ps.executeQuery();
-            
+
             ps.close();
             return rs.next();
         } catch (SQLException e) {
-            
+
         }
-        
+
         return false;
     }
-	
+
+    public User retrieveByMac(String macaddress) {
+        String sql = "SELECT * FROM user WHERE macaddress = ?";
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = ConnectionManager.getConnection();
+            ps = conn.prepareStatement(sql);
+
+            ps.setString(1, macaddress);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                return new User(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+
+            }
+
+        } catch (SQLException e) {
+
+        } finally {
+            ConnectionManager.close(conn, ps, rs);
+
+        }
+
+        return null;
+    }
 }
