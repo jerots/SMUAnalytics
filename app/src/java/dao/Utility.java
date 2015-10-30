@@ -50,30 +50,26 @@ public final class Utility {
     
     public static String formatOnlyDate(Date date){
         if(date != null){
-            String str = sdf.format(date);
-            if(checkOnlyDate(str)){
-                return str;
-            }
+            return sdf.format(date);
         }
         return null;
     }
     
     public static String formatDate(Date date){
         if(date != null){
-            String str = df.format(date);
-            if(checkDate(str)){
-                return str;
-            }
+            return df.format(date);
         }
         return null;
     }
     
     public static boolean checkDate(String str){
-        return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})\\s([0-9]{2}):([0-9]{2}):([0-9]{2})");
+        return str.matches("((((19[7-9]\\d)|([2-9]\\d{3}))-(0[13578]|1[02])-31)|(((19[7-9]\\d)|([2-9]\\d{3}))-(0[13456789]|1[012])-(0[1-9]|[12]\\d|30))|"
+                + "(((19[7-9]\\d)|([2-9]\\d{3}))-02-(0[1-9]|1\\d|2[0-8]))|((19([79][26])|(8[048]))|([2-9]\\d(([13579][26])|([24680][048])))-02-29))");
     }
     
-    public static boolean checkOnlyDate(String str){
-        return str.matches("([0-9]{4})-([0-9]{2})-([0-9]{2})");
+    public static boolean checkDelDate(String str){
+        return str.matches("((((19[7-9]\\d)|([2-9]\\d{3}))-(0[13578]|1[02])-31)|(((19[7-9]\\d)|([2-9]\\d{3}))-(0[13456789]|1[012])-(0[1-9]|[12]\\d|30))|"
+                + "(((19[7-9]\\d)|([2-9]\\d{3}))-02-(0[1-9]|1\\d|2[0-8]))|((19([79][26])|(8[048]))|([2-9]\\d(([13579][26])|([24680][048])))-02-29))");
     }
 
     public static int parseInt(String str) {
@@ -131,7 +127,6 @@ public final class Utility {
     
      public static boolean checkCategory(String chk) {
         String check = parseString(chk);
-        System.out.println(check);
         if(check != null){
             String str = check.substring(0, 1).toUpperCase() + check.substring(1).toLowerCase();
             return categories.contains(str);
