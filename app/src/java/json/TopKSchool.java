@@ -55,6 +55,9 @@ public class TopKSchool extends HttpServlet {
             String startdate = request.getParameter("startdate");
             String enddate = request.getParameter("enddate");
  
+			Date dateFormattedStart = null;
+			Date dateFormattedEnd = null;
+			
             //TOKEN VALIDATION
             if (token == null) {
                 errors.add("missing token");
@@ -81,8 +84,6 @@ public class TopKSchool extends HttpServlet {
             //This is the choice selection of which of the 3 option the user wants to be processed.
             String selection = request.getParameter("category");
             //Gets the start and end dates as necessary.
-            String startDate = request.getParameter("startdate");
-            String endDate = request.getParameter("endDate");
             output.addProperty("status", "success");
              
             //START DATE VALIDATION
@@ -94,8 +95,8 @@ public class TopKSchool extends HttpServlet {
                 if (startdate.length() != 10) {
                     errors.add("invalid startdate");
                 } else {
-                    Date dateFormatted = Utility.parseOnlyDate(startdate);
-                    if (dateFormatted == null || Utility.checkOnlyDate(startdate)) {
+                    dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
+                    if (dateFormattedStart == null || Utility.checkOnlyDate(startdate)) {
                         errors.add("invalid startdate");
                     }
                 }
@@ -110,8 +111,8 @@ public class TopKSchool extends HttpServlet {
                 if (enddate.length() != 10) {
                     errors.add("invalid enddate");
                 } else {
-                    Date dateFormatted = Utility.parseOnlyDate(startdate);
-                    if (dateFormatted == null || Utility.checkOnlyDate(enddate)) {
+                    dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
+                    if (dateFormattedEnd == null || Utility.checkOnlyDate(enddate)) {
                         errors.add("invalid enddate");
                     }
                 }
@@ -145,12 +146,12 @@ public class TopKSchool extends HttpServlet {
             }
              
             TopkReportController ctrl = new TopkReportController();
-             
+            
             //This error string is just passed in, but is meant for the UI and not the JSON.
             String error = "";
             //This parameter is only for those who select App Category and return School
-            /*ArrayList<HashMap<String, String>> catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
-             
+            ArrayList<HashMap<String, String>> catValues = ctrl.getTopkSchool(topK, selected, dateFormattedStart, dateFormattedEnd, error);
+            
             if(catValues != null){
                 Iterator<HashMap<String, String>> iter = catValues.iterator();
                 JsonArray param = new JsonArray();
@@ -164,9 +165,11 @@ public class TopKSchool extends HttpServlet {
                     }
                      param.add(indiv);
                 }
+                output.addProperty("status", "success");
                 output.add("results", param);
                 out.println(gson.toJson(output));
-            }*/
+            }
+        
         }
     }
  

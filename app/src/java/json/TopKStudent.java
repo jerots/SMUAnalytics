@@ -5,8 +5,22 @@
  */
 package json;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import controller.TopkReportController;
+import dao.UserDAO;
+import dao.Utility;
+import entity.User;
+import is203.JWTException;
+import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,16 +47,123 @@ public class TopKStudent extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet TopkStudent</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet TopkStudent at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+           Gson gson = new GsonBuilder().setPrettyPrinting().create();
+           JsonObject output = new JsonObject();
+           JsonArray errors = new JsonArray();
+           
+            String token = request.getParameter("token");
+            String startdate = request.getParameter("startdate");
+            String enddate = request.getParameter("enddate");
+
+            //TOKEN VALIDATION
+            if (token == null) {
+                errors.add("missing token");
+            } else if (token.length() == 0) {
+                errors.add("blank token");
+            } else {
+                try {
+                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    if (username == null) {
+                        //failed
+                        errors.add("invalid token");
+                    }else {
+                        UserDAO userDAO = new UserDAO();
+                        User user = userDAO.retrieve(username);
+                        if (user == null) {
+                            errors.add("invalid token");
+                        }
+                    }
+                } catch (JWTException e) {
+                    //failed
+                    errors.add("invalid token");
+                }
+
+            }
+            
+            //Gets the number of (top) K that the individual wants displayed
+            String entry = request.getParameter("k");
+            
+            //START DATE VALIDATION
+            Date dateFormattedStart = null;
+            if (startdate == null) {
+                errors.add("missing startdate");
+            } else if (startdate.length() == 0) {
+                errors.add("blank startdate");
+            } else {
+                if (startdate.length() != 10) {
+                    errors.add("invalid startdate");
+                } else {
+                    dateFormattedStart = Utility.parseDate(startdate);
+                    if (dateFormattedStart == null) {
+                        errors.add("invalid startdate");
+                    }
+                }
+            }
+
+            //END DATE VALIDATION
+            Date dateFormattedEnd = null;
+            if (enddate == null) {
+                errors.add("missing enddate");
+            } else if (enddate.length() == 0) {
+                errors.add("blank enddate");
+            } else {
+                if (enddate.length() != 10) {
+                    errors.add("invalid enddate");
+                } else {
+                    dateFormattedEnd = Utility.parseDate(enddate);
+                    if (dateFormattedEnd == null) {
+                        errors.add("invalid enddate");
+                    }
+                }
+            }
+            if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+                errors.add("end date is after start date");
+            }
+            //NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
+            //All the values are from the same select place. It only changes based on the report selected
+            String selected = request.getParameter("app category");
+            //Checks school/appcategory (Actually this is chosen)
+            if(!Utility.checkCategory(selected)){
+                errors.add("invalid app category");
+            }
+            
+            
+            int topK = Utility.parseInt(entry);
+            if(topK > 10 || topK < 1){
+                errors.add("invalid k");
+            }
+            
+            //PRINT ERROR AND EXIT IF ERRORS EXIST
+            if (errors.size() > 0) {
+                output.addProperty("status", "error");
+                output.add("errors", errors);
+                out.println(gson.toJson(errors));
+                return;
+            }
+            
+            TopkReportController ctrl = new TopkReportController();
+            
+            //This error string is just passed in, but is meant for the UI and not the JSON.
+            String error = "";
+            ArrayList<HashMap<String, String>> catValues = ctrl.getTopkStudents(topK, selected, dateFormattedStart, dateFormattedEnd, error);
+            
+            if(catValues != null){
+                Iterator<HashMap<String, String>> iter = catValues.iterator();
+                JsonArray param = new JsonArray();
+                while(iter.hasNext()){
+                    HashMap<String, String> map = iter.next();
+                    Iterator<String> iterKey = map.keySet().iterator();
+                    JsonObject indiv = new JsonObject();
+                    while(iterKey.hasNext()){
+                        String key = iterKey.next();
+                        indiv.addProperty(key, map.get(key));
+                    }
+                     param.add(indiv);
+                }
+                output.addProperty("status", "success");
+                output.add("results", param);
+                out.println(gson.toJson(output));
+            }
         }
     }
 

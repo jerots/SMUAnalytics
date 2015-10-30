@@ -464,7 +464,7 @@ public class AppUsageDAO {
         return result;
     }
 
-    public ArrayList<AppUsage> getAppsBySchool(String school, String start, String end) {
+    public ArrayList<AppUsage> getAppsBySchool(String school, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
         
         //This has been changed to take into account that the next update is calculated as well.
@@ -479,8 +479,8 @@ public class AppUsageDAO {
                     + "AND u.email LIKE ? \n"
                     + "ORDER BY u.macaddress, timestamp;");
 
-            ps.setString(1, start + " 00:00:00");
-            ps.setString(2, end + " 23:59:59");
+            ps.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            ps.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
             ps.setString(3, "%" + school + "%");
 
             ResultSet rs = ps.executeQuery();
@@ -500,7 +500,7 @@ public class AppUsageDAO {
         return aList;
     }
 
-    public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priKMac, String start, String end) {
+    public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priKMac, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
         String sql = "SELECT timestamp, u.name, u.macaddress, a.appid, a.appcategory, appname\n"
@@ -515,8 +515,8 @@ public class AppUsageDAO {
         try {
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pStmt = conn.prepareStatement(sql);
-            pStmt.setString(1, start);
-            pStmt.setString(2, end);
+            pStmt.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            pStmt.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
             ResultSet rs = pStmt.executeQuery();
 
@@ -538,7 +538,7 @@ public class AppUsageDAO {
         return aList;
     }
 
-    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priKSch, String start, String end) {
+    public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priKSch, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
         String sql = "SELECT timestamp, u.macaddress, a.appid, appcategory, email, appname\n"
@@ -559,8 +559,8 @@ public class AppUsageDAO {
         try {
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pStmt = conn.prepareStatement(sql);
-            pStmt.setString(1, start);
-            pStmt.setString(2, end);
+            pStmt.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            pStmt.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
 
             ResultSet rs = pStmt.executeQuery();
             //Need to retrieve category as you must take the first time of every new app to be accurate
