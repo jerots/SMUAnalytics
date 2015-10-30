@@ -1,8 +1,3 @@
-<%-- 
-    Document   : top-kreport
-    Created on : 17-Oct-2015, 00:06:45
-    Author     : Boyofthefuture
---%>
 
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>

@@ -29,10 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Boyofthefuture
- */
 @WebServlet(name = "TopK", urlPatterns = {"/json/top-k-most-used-apps"})
 public class TopK extends HttpServlet {
 

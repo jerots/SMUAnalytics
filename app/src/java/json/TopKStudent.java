@@ -27,10 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author ASUS-PC
- */
 @WebServlet(name = "TopKStudent", urlPatterns = {"/json/top-k-most-used-students"})
 public class TopKStudent extends HttpServlet {
 

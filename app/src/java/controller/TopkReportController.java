@@ -12,15 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author ASUS-PC
- */
 public class TopkReportController {
     //This method gets the top few Apps based on AppUsage time given a school, and their rank.
     public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors){

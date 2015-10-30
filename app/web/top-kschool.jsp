@@ -1,8 +1,3 @@
-<%-- 
-    Document   : top-kreport
-    Created on : 17-Oct-2015, 00:06:45
-    Author     : Boyofthefuture
---%>
 
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>
@@ -159,7 +154,7 @@
                                                 out.println("<h1 style='color:red'>Error!</h1>");
                                                 out.println("<h3 style='color:red'>" + error + "</h3>");
                                             }else if(values != null){ //Checks this because in case of category refresh.
-                                                ArrayList<String> schoolList = new ArrayList<>();
+                                                ArrayList<String> schoolList = new ArrayList<String>();
                                                 String names = "";
                                                 out.println("<h1>Result</h1>");
                                                 //This prints the type of table
