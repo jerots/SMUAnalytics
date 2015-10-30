@@ -21,14 +21,14 @@
     </head>
     <body>
         <%            User user = (User) session.getAttribute("user");
-			String startdate = request.getParameter("startdate");
-			if (startdate == null) {
-				startdate = "";
-			}
-			String enddate = request.getParameter("enddate");
-			if (enddate == null) {
-				enddate = "";
-			}
+            String startdate = request.getParameter("startdate");
+            if (startdate == null) {
+                startdate = "";
+            }
+            String enddate = request.getParameter("enddate");
+            if (enddate == null) {
+                enddate = "";
+            }
 
 
         %>	
@@ -62,10 +62,10 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-								<li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-								<li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-								<li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
-							</ul>
+                                <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
+                                <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                            </ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
@@ -101,46 +101,49 @@
                     </form>
                 </div>
                 <div class="theme-div theme-content" style="width:60%">
+                    <h4><b> App Category</b> </h4> <hr>
                     <%	ArrayList<String> errors = (ArrayList<String>) request.getAttribute("errors");
 
-						//IF THERE IS ERROR, PRINT
-						if (errors != null) {
-							out.println("<h1 class=errorMsg>Error!</h1>");
-							out.println("<ul>");
-							for (String error : errors) {
-								out.println("<li>" + error + "</li>");
-							}
-							out.println("</ul>");
-							return;
-						}
-						TreeMap<String, Double[]> catList = (TreeMap<String, Double[]>) request.getAttribute("result");
+                        //IF THERE IS ERROR, PRINT
+                        if (errors != null) {
+                            out.println("<h1 class=errorMsg>Error!</h1>");
+                            out.println("<ul>");
+                            for (String error : errors) {
+                                out.println("<li>" + error + "</li>");
+                            }
+                            out.println("</ul>");
 
-						if (catList != null) {
-							if (catList.size() <= 0) {
-								out.println("<h1>Result</h1>");
-								out.println("No records found. Please select another day.");
-								return;
-							}
-							Iterator<String> iter = catList.keySet().iterator();
-							out.println("<table class='table'>");
-							out.println("<tr><th>Category</th><th>Average Duration</th><th>Percentage</th></tr>");
+                        } else {
+                            TreeMap<String, Double[]> catList = (TreeMap<String, Double[]>) request.getAttribute("result");
 
-							while (iter.hasNext()) {
+                            if (catList != null) {
+                                if (catList.size() <= 0) {
+                                    out.println("<h1>Result</h1>");
+                                    out.println("No records found. Please select another day.");
+                                    
+                                } else {
+                                    Iterator<String> iter = catList.keySet().iterator();
+                                    out.println("<table class='table'>");
+                                    out.println("<tr><th>Category</th><th>Average Duration</th><th>Percentage</th></tr>");
 
-								String catName = iter.next();
+                                    while (iter.hasNext()) {
 
-								Double[] infoArr = catList.get(catName);
-								long duration = Math.round(infoArr[0]);
-								long percent = Math.round(infoArr[1]);
-								out.println("<tr><td>" + catName + "</td><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
+                                        String catName = iter.next();
 
-							}
-							out.println("</table>");
-						} else {
-							//NO REPORT AND NO ERROR
-							out.println("<h1>Result</h1>");
-							out.println("You have not entered any input.");
-						}
+                                        Double[] infoArr = catList.get(catName);
+                                        long duration = Math.round(infoArr[0]);
+                                        long percent = Math.round(infoArr[1]);
+                                        out.println("<tr><td>" + catName + "</td><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
+
+                                    }
+                                    out.println("</table>");
+                                }
+                            } else {
+                                //NO REPORT AND NO ERROR
+                                out.println("<h1>Result</h1>");
+                                out.println("You have not entered any input.");
+                            }
+                        }
                     %>
                 </div>
 
