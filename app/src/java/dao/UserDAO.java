@@ -176,6 +176,7 @@ public class UserDAO {
 				if (!err) {
 					//add to list
 					//insert into tables
+					macList.put(macAdd,"");
 					stmt.setString(1, macAdd);
 					stmt.setString(2, name);
 					stmt.setString(3, password);

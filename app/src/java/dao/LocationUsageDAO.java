@@ -52,7 +52,7 @@ public class LocationUsageDAO {
 				}
 				//check timestamp
 				String date = Utility.parseString(reader.get("timestamp"));
-				if (date == null || !Utility.checkDate(date)) {
+				if (date == null) {
 					errorMsg += ",invalid timestamp";
 					err = true;
 				}
