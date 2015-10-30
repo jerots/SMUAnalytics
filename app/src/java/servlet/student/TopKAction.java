@@ -37,6 +37,9 @@ public class TopKAction extends HttpServlet {
 
 		//Gets the number of (top) K that the individual wants displayed
 		String entry = request.getParameter("entries");
+		if(entry == null || entry.length() == 0){
+			entry = "3";
+		}
 
 		//This is the choice selection of which of the 3 option the user wants to be processed.
 		String selection = request.getParameter("category");

@@ -110,8 +110,7 @@ public final class Utility {
     
      public static boolean checkCategory(String chk) {
         String check = parseString(chk);
-        System.out.println(check);
-        if(check != null){
+	        if(check != null){
             String str = check.substring(0, 1).toUpperCase() + check.substring(1).toLowerCase();
             return categories.contains(str);
         }

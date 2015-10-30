@@ -31,179 +31,191 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author ASUS-PC
  */
-@WebServlet(name = "TopKStudent", urlPatterns = {"/TopKStudent"})
+@WebServlet(name = "TopKStudent", urlPatterns = {"/json/top-k-most-used-students"})
 public class TopKStudent extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-           Gson gson = new GsonBuilder().setPrettyPrinting().create();
-           JsonObject output = new JsonObject();
-           JsonArray errors = new JsonArray();
-           
-            String token = request.getParameter("token");
-            String startdate = request.getParameter("startdate");
-            String enddate = request.getParameter("enddate");
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		response.setContentType("application/json");
+		try (PrintWriter out = response.getWriter()) {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonObject output = new JsonObject();
+			JsonArray errors = new JsonArray();
 
-            //TOKEN VALIDATION
-            if (token == null) {
-                errors.add("missing token");
-            } else if (token.length() == 0) {
-                errors.add("blank token");
-            } else {
-                try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
-                    if (username == null) {
-                        //failed
-                        errors.add("invalid token");
-                    }else {
-                        UserDAO userDAO = new UserDAO();
-                        User user = userDAO.retrieve(username);
-                        if (user == null) {
-                            errors.add("invalid token");
-                        }
-                    }
-                } catch (JWTException e) {
-                    //failed
-                    errors.add("invalid token");
-                }
+			String token = request.getParameter("token");
+			String startdate = request.getParameter("startdate");
+			String enddate = request.getParameter("enddate");
 
-            }
-            
-            //Gets the number of (top) K that the individual wants displayed
-            String entry = request.getParameter("k");
-            
-            //START DATE VALIDATION
-            Date dateFormattedStart = null;
-            if (startdate == null) {
-                errors.add("missing startdate");
-            } else if (startdate.length() == 0) {
-                errors.add("blank startdate");
-            } else {
-                if (startdate.length() != 10) {
-                    errors.add("invalid startdate");
-                } else {
-                    dateFormattedStart = Utility.parseDate(startdate);
-                    if (dateFormattedStart == null) {
-                        errors.add("invalid startdate");
-                    }
-                }
-            }
+			//TOKEN VALIDATION
+			if (token == null) {
+				errors.add("missing token");
+			} else if (token.length() == 0) {
+				errors.add("blank token");
+			} else {
+				try {
+					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					if (username == null) {
+						//failed
+						errors.add("invalid token");
+					} else {
+						UserDAO userDAO = new UserDAO();
+						User user = userDAO.retrieve(username);
+						if (user == null) {
+							errors.add("invalid token");
+						}
+					}
+				} catch (JWTException e) {
+					//failed
+					errors.add("invalid token");
+				}
 
-            //END DATE VALIDATION
-            Date dateFormattedEnd = null;
-            if (enddate == null) {
-                errors.add("missing enddate");
-            } else if (enddate.length() == 0) {
-                errors.add("blank enddate");
-            } else {
-                if (enddate.length() != 10) {
-                    errors.add("invalid enddate");
-                } else {
-                    dateFormattedEnd = Utility.parseDate(enddate);
-                    if (dateFormattedEnd == null) {
-                        errors.add("invalid enddate");
-                    }
-                }
-            }
-            if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
-                errors.add("end date is after start date");
-            }
-            //NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
-            //All the values are from the same select place. It only changes based on the report selected
-            String selected = request.getParameter("app category");
-            //Checks school/appcategory (Actually this is chosen)
-            if(!Utility.checkCategory(selected)){
-                errors.add("invalid app category");
-            }
-            
-            
-            int topK = Utility.parseInt(entry);
-            if(topK > 10 || topK < 1){
-                errors.add("invalid k");
-            }
-            
-            //PRINT ERROR AND EXIT IF ERRORS EXIST
-            if (errors.size() > 0) {
-                output.addProperty("status", "error");
-                output.add("errors", errors);
-                out.println(gson.toJson(errors));
-                return;
-            }
-            
-            TopkReportController ctrl = new TopkReportController();
-            
-            //This error string is just passed in, but is meant for the UI and not the JSON.
-            String error = "";
-            ArrayList<HashMap<String, String>> catValues = ctrl.getTopkStudents(topK, selected, dateFormattedStart, dateFormattedEnd, error);
-            
-            if(catValues != null){
-                Iterator<HashMap<String, String>> iter = catValues.iterator();
-                JsonArray param = new JsonArray();
-                while(iter.hasNext()){
-                    HashMap<String, String> map = iter.next();
-                    Iterator<String> iterKey = map.keySet().iterator();
-                    JsonObject indiv = new JsonObject();
-                    while(iterKey.hasNext()){
-                        String key = iterKey.next();
-                        indiv.addProperty(key, map.get(key));
-                    }
-                     param.add(indiv);
-                }
-                output.addProperty("status", "success");
-                output.add("results", param);
-                out.println(gson.toJson(output));
-            }
-        }
-    }
+			}
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+			//Gets the number of (top) K that the individual wants displayed
+			String entry = request.getParameter("k");
+			if (entry == null || entry.length() == 0) {
+				entry = "3";
+			}
+			int entryInt = Utility.parseInt(entry);
+			if (entryInt < 1 || entryInt > 10) {
+				errors.add("invalid k");
+			}
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+			//START DATE VALIDATION
+			Date dateFormattedStart = null;
+			if (startdate == null) {
+				errors.add("missing startdate");
+			} else if (startdate.length() == 0) {
+				errors.add("blank startdate");
+			} else {
+				if (startdate.length() != 10) {
+					errors.add("invalid startdate");
+				} else {
+					dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
+					if (dateFormattedStart == null) {
+						errors.add("invalid startdate");
+					}
+				}
+			}
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+			//END DATE VALIDATION
+			Date dateFormattedEnd = null;
+			if (enddate == null) {
+				errors.add("missing enddate");
+			} else if (enddate.length() == 0) {
+				errors.add("blank enddate");
+			} else {
+				if (enddate.length() != 10) {
+					errors.add("invalid enddate");
+				} else {
+					dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
+					if (dateFormattedEnd == null) {
+						errors.add("invalid enddate");
+					}
+				}
+			}
+			if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+                errors.add("invalid startdate");
+            }
+			//NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
+			//All the values are from the same select place. It only changes based on the report selected
+			String selected = request.getParameter("appcategory");
+			//Checks school/appcategory (Actually this is chosen)
+			if (selected == null){
+				errors.add("missing appcategory");
+			} else if (selected.length() == 0){
+				errors.add("blank appcategory");
+			} else if (!Utility.checkCategory(selected)) {
+				errors.add("invalid appcategory");
+			}
 
+
+
+			//PRINT ERROR AND EXIT IF ERRORS EXIST
+			if (errors.size() > 0) {
+				output.addProperty("status", "error");
+				output.add("errors", errors);
+				out.println(gson.toJson(output));
+				return;
+			}
+
+			TopkReportController ctrl = new TopkReportController();
+
+			//This error string is just passed in, but is meant for the UI and not the JSON.
+			String error = "";
+
+			//IF PASSED VALIDATION, PROCEED TO GENERATE REPORT
+			output.addProperty("status", "success");
+
+			ArrayList<HashMap<String, String>> catValues = ctrl.getTopkStudents(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
+
+			if (catValues != null) {
+				Iterator<HashMap<String, String>> iter = catValues.iterator();
+				JsonArray param = new JsonArray();
+				while (iter.hasNext()) {
+					HashMap<String, String> map = iter.next();
+
+					JsonObject indiv = new JsonObject();
+
+					indiv.addProperty("rank", map.get("rank"));
+					indiv.addProperty("name", map.get("name"));
+					indiv.addProperty("mac-address", map.get("mac-address"));
+					indiv.addProperty("duration", map.get("duration"));
+					param.add(indiv);
+
+				}
+				output.add("results", param);
+
+			}
+			out.println(gson.toJson(output));
+		}
+	}
+
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+	/**
+	 * Handles the HTTP <code>GET</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
+
+	/**
+	 * Handles the HTTP <code>POST</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
+
+	/**
+	 * Returns a short description of the servlet.
+	 *
+	 * @return a String containing servlet description
+	 */
+	@Override
+	public String getServletInfo() {
+		return "Short description";
+	}// </editor-fold>
 }
