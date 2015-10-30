@@ -10,7 +10,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.TopkReportController;
+import dao.UserDAO;
 import dao.Utility;
+import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
@@ -27,10 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Boyofthefuture
- */
 @WebServlet(name = "TopK", urlPatterns = {"/json/top-k-most-used-apps"})
 public class TopK extends HttpServlet {
 
@@ -45,7 +43,7 @@ public class TopK extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
            Gson gson = new GsonBuilder().setPrettyPrinting().create();
            JsonObject output = new JsonObject();
@@ -66,8 +64,13 @@ public class TopK extends HttpServlet {
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
+                    }else {
+                        UserDAO userDAO = new UserDAO();
+                        User user = userDAO.retrieve(username);
+                        if (user == null) {
+                            errors.add("invalid token");
+                        }
                     }
-
                 } catch (JWTException e) {
                     //failed
                     errors.add("invalid token");
@@ -76,16 +79,18 @@ public class TopK extends HttpServlet {
             }
             
             //Gets the number of (top) K that the individual wants displayed
-            String entry = request.getParameter("entries");
-            
-            //This is the choice selection of which of the 3 option the user wants to be processed.
-            String selection = request.getParameter("category");
-            //Gets the start and end dates as necessary.
-            String startDate = request.getParameter("startdate");
-            String endDate = request.getParameter("endDate");
-            output.addProperty("status", "success");
-            
+            String entry = request.getParameter("k");
+            if (entry == null || entry.length() == 0) {
+				entry = "3";
+			}
+			int entryInt = Utility.parseInt(entry);
+			if (entryInt < 1 || entryInt > 10 ){
+				errors.add("invalid k");
+			}
+			
+			
             //START DATE VALIDATION
+            Date dateFormattedStart = null;
             if (startdate == null) {
                 errors.add("missing startdate");
             } else if (startdate.length() == 0) {
@@ -94,14 +99,15 @@ public class TopK extends HttpServlet {
                 if (startdate.length() != 10) {
                     errors.add("invalid startdate");
                 } else {
-                    Date dateFormatted = Utility.parseOnlyDate(startdate);
-                    if (dateFormatted == null || Utility.checkOnlyDate(startdate)) {
+                    dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
+                    if (dateFormattedStart == null) {
                         errors.add("invalid startdate");
                     }
                 }
             }
 
             //END DATE VALIDATION
+            Date dateFormattedEnd = null;
             if (enddate == null) {
                 errors.add("missing enddate");
             } else if (enddate.length() == 0) {
@@ -110,30 +116,25 @@ public class TopK extends HttpServlet {
                 if (enddate.length() != 10) {
                     errors.add("invalid enddate");
                 } else {
-                    Date dateFormatted = Utility.parseOnlyDate(startdate);
-                    if (dateFormatted == null || Utility.checkOnlyDate(enddate)) {
+                    dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
+                    if (dateFormattedEnd == null) {
                         errors.add("invalid enddate");
                     }
                 }
             }
+            if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+                errors.add("invalid startdate");
+            }
             //NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
             //All the values are from the same select place. It only changes based on the report selected
-            String selected = request.getParameter("choices");
+            String selected = request.getParameter("school");
             //Checks school/appcategory (Actually this is chosen)
-            if(selection.equals("schoolapps")){
-                if(!Utility.checkSchools(selected)){
-                    errors.add("invalid school");
-                }
-            }else{
-                if(!Utility.checkCategory(selected)){
-                    errors.add("invalid app category");
-                }
-            }
-            
-            
-            int topK = Utility.parseInt(entry);
-            if(topK > 10 || topK < 1){
-                errors.add("invalid k");
+            if (selected == null){
+				errors.add("missing school");
+			} else if (selected.length() == 0){
+				errors.add("blank school");
+			} else if(!Utility.checkSchools(selected)){
+                errors.add("invalid school");
             }
             
             //PRINT ERROR AND EXIT IF ERRORS EXIST
@@ -150,21 +151,22 @@ public class TopK extends HttpServlet {
             String error = "";
 
             //This parameter is only for the school function
-            ArrayList<HashMap<String, String>>  catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
+            ArrayList<HashMap<String, String>>  catValues = ctrl.getTopkApp(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
             
             if(catValues != null){
                 Iterator<HashMap<String, String>> iter = catValues.iterator();
                 JsonArray param = new JsonArray();
                 while(iter.hasNext()){
                     HashMap<String, String> map = iter.next();
-                    Iterator<String> iterKey = map.keySet().iterator();
-                    Iterator<String> iterValue = map.values().iterator();
                     JsonObject indiv = new JsonObject();
-                    while(iterKey.hasNext()){
-                        indiv.addProperty(iterKey.next(), iterValue.next());
-                    }
-                     param.add(indiv);
+                    param.add(indiv);
+					
+					indiv.addProperty("rank", map.get("rank"));
+					indiv.addProperty("app-name", map.get("app-name"));
+					indiv.addProperty("duration", map.get("duration"));
+					
                 }
+                output.addProperty("status", "success");
                 output.add("results", param);
                 out.println(gson.toJson(output));
             }

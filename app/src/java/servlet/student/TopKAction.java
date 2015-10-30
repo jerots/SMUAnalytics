@@ -37,6 +37,9 @@ public class TopKAction extends HttpServlet {
 
 		//Gets the number of (top) K that the individual wants displayed
 		String entry = request.getParameter("entries");
+		if(entry == null || entry.length() == 0){
+			entry = "3";
+		}
 
 		//This is the choice selection of which of the 3 option the user wants to be processed.
 		String selection = request.getParameter("category");
@@ -56,12 +59,11 @@ public class TopKAction extends HttpServlet {
 		} else if (startDate.length() == 0) {
 			errors += ", invalid startdate";
 		} else {
-			dateFormattedStart = Utility.parseOnlyDate(startDate);
-			if (dateFormattedStart == null && Utility.formatOnlyDate(dateFormattedStart) != null) {
+			dateFormattedStart = Utility.parseDate(startDate + " 00:00:00");
+			if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
 				errors += ", invalid startdate";
 			}
 		}
-		System.out.println("TESTa");
 
             //Checks endDate
 		//Places this outside to compare dates later
@@ -71,12 +73,11 @@ public class TopKAction extends HttpServlet {
 		} else if (endDate.length() == 0) {
 			errors += ", invalid enddate";
 		} else {
-			dateFormattedEnd = Utility.parseOnlyDate(endDate);
-			if (dateFormattedEnd == null && Utility.formatOnlyDate(dateFormattedEnd) != null) {
+			dateFormattedEnd = Utility.parseDate(endDate + " 23:59:59");
+			if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
 				errors += ", invalid enddate";
 			}
 		}
-		System.out.println("TESTb");
 
 		//Finally, makes sure the start date if after to add error, as if it is before or similar, no error
 		if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
@@ -95,7 +96,6 @@ public class TopKAction extends HttpServlet {
 				errors += ", invalid app category";
 			}
 		}
-		System.out.println("TESTc");
 
 		//Checks for K
 		int topK = Utility.parseInt(entry);
@@ -105,7 +105,6 @@ public class TopKAction extends HttpServlet {
 
 		//Delcares the values to return. Declares both in case of 
 		ArrayList<HashMap<String, String>> catValues = null;
-		System.out.println("TEST");
 
 		//If all checks are passed:
 		if (errors.length() == 0) {
@@ -113,22 +112,21 @@ public class TopKAction extends HttpServlet {
 			switch (selection) {
 				case "schoolapps":
 					//This parameter is only for the school function
-					catValues = ctrl.getTopkApp(topK, selected, startDate, endDate, error);
+					catValues = ctrl.getTopkApp(topK, selected, dateFormattedStart, dateFormattedEnd, error);
 					break;
 				case "appstudents":
 					//This parameter is only for those who select App Category and return Students
-					catValues = ctrl.getTopkStudents(topK, selected, startDate, endDate, error);
+					catValues = ctrl.getTopkStudents(topK, selected, dateFormattedStart, dateFormattedEnd, error);
 					break;
 				default:
 					//This parameter is only for those who select App Category and return School
-					catValues = ctrl.getTopkSchool(topK, selected, startDate, endDate, error);
+					catValues = ctrl.getTopkSchool(topK, selected, dateFormattedStart, dateFormattedEnd, error);
 					break;
 			}
 		} else {
 			//Need to substring for multiple errors
 			errors = errors.substring(2);
 		}
-		System.out.println("TEST2");
 
 		request.setAttribute("catvalues", catValues);
 		request.setAttribute("choice", selected);

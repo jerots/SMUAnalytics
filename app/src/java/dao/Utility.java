@@ -17,7 +17,6 @@ import java.util.Date;
 public final class Utility {
 
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
 
@@ -37,37 +36,17 @@ public final class Utility {
         return null;
     }
     
-    public static Date parseOnlyDate(String date){
-        date = date.replace("\"","");
-        if (date != null && date.length() > 0) {
-            try {       
-                return sdf.parse(date);
-            } catch (ParseException e) {
+    public static String formatDate(Date date){
+        if(date != null){
+            String format = df.format(date);
+            if(checkDate(format)){
+                return format;
             }
         }
         return null;
     }
     
-    public static String formatOnlyDate(Date date){
-        if(date != null){
-            return sdf.format(date);
-        }
-        return null;
-    }
-    
-    public static String formatDate(Date date){
-        if(date != null){
-            return df.format(date);
-        }
-        return null;
-    }
-    
     public static boolean checkDate(String str){
-        return str.matches("((((19[7-9]\\d)|([2-9]\\d{3}))-(0[13578]|1[02])-31)|(((19[7-9]\\d)|([2-9]\\d{3}))-(0[13456789]|1[012])-(0[1-9]|[12]\\d|30))|"
-                + "(((19[7-9]\\d)|([2-9]\\d{3}))-02-(0[1-9]|1\\d|2[0-8]))|((19([79][26])|(8[048]))|([2-9]\\d(([13579][26])|([24680][048])))-02-29))");
-    }
-    
-    public static boolean checkDelDate(String str){
         return str.matches("((((19[7-9]\\d)|([2-9]\\d{3}))-(0[13578]|1[02])-31)|(((19[7-9]\\d)|([2-9]\\d{3}))-(0[13456789]|1[012])-(0[1-9]|[12]\\d|30))|"
                 + "(((19[7-9]\\d)|([2-9]\\d{3}))-02-(0[1-9]|1\\d|2[0-8]))|((19([79][26])|(8[048]))|([2-9]\\d(([13579][26])|([24680][048])))-02-29))");
     }
@@ -127,7 +106,7 @@ public final class Utility {
     
      public static boolean checkCategory(String chk) {
         String check = parseString(chk);
-        if(check != null){
+	        if(check != null){
             String str = check.substring(0, 1).toUpperCase() + check.substring(1).toLowerCase();
             return categories.contains(str);
         }
@@ -146,7 +125,6 @@ public final class Utility {
          ArrayList<String> missing = new ArrayList<>();
          for(String s: schoolList){
             if(!schools.contains(s)){
-                System.out.println(s);
                 missing.add(s);
             }
          }

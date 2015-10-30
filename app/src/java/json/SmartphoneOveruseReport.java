@@ -39,209 +39,181 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "SmartphoneOveruseReport", urlPatterns = {"/json/overuse-report"})
 public class SmartphoneOveruseReport extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonObject output = new JsonObject();
-            JsonArray errors = new JsonArray();
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		response.setContentType("text/html;charset=UTF-8");
+		try (PrintWriter out = response.getWriter()) {
+			/* TODO output your page here. You may use following sample code. */
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonObject output = new JsonObject();
+			JsonArray errors = new JsonArray();
 
-            String token = request.getParameter("token");
-            String startDateStr = request.getParameter("startDate");
-            String startTimeStr = request.getParameter("startTime");
-            String endDateStr = request.getParameter("endDate");
-            String endTimeStr = request.getParameter("endTime");
+			String token = request.getParameter("token");
+			String startDateStr = request.getParameter("startdate");
+			String endDateStr = request.getParameter("enddate");
+			String macAdd = request.getParameter("macaddress");
+			Date dateFormattedStart = null;
+			Date dateFormattedEnd = null;
+			User user = null;
 
-            //TOKEN VALIDATION
-            if (token == null) {
-                errors.add("missing token");
-            } else if (token.length() == 0) {
-                errors.add("blank token");
-            } else {
-                try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
-                    if (username == null) {
-                        //failed
-                        errors.add("invalid token");
-                    } else {
-                        UserDAO userDAO = new UserDAO();
-                        User user = userDAO.retrieve(username);
-                        if (user == null) {
-                            errors.add("invalid token");
-                        }
-                    }
+			//TOKEN VALIDATION
+			if (token == null) {
+				errors.add("missing token");
+			} else if (token.length() == 0) {
+				errors.add("blank token");
+			} else {
+				try {
+					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					if (username == null) {
+						//failed
+						errors.add("invalid token");
+					} else {
+						UserDAO userDAO = new UserDAO();
+						user = userDAO.retrieve(username);
+						if (user == null) {
+							errors.add("invalid token");
+						}
+					}
 
-                } catch (JWTException e) {
-                    //failed
-                    errors.add("invalid token");
-                }
+				} catch (JWTException e) {
+					//failed
+					errors.add("invalid token");
+				}
 
-            }
+			}
 
-            //START DATE VALIDATION
-            if (startDateStr == null) {
-                errors.add("missing startdate");
-            } else if (startDateStr.length() == 0) {
-                errors.add("blank startdate");
-            } else {
-                if (startDateStr.length() != 10) {
-                    errors.add("invalid startdate");
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-                    Date dateFormatted = sdf.parse(startDateStr, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(startDateStr)) {
-                        errors.add("invalid startdate");
-                    }
-                }
-            }
+			//MACADDRESS VALIDATION
+			if (macAdd == null) {
+				errors.add("missing macaddress");
+			} else if (macAdd.length() == 0) {
+				errors.add("blank macaddress");
+			} else {
+				UserDAO userDAO = new UserDAO();
+				user = userDAO.retrieveByMac(macAdd);
+				if (user == null) {
+					errors.add("invalid macaddress");
+				}
 
-            //END DATE VALIDATION
-            if (endDateStr == null) {
-                errors.add("missing enddate");
-            } else if (endDateStr.length() == 0) {
-                errors.add("blank enddate");
-            } else {
-                if (endDateStr.length() != 10) {
-                    errors.add("invalid enddate");
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-                    Date dateFormatted = sdf.parse(endDateStr, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(endDateStr)) {
-                        errors.add("invalid enddate");
-                    }
-                }
-            }
+			}
 
-            //START TIME VALIDATION
-            if (startTimeStr == null) {
-                errors.add("missing time");
-            } else if (startTimeStr.length() == 0) {
-                errors.add("blank time");
-            } else {
-                if (startTimeStr.length() != 8) {
-                    errors.add("invalid time");
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    Date dateFormatted = sdf.parse(startTimeStr, new ParsePosition(0));
-                    if (dateFormatted == null) {
-                        errors.add("invalid time");
-                    }
-                }
-            }
+			//START DATE VALIDATION
+			if (startDateStr == null) {
+				errors.add("missing startdate");
+			} else if (startDateStr.length() == 0) {
+				errors.add("blank startdate");
+			} else {
+				if (startDateStr.length() != 10) {
+					errors.add("invalid startdate");
+				} else {
+					dateFormattedStart = Utility.parseDate(startDateStr + " 00:00:00");
+					if (dateFormattedStart == null) {
+						errors.add("invalid startdate");
+					}
+				}
+			}
 
-            //END TIME VALIDATION
-            if (endTimeStr == null) {
-                errors.add("missing time");
-            } else if (endTimeStr.length() == 0) {
-                errors.add("blank time");
-            } else {
-                if (endTimeStr.length() != 8) {
-                    errors.add("invalid time");
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    Date dateFormatted = sdf.parse(endTimeStr, new ParsePosition(0));
-                    if (dateFormatted == null) {
-                        errors.add("invalid time");
-                    }
-                }
-            }
+			//END DATE VALIDATION
+			if (endDateStr == null) {
+				errors.add("missing enddate");
+			} else if (endDateStr.length() == 0) {
+				errors.add("blank enddate");
+			} else {
+				if (endDateStr.length() != 10) {
+					errors.add("invalid enddate");
+				} else {
+					dateFormattedEnd = Utility.parseDate(endDateStr + " 23:59:59");
+					if (dateFormattedEnd == null) {
+						errors.add("invalid enddate");
+					}
+				}
+			}
 
-            //PRINT ERROR AND EXIT IF ERRORS EXIST
-            if (errors.size() > 0) {
-                output.addProperty("status", "error");
-                output.add("errors", errors);
-                out.println(gson.toJson(output));
-                return;
-            }
+			//PRINT ERROR AND EXIT IF ERRORS EXIST
+			if (errors.size() > 0) {
+				output.addProperty("status", "error");
+				output.add("errors", errors);
+				out.println(gson.toJson(output));
+				return;
+			}
+			//PASSES ALL VALIDATION, proceed to report generation
 
-            //PASSES ALL VALIDATION, proceed to report generation
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date startdatetime = dateFormat.parse(startDateStr + " " + startTimeStr, new ParsePosition(0));
-            Date enddatetime = dateFormat.parse(endDateStr + " " + endTimeStr, new ParsePosition(0));
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
+			SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
 
-            SmartphoneOveruseController ctrl = new SmartphoneOveruseController();         
+			output.addProperty("status", "success");
+			System.out.println("" + user + dateFormattedStart + dateFormattedEnd);
+			TreeMap<String, String> results = ctrl.generateReport(user, dateFormattedStart, dateFormattedEnd);
 
-            output.addProperty("status", "success");
-            TreeMap<String, String> results = ctrl.generateReport(user, startdatetime, enddatetime);            
-            JsonArray metrics = new JsonArray();
-            Iterator<String> iter = results.keySet().iterator();
+			JsonArray metrics = new JsonArray();
 
-            while (iter.hasNext()) {
-                JsonObject category = new JsonObject();
+			
+			output.addProperty("overuse-index", results.get("overuse-index"));
+			
+			JsonObject usageObj = new JsonObject();
+			usageObj.addProperty("usage-category", results.get("usage-category"));
+			usageObj.addProperty("usage-duration", results.get("usage-duration"));
+			metrics.add(usageObj);
 
-                String index = iter.next();
-                if (index.equals("usage")) {
-                    category.addProperty("usage-category", index);
-                    String usage = results.get(index);
-                    category.addProperty("usage-duration", usage);
-                } else if (index.equals("gaming")) {
-                    category.addProperty("gaming-category", index);
-                    String duration = results.get(index);
-                    category.addProperty("gaming-duration", duration);
-                } else {
-                    category.addProperty("accessfrequency-category", index);
-                    String frequency = results.get(index);
-                    category.addProperty("accessfrequency", frequency);
-                }
+			JsonObject gamingObj = new JsonObject();
+			gamingObj.addProperty("gaming-category", results.get("gaming-category"));
+			gamingObj.addProperty("gaming-duration", results.get("gaming-duration"));
+			metrics.add(gamingObj);
 
-                metrics.add(category);
-            }
+			JsonObject accessObj = new JsonObject();
+			accessObj.addProperty("accessfrequency-category", results.get("accessfrequency-category"));
+			accessObj.addProperty("accessfrequency", results.get("accessfrequency"));
+			metrics.add(accessObj);
 
-            output.add("metrics", metrics);
-            out.println(gson.toJson(output));
-        }
-    }
+			output.add("metrics", metrics);
+			out.println(gson.toJson(output));
+		}
+	}
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+	/**
+	 * Handles the HTTP <code>GET</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+	/**
+	 * Handles the HTTP <code>POST</code> method.
+	 *
+	 * @param request servlet request
+	 * @param response servlet response
+	 * @throws ServletException if a servlet-specific error occurs
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		processRequest(request, response);
+	}
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+	/**
+	 * Returns a short description of the servlet.
+	 *
+	 * @return a String containing servlet description
+	 */
+	@Override
+	public String getServletInfo() {
+		return "Short description";
+	}// </editor-fold>
 
 }

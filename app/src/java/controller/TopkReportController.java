@@ -12,21 +12,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author ASUS-PC
- */
 public class TopkReportController {
     //This method gets the top few Apps based on AppUsage time given a school, and their rank.
-    public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, String strDate, String endDate, String errors){
-        AppUsageDAO aDao = new AppUsageDAO();
+    public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors){
+        AppUsageDAO auDAO = new AppUsageDAO();
         //Retrieve the results to be passed back. The method ONLY gets the apps based on school. This method still has to sort and find the top-K.
-        ArrayList<AppUsage> aList = aDao.getAppsBySchool(school, strDate, endDate);
+        ArrayList<AppUsage> aList = auDAO.getAppsBySchool(school, strDate, endDate);
         Iterator<AppUsage> iter = aList.iterator();
         //Ordered by appId.
         HashMap<App, Long> storage = new HashMap<>();
@@ -41,8 +32,8 @@ public class TopkReportController {
         //Stores the MacAdd for comparison
         String macAdd = null;
         //Gets Ready the end of the date for the period of interest
-        Date date = Utility.parseOnlyDate(endDate);
-        long endDateTime = date.getTime() + (60*60*24*1000); //This is the amount of millisecs in a day. You want to include the entire last day
+       
+        long endDateTime = endDate.getTime(); //This is the amount of millisecs in a day. You want to include the entire last day
         //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered.
         while(iter.hasNext()){
             AppUsage aUsage = iter.next();
@@ -130,7 +121,7 @@ public class TopkReportController {
         return returnList;
     }
     //This method gets the students with most usage based on AppUsage time given an AppCategory.
-    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, String strDate, String endDate, String errors){
+    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, String errors){
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and student name
         HashMap<String, String> linkMac = new HashMap<>();
@@ -151,8 +142,7 @@ public class TopkReportController {
         //Tracks the total of the current user
         long userTotal = 0;
         //Gets Ready the end of the date for the period of interest
-        Date date = Utility.parseOnlyDate(endDate);
-        long endDateTime = date.getTime() + (60*60*24*1000);
+        long endDateTime = endDate.getTime();
         //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered. 
         while(iter.hasNext()){
             AppUsage aUsage = iter.next();
@@ -203,7 +193,7 @@ public class TopkReportController {
             if(diff > 120000){
                 diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
             }
-            if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
+            if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
                 userTotal += diff;
             }
             userTime.put(macAdd, userTotal);
@@ -240,7 +230,7 @@ public class TopkReportController {
         return returnList;
     }
     
-    public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, String strDate, String endDate, String errors){
+    public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, String errors){
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and email
         HashMap<String, String> schoolList = new HashMap<>();
@@ -264,8 +254,7 @@ public class TopkReportController {
         //This keeps track of the school total
         long schoolTotal = 0;
         //Gets Ready the end of the date for the period of interest
-        Date date = Utility.parseOnlyDate(endDate);
-        long endDateTime = date.getTime() + (60*60*24*1000);
+        long endDateTime = endDate.getTime();
         //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered. 
         while(iter.hasNext()){
             AppUsage aUsage = iter.next();
@@ -289,7 +278,7 @@ public class TopkReportController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
             }else{
@@ -298,13 +287,15 @@ public class TopkReportController {
                 if(diff > 120000){
                     diff = 10000;
                 }
-                if(app.getAppCategory().toLowerCase().equals(cat)){ //This means they are of the right category. Removes those that are not.
+                if(app.getAppCategory().equals(cat)){ //This means they are of the right category. Removes those that are not.
                     schoolTotal += diff;
                 }
                 //This can only occur when the individual changes
                 if(!currentSchool.equals(school)){
                     //Places the school total for tracking
-                    schoolTime.put(school, schoolTotal);
+					if(schoolTotal != 0){
+						schoolTime.put(school, schoolTotal);
+					}
                     school = currentSchool;
                     schoolTotal = 0;
                 }
@@ -323,7 +314,9 @@ public class TopkReportController {
             if(app.getAppCategory().equals(cat)){ //This means they are of the right category
                 schoolTotal += diff;
             }
-            schoolTime.put(school, schoolTotal);
+			if(schoolTotal != 0){
+				schoolTime.put(school, schoolTotal);
+			}
         }
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();

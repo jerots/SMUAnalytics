@@ -122,7 +122,7 @@ public class UsageHeatmap extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(date, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(date)) {
+                    if (dateFormatted == null) {
                         errors.add("invalid date");
                     }
                 }

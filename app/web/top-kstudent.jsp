@@ -1,8 +1,3 @@
-<%-- 
-    Document   : top-kreport
-    Created on : 17-Oct-2015, 00:06:45
-    Author     : Boyofthefuture
---%>
 
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>
@@ -130,7 +125,7 @@
 					</form>
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
-                                    <h4><b> Top-K Report</b> </h4> <hr>
+                                    <h4><b> Top-K Student Report</b> </h4> <hr>
 					<%  
                                             ArrayList<HashMap<String, String>> values = (ArrayList<HashMap<String, String>>) request.getAttribute("catvalues");
                                             String error = (String) request.getAttribute("error");
