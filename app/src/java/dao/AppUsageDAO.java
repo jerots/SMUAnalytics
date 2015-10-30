@@ -43,7 +43,7 @@ public class AppUsageDAO {
                 }
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null || !Utility.checkDate(date)) {
+                if (date == null ){
                     err = true;
 
                     errorMsg += ",invalid timestamp";
