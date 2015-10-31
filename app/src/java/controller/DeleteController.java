@@ -10,11 +10,13 @@ import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.LocationUsage;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  *
@@ -22,65 +24,75 @@ import java.util.Date;
  */
 public class DeleteController {
   
-    public int delete(String macAdd, String startDate, String endDate, String startTime, String endTime, String locId, String semanticPl, String errors) throws SQLException, IOException {
-        int deleted = 0;
+    public ArrayList<LocationUsage> delete(String macAdd, String startDate, String endDate, String startTime, String endTime, String locId, String semanticPl, ArrayList<String> error) throws SQLException {
+        ArrayList<LocationUsage> deleted = null;
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
+        String errors = "";
     
         LocationUsageDAO luDao = new LocationUsageDAO();
         
         //Starts the checking here
         //START DATE VALIDATION
-        Date dateFormattedStart = null;        
+        Date dateFormattedStart = null;      
         if (startDate == null) {
             errors += ", missing startdate";
-            
-        } else if (startDate.length() == 0) {
+        } else if (startDate.length() == 0){
             errors += ", blank startdate";
-            dateFormattedStart = Utility.parseDate(startDate);
-            if(startDate.length() != 10 || dateFormattedStart == null){
+        } else {
+            if(startDate.length() != 10){
                 errors += ", invalid startdate";
             }else{
-                startDate = Utility.formatDate(dateFormattedStart);
-                if(startDate == null || !Utility.checkOnlyDate(startDate)){
-                    errors += ", invalid startdate";
+                if(startTime != null && startTime.length() != 0){
+                    startDate += " " + startTime + ":00";
+                }else{
+                    startDate += " 00:00:00";
+                }
+                dateFormattedStart = Utility.parseDate(startDate);  
+                if(dateFormattedStart == null){
+                    startDate += ", invalid startdate";
+                }else{
+                    startDate = Utility.formatDate(dateFormattedStart);
+                    if(!Utility.checkOnlyDate(startDate)){
+                        errors += ", invalid startdate";
+                    } else{
+                        if ((startTime != null && startTime.length() != 0) && startDate.length() != 19 || !Utility.checkDate(startDate)) { // if they are of the wrong length
+                            errors += ", invalid starttime";
+                        }
+                    }
                 }
             }
         } 
-        
-        if(startTime != null && startTime.length() != 0){
-            startDate += " " + startTime + ":00";
-            if ((startDate.length() != 19 || !Utility.checkDate(startDate))) { // if they are of the wrong length
-                errors += ", invalid starttime";
-            }
-        }else{
-            startDate += " 00:00:00";
-        }
         
         //END DATE VALIDATION
-        Date dateFormattedEnd = null;
-        if (endDate == null) {
-            errors += ", missing enddate";
-        } else if (endDate.length() == 0) {
-            errors += ", blank enddate";
-            dateFormattedEnd = Utility.parseDate(endDate);
-            if(endDate.length() != 10 || dateFormattedEnd == null){
-                errors += ", invalid enddate";
-            }else{
-                endDate = Utility.formatDate(dateFormattedEnd);
-                if(endDate == null || !Utility.checkOnlyDate(endDate)){
+        Date dateFormattedEnd = null;      
+        if (endDate != null) {
+            if (endDate.length() == 0){
+                errors += ", blank enddate";
+            } else {
+                if(endDate.length() != 10){
                     errors += ", invalid enddate";
+                }else{
+                    if(endTime != null && endTime.length() != 0){
+                        endDate += " " + endTime + ":00";
+                    }else{
+                        endDate += " 00:00:00";
+                    }
+                    dateFormattedEnd = Utility.parseDate(endDate);  
+                    if(dateFormattedEnd == null){
+                        endDate += ", invalid enddate";
+                    }else{
+                        endDate = Utility.formatDate(dateFormattedEnd);
+                        if(!Utility.checkOnlyDate(endDate)){
+                            errors += ", invalid enddate";
+                        } else{
+                            if ((endTime != null && endTime.length() != 0) && endDate.length() != 19 || !Utility.checkDate(endDate)) { // if they are of the wrong length
+                                errors += ", invalid endtime";
+                            }
+                        }
+                    }
                 }
-            }
-        } 
-        
-        if(endTime != null && endTime.length() != 0){
-            endDate += " " + endTime + ":00";
-            if ((endDate.length() != 19 || !Utility.checkDate(endDate))) { // if they are of the wrong length
-                errors += ", invalid endtime";
-            }
-        }else{
-            endDate += " 00:00:00";
+            } 
         }
         
         if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
@@ -103,15 +115,17 @@ public class DeleteController {
         }
         
         //Location id validation
+        String place = null;
         int locationId = Utility.parseInt(locId);
-        if(locationId != 0){
+        if(locId != null && locId.length() != 0){
             if(locationId < 0){
                 errors += ", invalid location-id";
                 
                 //Here, have to call for locationIdList
             } else{
                 LocationDAO lDao = new LocationDAO();
-                if (!lDao.checkLocationId(conn, locationId)) {
+                place = lDao.checkLocationId(conn, locationId);
+                if (place == null) {
                     errors += ", invalid location-id";       
                 }
             }
@@ -128,10 +142,10 @@ public class DeleteController {
         }
         
         if(errors.length() == 0){
-            int[] delete = luDao.delete(conn, macAdd, startDate, endDate, locationId, semanticPl);
-            deleted = delete[0];
+            deleted = luDao.delete(conn, macAdd, startDate, endDate, locationId, macAdd);
         }else{
-            errors.substring(2);
+            error.add(errors.substring(2));
+            System.out.println(errors);
         }
         return deleted;
     }

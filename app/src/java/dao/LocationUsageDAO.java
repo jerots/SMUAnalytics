@@ -329,24 +329,23 @@ public class LocationUsageDAO {
 		return toReturn;
 	}
 	
-	public int[] delete(Connection conn, String macAdd, String startDate, String endDate, int locationId, String semanticPlace) throws IOException, SQLException {
-		int[] updated = {};
+	public ArrayList<LocationUsage> delete(Connection conn, String macAdd, String startDate, String endDate, int locationId, String semanticPlace) throws SQLException {
+		ArrayList<LocationUsage> lList = new ArrayList<LocationUsage>();
 		int stringCount = 2;
 		try {
-			String sql = "DELETE FROM locationusage lu, user u, location l WHERE lu.macaddress = u.macaddress AND lu.locationid = l.locationid"
-					+ "AND timestamp >= ?";
+			String sql = "SELECT lu.locationid, macaddress, lu.timestamp, semanticplace FROM locationusage lu, location l WHERE lu.locationid = l.locationid"
+					+ " AND timestamp >= STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s')";
 			
 			if (endDate != null) {
-				sql += " AND timestamp < ?";
+				sql += " AND timestamp < STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s')";
 			}
-			if (locationId <= 0) {
+			if (locationId > 0) {
 				sql += " AND lu.locationid = ?";
-			}
-			if (semanticPlace != null) {
+			}else if(semanticPlace != null) {
 				sql += " AND semanticplace = ?";
 			}
 			if (macAdd != null) {
-				sql += " AND u.macaddress = ?";
+				sql += " AND macaddress = ?";
 			}
 			sql += ";";
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -355,26 +354,69 @@ public class LocationUsageDAO {
 				stmt.setString(stringCount, endDate);
 				stringCount++;
 			}
-			if (locationId <= 0) {
+			if (locationId > 0) {
 				stmt.setInt(stringCount, locationId);
 				stringCount++;
-			}
-			if (semanticPlace != null) {
+			}else if (semanticPlace != null) {
 				stmt.setString(stringCount, semanticPlace);
 				stringCount++;
 			}
 			if (macAdd != null) {
 				stmt.setString(stringCount, macAdd);
 			}
-			stmt.addBatch();
+                        stringCount = 2;
+			ResultSet rs = stmt.executeQuery();
+                        
+                        while (rs.next()) {
+                            locationId = rs.getInt(1);
+                            macAdd = rs.getString(2);
+                            String timestamp = rs.getString(3);
+                            semanticPlace = rs.getString(4);
+                            lList.add(new LocationUsage(timestamp, macAdd, new Location(locationId, semanticPlace)));
+                        }
+                        rs.close();
+                        stmt.close();
+                        sql = "DELETE FROM locationusage WHERE timestamp >= STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s')";
 			
-			updated = stmt.executeBatch();
-			conn.commit();
-			ConnectionManager.close(conn, stmt);
+			if (endDate != null) {
+				sql += " AND timestamp < STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s')";
+			}
+			if (locationId > 0) {
+				sql += " AND locationid = ?";
+			}else if (semanticPlace != null) {
+				sql += " AND locationid IN (SELECT locationid FROM location WHERE semanticplace = ?)";
+			}
+			if (macAdd != null) {
+				sql += " AND macaddress = ?";
+			}
+			sql += ";";
+                        PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, startDate);
+			if (endDate != null) {
+				ps.setString(stringCount, endDate);
+				stringCount++;
+			}
+			if (locationId > 0) {
+				ps.setInt(stringCount, locationId);
+				stringCount++;
+			}else if (semanticPlace != null) {
+				ps.setString(stringCount, semanticPlace);
+				stringCount++;
+			}
+			if (macAdd != null) {
+				ps.setString(stringCount, macAdd);
+			}
+                        ps.addBatch();
+                        ps.executeBatch();
+                        conn.commit();
+                        
+                        ConnectionManager.close(conn, stmt);
+
 			
 		} catch (NullPointerException e) {
-		}
-		return updated;
+		} catch(SQLException e){
+                }
+		return lList;
 	}
 	
 	public ArrayList<LocationUsage> retrieve(java.util.Date date, String loc) {
@@ -459,7 +501,7 @@ public class LocationUsageDAO {
 				String macAddress = rs.getString(5);
 				int locationId = rs.getInt(6);
 				String semanticplace = rs.getString(8);
-				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, locationId, new Location(locationId, semanticplace));
+				LocationUsage curr = new LocationUsage(Utility.formatDate(new Date(timestamp.getTime())), macAddress, new Location(locationId, semanticplace));
 				result.put(macAddress, curr);
 				
 			}

@@ -18,10 +18,9 @@ public class LocationUsage {
 		location = null;
 	}
 
-	public LocationUsage(String timestamp, String macAddress, int locationId, Location location) {
+	public LocationUsage(String timestamp, String macAddress, Location location) {
 		this.timestamp = timestamp;
 		this.macAddress = macAddress;
-		this.locationId = locationId;
 		this.location = location;
 	}
 

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Boyofthefuture
  */
-@WebServlet(name = "DeleteLocation", urlPatterns = {"/DeleteLocation"})
+@WebServlet(name = "DeleteLocation", urlPatterns = {"/json/location-delete"})
 public class DeleteLocation extends HttpServlet {
 
     /**

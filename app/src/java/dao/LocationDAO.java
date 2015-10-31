@@ -138,23 +138,26 @@ public class LocationDAO {
 		return result;
 	}
 	
-	public boolean checkLocationId(Connection conn, int locationId) {
+	public String checkLocationId(Connection conn, int locationId) {
 		
 		try {
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT locationid FROM location WHERE locationid = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT macaddress FROM location WHERE locationid = ?");
 			
 			ps.setInt(1, locationId);
 			ResultSet rs = ps.executeQuery();
 			
-			boolean check = rs.next();
+                        String location = null;
+			while(rs.next()){
+                            location = rs.getString(1);
+                        }
                         ps.close();
                         rs.close();
-                        return check;
+                        return location;
 			
 		} catch (SQLException e) {
 		}
-		return false;
+            return null;
 	}
 	
 }

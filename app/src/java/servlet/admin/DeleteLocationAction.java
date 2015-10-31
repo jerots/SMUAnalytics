@@ -7,7 +7,10 @@ package servlet.admin;
 
 import controller.DeleteController;
 import dao.Utility;
+import entity.LocationUsage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -42,11 +45,11 @@ public class DeleteLocationAction extends HttpServlet {
                         String semanticPl = Utility.parseString(request.getParameter("semanticplace"));
                         String startTime = Utility.parseString(request.getParameter("starttime"));
                         String endTime = Utility.parseString(request.getParameter("endtime"));
-                        String errors = "";
+                        ArrayList<String> errors = new ArrayList<>();
 
 			DeleteController cntrl = new DeleteController();
-			int deleted = cntrl.delete(macAdd, startDate, endDate, startTime, endTime, locationId, semanticPl, errors);
-			
+			ArrayList<LocationUsage> lList = cntrl.delete(macAdd, startDate, endDate, startTime, endTime, locationId, semanticPl, errors);
+
 			request.setAttribute("macadd", macAdd);
 			request.setAttribute("startdate", startDate);
 			request.setAttribute("enddate", endDate);
@@ -54,14 +57,16 @@ public class DeleteLocationAction extends HttpServlet {
                         request.setAttribute("semanticplace", semanticPl);
                         request.setAttribute("starttime", startTime);
                         request.setAttribute("endtime", endTime);
-                        request.setAttribute("errors", errors);
-			
-			request.setAttribute("rowsDeleted", "" + deleted);
+                        if(errors.size() != 0){
+                            request.setAttribute("errors", errors.get(0));
+                        }
+			request.setAttribute("deleted", lList);
+                        
 			RequestDispatcher rd = request.getRequestDispatcher("delete-location.jsp");
 			rd.forward(request, response);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+                    e.printStackTrace();
 		}
 	}
 

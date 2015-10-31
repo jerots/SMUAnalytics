@@ -4,6 +4,9 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="entity.LocationUsage"%>
+<%@page import="entity.LocationUsage"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="entity.Admin"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -86,12 +89,7 @@
 
 					<form action="DeleteLocationAction" method="post">
 						<br/>
-
-						<div class="form-group">
-							<label for="macadd">Mac Address (Optional)</label>
-							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>">
-						</div>
-						<div class="form-group">
+                                                <div class="form-group">
 							<label for="startdate">Start Date</label>
 							<input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="startdate" name="startdate" value="<%=startdate%>" required>
 						</div>
@@ -106,6 +104,10 @@
                                                 <div class="form-group">
 							<label for="endtime">End Time (Optional)</label>
 							<input type="time" class="form-control" id="endtime" name="endtime" placeholder="HH:MM" value="<%=endTime%>">
+						</div>
+						<div class="form-group">
+							<label for="macadd">Mac Address (Optional)</label>
+							<input type="text" class="form-control" id="macadd" name="macadd" placeholder="mac address" value="<%=macAdd%>">
 						</div>
                                                 <div class="form-group">
 							<label for="locationid">Location Id (Optional)</label>
@@ -124,15 +126,21 @@
 				</div>
 				<div class="theme-div theme-content" style="width:60%">
 					<%      String errors = (String) request.getAttribute("errors");
-						String rowsDel = (String) request.getAttribute("rowsDeleted");
-						out.println("<h1>Result</h1>");
+						ArrayList<LocationUsage> rowsDel = (ArrayList<LocationUsage>) request.getAttribute("deleted");
+						out.println("<h1>Result</h1><br>");
                                                 if(errors != null && errors.length() != 0){
                                                     out.println("<h1 style='color:red'>Error!</h1>");
                                                     out.println("<h3 style='color:red'>" + errors + "</h3>");
-                                                } else if (rowsDel == null) {
+                                                } else if (rowsDel == null || rowsDel.size() == 0) {
 							out.println("You have not chosen anything to delete");
 						} else {
-							out.println(rowsDel + " location usage records deleted.<br>");
+                                                    out.println(rowsDel.size() + " location usage records deleted.<br>");
+                                                     out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
+                                                     out.println("<td><b>Location Id</b></td><td><b>Mac Address</b></td><td><b>TimeStamp</b></td></tr>");
+                                                    for(LocationUsage lu : rowsDel){
+                                                        out.println("<tr><td>" + lu.getLocation().getLocationId() + "</td><td>" + lu.getMacAddress() + "</td><td>" + lu.getTimestamp() + "</td></tr>");
+                                                    }
+                                                    out.println("</table>");
 						}
 					%>
 				</div>
