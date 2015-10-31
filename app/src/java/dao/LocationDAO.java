@@ -142,7 +142,7 @@ public class LocationDAO {
 		
 		try {
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT macaddress FROM location WHERE locationid = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT semanticplace FROM location WHERE locationid = ?");
 			
 			ps.setInt(1, locationId);
 			ResultSet rs = ps.executeQuery();
@@ -151,8 +151,9 @@ public class LocationDAO {
 			while(rs.next()){
                             location = rs.getString(1);
                         }
-                        ps.close();
+                        
                         rs.close();
+                        ps.close();
                         return location;
 			
 		} catch (SQLException e) {

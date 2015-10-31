@@ -439,9 +439,11 @@ public class UserDAO {
 			
 			rs = ps.executeQuery();
 			
-			ps.close();
+			
 			boolean result = rs.next();
+                        
 			rs.close();
+                        ps.close();
 			return result;
 		} catch (SQLException e) {
 			

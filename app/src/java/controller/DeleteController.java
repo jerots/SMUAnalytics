@@ -142,10 +142,13 @@ public class DeleteController {
         }
         
         if(errors.length() == 0){
+            //System.out.println(macAdd);
+            
             deleted = luDao.delete(conn, macAdd, startDate, endDate, locationId, macAdd);
+            //System.out.println(macAdd);
         }else{
             error.add(errors.substring(2));
-            System.out.println(errors);
+            //System.out.println(errors);
         }
         return deleted;
     }
