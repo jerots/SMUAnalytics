@@ -144,7 +144,7 @@ public class DeleteController {
         if(errors.length() == 0){
             //System.out.println(macAdd);
             
-            deleted = luDao.delete(conn, macAdd, startDate, endDate, locationId, macAdd);
+            deleted = luDao.delete(conn, macAdd, startDate, endDate, locationId, semanticPl);
             //System.out.println(macAdd);
         }else{
             error.add(errors.substring(2));
