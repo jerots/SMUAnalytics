@@ -105,22 +105,28 @@
                                                 out.println("<h1 style='color:red'>Error!</h1>");
                                                 out.println("<h3 style='color:red'>" + errors + "</h3>");
                                             }else if(resultsMap != null){ //Checks this because in case of category refresh.
-                                                out.println("<h1>Result</h1>");
+                                                String msg = resultsMap.get("total-social-app-usage-duration").getMessage();
+                                                int num = Utility.parseInt(msg);
+                                                out.println("<h1>Result</h1><br>");
                                                 //This prints the type of table
                                                 out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
                                                 //Note that the value will never get larger than 0 so it is fine to keep iterating without adding.
-                                                out.println("<td><b>Total Usage Time (for Social apps)</b></td>");
-                                                out.println("<td>" + resultsMap.get("total-social-app-usage-duration").getMessage() + "</td></tr></table><br><br>");
-                                                out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td>Individual Social App Usage</td></tr>");
-                                                ArrayList<HashMap<String, Breakdown>> arrList = resultsMap.get("individual-social-app-usage").getBreakdown();
-                                                for(HashMap<String, Breakdown> appItems: arrList){
-                                                    out.println("<tr><td><b>"+ appItems.get("app-name").getMessage() + "</b></td>");
-                                                    out.println("<td>" + appItems.get("percent").getMessage() + "</td></tr></table><br><br>");
+                                                out.println("<td colspan='2'><b>App Breakdown of Social Activeness</b></td></tr><tr><td>Total Usage Time (for Social apps)</td>");
+                                                out.println("<td>" + num + "</td></tr></table><br><br>");
+                                                if(num != 0){
+                                                    out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'><b>Individual Social App Usage</b></td></tr>");
+                                                    ArrayList<HashMap<String, Breakdown>> arrList = resultsMap.get("individual-social-app-usage").getBreakdown();
+                                                    for(HashMap<String, Breakdown> appItems: arrList){
+                                                        out.println("<tr><td>"+ appItems.get("app-name").getMessage() + "</td>");
+                                                        out.println("<td>" + appItems.get("percent").getMessage() + "%</td></tr>");
+                                                    }
+                                                    out.println("</table><br>");
                                                 }
-                                                out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><tr><td><b>");
-                                                out.println("Total Time Spent in SIS</b></td><td>" + resultsMap.get("total-time-spent-in-sis").getMessage() + "</td></tr>");
-                                                out.println("<tr><td><b> Group Percent </b></td><td>" + resultsMap.get("group-percent").getMessage() + "</td></tr>");
-                                                out.println("<tr><td><b> Solo Percent </b></td><td>" + resultsMap.get("solo-percent").getMessage() + "</td></tr></table>");
+                                                out.println("<br><table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'><b>");
+                                                out.println("Physical Breakdown for Social Activeness</b></td></tr><tr><td>");
+                                                out.println("Total Time Spent in SIS</td><td>" + resultsMap.get("total-time-spent-in-sis").getMessage() + "</td></tr>");
+                                                out.println("<tr><td> Group Percent </td><td>" + resultsMap.get("group-percent").getMessage() + "%</td></tr>");
+                                                out.println("<tr><td> Solo Percent </td><td>" + resultsMap.get("solo-percent").getMessage() + "%</td></tr></table>");
                                             }else{
                                                 out.println("<h1>Result</h1>");
                                                 out.println("You have not entered any input.");
