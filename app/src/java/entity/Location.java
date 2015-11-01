@@ -56,7 +56,7 @@ public class Location implements Comparable<Location>{
             return false;
         }
         final Location other = (Location) obj;
-        return this.locationId != other.locationId;
+        return this.locationId == other.locationId;
     }
     
     //NOT IMPLEMENTED
