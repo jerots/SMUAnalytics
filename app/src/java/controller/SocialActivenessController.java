@@ -214,9 +214,9 @@ public class SocialActivenessController {
             activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc));
             userList.put(loc, activeArr);
             overall += total; //adds to overall time
-            System.out.println("haha");
             //--------------------------------------PART II: GROUPING OF LOCATION AND TIME -- INDIVIDUALS.------------------------------------------------------------
             //Do the same thing for each user again, however, this time, toss users out who dont fit the criteria.
+            
             ArrayList<LocationUsage> luList = luDao.retrievePeopleExceptUserLocationUsage(onlyDate, macAddress);
             Iterator<LocationUsage> iterLoc = luList.iterator();
             //THIS IS THE FINAL ARRAYLIST FOR OVERLAP. Here tallies ALL the overlaps with the user
@@ -229,6 +229,7 @@ public class SocialActivenessController {
             String macAdd = null;
             total = 0;
             //Goes through the entire list by person. Arranged by person, macadd, and compares immediately to throw.
+            //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CHECK TILL HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             while(iterLoc.hasNext()){
                 LocationUsage lUsage = iterLoc.next();
                 //Gets the date from the LocationUsage
@@ -287,6 +288,7 @@ public class SocialActivenessController {
                         }
                         userOverlapList.add(temp);
                     }
+                    singleList = new ArrayList<Activeness>();
                     //Resets for next location IF it is the second situation that it enters
                     total = 0;
                     loc = l;
@@ -383,7 +385,7 @@ public class SocialActivenessController {
                                 activity = a;
                             }
                             if(totalTime < 300000){
-                                while(i > 0){
+                                while(i > 0 && iterA.hasNext()){
                                     //Deletes all records that have no continuation.
                                     iterA.next();
                                     iterA.remove();
