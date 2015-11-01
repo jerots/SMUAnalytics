@@ -17,6 +17,7 @@ import java.util.Date;
 public final class Utility {
 
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
 
@@ -40,6 +41,27 @@ public final class Utility {
         if(date != null){
             String format = df.format(date);
             if(checkDate(format)){
+                return format;
+            }
+        }
+        return null;
+    }
+    
+    public static Date parseOnlyDate(String date) {
+        date = date.replace("\"","");
+        if (date != null && date.length() > 0) {
+            try {                
+                return sdf.parse(date);
+            } catch (ParseException e) {
+            }
+        }
+        return null;
+    }
+    
+    public static String formatOnlyDate(Date date){
+        if(date != null){
+            String format = sdf.format(date);
+            if(checkOnlyDate(format)){
                 return format;
             }
         }
