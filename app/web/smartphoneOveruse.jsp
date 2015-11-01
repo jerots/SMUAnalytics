@@ -61,7 +61,7 @@
                         </li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
-                        <li><a href="#">Social Activeness</a></li>
+                        <li><a href="socialActiveness.jsp">Social Activeness</a></li>
 
                     </ul>
 
