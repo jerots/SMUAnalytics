@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.Objects;
+
 public class Location implements Comparable<Location>{
 
     private int locationId;
@@ -43,7 +45,7 @@ public class Location implements Comparable<Location>{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 31 * hash + this.locationId;
+        hash = 31 * hash + Objects.hashCode(this.semanticPlace);
         return hash;
     }
 
@@ -56,7 +58,7 @@ public class Location implements Comparable<Location>{
             return false;
         }
         final Location other = (Location) obj;
-        return this.locationId == other.locationId;
+        return this.semanticPlace.equals(other.semanticPlace);
     }
     
     //NOT IMPLEMENTED
