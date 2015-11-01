@@ -59,7 +59,7 @@ public class Activeness implements Comparable<Activeness>{
     //This method DOES return an overlap if it is less than 5 minutes
     public Activeness overlap(Activeness active){ //Puts the overlap into a new activeness
         //Checks for location initially as well to make sure that their locations are correct so that they can overlap
-        if(!(active.endTime < startTime || active.startTime > endTime) && active.location.equals(location)){
+        if(!(active.endTime <= startTime || active.startTime >= endTime) && active.location.equals(location)){
             //If there is an overlap, returns the millisecs that is overlapped
             if(active.startTime <= startTime){
                 long activeEnd = active.endTime;
