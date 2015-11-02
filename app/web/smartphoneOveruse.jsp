@@ -77,16 +77,17 @@
 
         <!--START OF CONTENT-->
         <%
-			String time = (String) request.getAttribute("time");
-			String date = (String) request.getAttribute("date");
-			String dateCode = "";
-			if (date != null) {
-				dateCode = "value='" + date + "'";
+			
+			String startDate = request.getParameter("startDate");
+			String endDate = request.getParameter("endDate");
+			
+			if (startDate == null){
+				startDate = "";
 			}
-			String timeCode = "";
-			if (time != null) {
-				timeCode = "value='" + time + "'";
+			if (endDate == null){
+				endDate = "";
 			}
+			
         %>
 
 
@@ -96,11 +97,11 @@
                     <form action="SmartphoneOveruse" method="GET">
                         <div class="form-group">
                             <label for="date">Start Date</label>
-                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="startDate" <%=dateCode%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="startDate" value='<%=startDate%>' required>
                         </div>
                         <div class="form-group">
                             <label for="date">End Date</label>
-                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" <%=dateCode%> required>
+                            <input type="date" min="1970-01-01" max="2050-01-01" class="form-control" id="date" name="endDate" value='<%=endDate%>' required>
                         </div>
 
 
