@@ -138,7 +138,7 @@ public class BasicUsetime extends HttpServlet {
 
             BasicAppController ctrl = new BasicAppController();
 
-            Breakdown breakdown = ctrl.generateReport(startDate, endDate, null);
+            Breakdown breakdown = ctrl.generateReport(startDate, endDate, null, -1);
 
             ArrayList<HashMap<String, Breakdown>> breakdownList = breakdown.getBreakdown();
 

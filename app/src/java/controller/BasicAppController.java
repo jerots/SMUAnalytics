@@ -26,7 +26,7 @@ import java.util.TreeMap;
  */
 public class BasicAppController {
 
-	public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList) {
+	public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList, double total) {
 
 		//INTIATING VARIABLES
 		Breakdown result = new Breakdown();
@@ -130,11 +130,14 @@ public class BasicAppController {
 
 		}
 		//Calculate percentage
-		double totalCount = mildCount + normalCount + intenseCount;
+		if (total == -1) {
+			total = mildCount + normalCount + intenseCount;
 
-		int mildPercent = (int) Math.round(mildCount / totalCount * 100);
-		int normalPercent = (int) Math.round(normalCount / totalCount * 100);
-		int intensePercent = (int) Math.round(intenseCount / totalCount * 100);
+		}
+
+		int mildPercent = (int) Math.round(mildCount / total * 100);
+		int normalPercent = (int) Math.round(normalCount / total * 100);
+		int intensePercent = (int) Math.round(intenseCount / total * 100);
 
 		//Put in maps
 		intenseMap.put("intense-count", new Breakdown("" + intenseCount));
@@ -156,7 +159,8 @@ public class BasicAppController {
 		AppUsageDAO auDAO = new AppUsageDAO();
 		ArrayList<User> userList = auDAO.retrieveUsers(startDate, endDate);
 		
-		System.out.println(userList.size());
+		double total = userList.size();
+		
 		Breakdown result = new Breakdown();
 
 		ArrayList<String> schools = userDAO.getSchools();
@@ -300,14 +304,14 @@ public class BasicAppController {
 						demo3bd.addInList(demo4Map);
 
 						if (demoCount == 4) {
-							Breakdown demo4report = generateReport(startDate, endDate, demo4UserList);
+							Breakdown demo4report = generateReport(startDate, endDate, demo4UserList, total);
 							demo4Map.put("breakdown", demo4report);
 						}
 					}
 
 					if (demoCount == 3) {
 						//generate report if last demo
-						Breakdown demo3report = generateReport(startDate, endDate, demo3UserList);
+						Breakdown demo3report = generateReport(startDate, endDate, demo3UserList, total);
 						demo3Map.put("breakdown", demo3report);
 					}
 
@@ -315,7 +319,7 @@ public class BasicAppController {
 
 				if (demoCount == 2) {
 					//generate report if last demo
-					Breakdown demo2report = generateReport(startDate, endDate, demo2UserList);
+					Breakdown demo2report = generateReport(startDate, endDate, demo2UserList, total);
 					demo2Map.put("breakdown", demo2report);
 
 				}
@@ -323,27 +327,33 @@ public class BasicAppController {
 
 			if (demoCount == 1) {
 				//generate report if last demo
-				Breakdown demo1report = generateReport(startDate, endDate, demo1UserList);
+				Breakdown demo1report = generateReport(startDate, endDate, demo1UserList, total);
 				demo1Map.put("breakdown", demo1report);
 			}
 		}
 
 		//CALCULATE PERCENTAGE
 		if (demoCount > 0) {
-			generatePercentage(result);
+			Breakdown bd1 = result;
+			ArrayList<HashMap<String, Breakdown>> list1 = bd1.getBreakdown();
+
+			generatePercentage(bd1, total);
+
 		}
+
 		if (demoCount > 1) {
 			ArrayList<HashMap<String, Breakdown>> secondTier = result.getBreakdown();
 			for (HashMap<String, Breakdown> secondMap : secondTier) {
-				generatePercentage(secondMap.get("breakdown"));
+				generatePercentage(secondMap.get("breakdown"), total);
 			}
+
 		}
 		if (demoCount > 2) {
 			ArrayList<HashMap<String, Breakdown>> secondTier = result.getBreakdown();
 			for (HashMap<String, Breakdown> secondMap : secondTier) {
 				ArrayList<HashMap<String, Breakdown>> thirdTier = secondMap.get("breakdown").getBreakdown();
 				for (HashMap<String, Breakdown> thirdMap : thirdTier) {
-					generatePercentage(thirdMap.get("breakdown"));
+					generatePercentage(thirdMap.get("breakdown"), total);
 
 				}
 
@@ -351,12 +361,13 @@ public class BasicAppController {
 		}
 		if (demoCount > 3) {
 			ArrayList<HashMap<String, Breakdown>> secondTier = result.getBreakdown();
+
 			for (HashMap<String, Breakdown> secondMap : secondTier) {
 				ArrayList<HashMap<String, Breakdown>> thirdTier = secondMap.get("breakdown").getBreakdown();
 				for (HashMap<String, Breakdown> thirdMap : thirdTier) {
 					ArrayList<HashMap<String, Breakdown>> fourthTier = thirdMap.get("breakdown").getBreakdown();
 					for (HashMap<String, Breakdown> fourthMap : fourthTier) {
-						generatePercentage(fourthMap.get("breakdown"));
+						generatePercentage(fourthMap.get("breakdown"), total);
 					}
 				}
 
@@ -402,39 +413,29 @@ public class BasicAppController {
 			}
 			return toParse;
 
-		} else if (demoType.equals("cca")){
+		} else if (demoType.equals("cca")) {
 			// Filter by CCAs
-			while (iter.hasNext()){
+			while (iter.hasNext()) {
 				User user = iter.next();
-				if (!user.getCca().toLowerCase().equals(demo.toLowerCase())){
+				if (!user.getCca().toLowerCase().equals(demo.toLowerCase())) {
 					iter.remove();
 				}
 			}
-			
+
 			return toParse;
-			
-			
+
 		}
 		return userList;
 
 	}
 
-	public void generatePercentage(Breakdown breakdown) {
+	public void generatePercentage(Breakdown breakdown, double total) {
 
 		ArrayList<HashMap<String, Breakdown>> list1 = breakdown.getBreakdown();
-		double total = 0.0;
-
-		//Calculate the total
-		for (HashMap<String, Breakdown> map : list1) {
-			int count = Integer.parseInt(map.get("count").getMessage());
-			total += count;
-		}
-
-		//Calculate the percentage and put in Breakdown
 		for (HashMap<String, Breakdown> map : list1) {
 
 			int count = Integer.parseInt(map.get("count").getMessage());
-			int percent = (int) Math.round(count / total * 100);
+			int percent = (int) Math.round((count * 100) / total);
 			map.put("percent", new Breakdown("" + percent));
 
 		}

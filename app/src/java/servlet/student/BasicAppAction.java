@@ -112,7 +112,7 @@ public class BasicAppAction extends HttpServlet {
 			BasicAppController ctrl = new BasicAppController();
 
 			if (demoArr.length == 0) {
-				result = ctrl.generateReport(startDate, endDate, null);
+				result = ctrl.generateReport(startDate, endDate, null, -1);
 				
 
 			} else {
