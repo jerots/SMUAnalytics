@@ -621,7 +621,8 @@ public class BasicAppController {
 			int targetCount = targetList.size();
 			//get userList for this hour, filtered by demo
 			ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
-
+			System.out.println(targetList.size());
+			System.out.println(userList.size());
 			int secondsThisHour = 0;
 
 			//for each user
