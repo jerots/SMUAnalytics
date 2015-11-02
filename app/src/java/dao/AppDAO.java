@@ -132,6 +132,7 @@ public class AppDAO {
 			}
 			
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -167,7 +168,7 @@ public class AppDAO {
 			}
 			
 		} catch (SQLException e) {
-			
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}

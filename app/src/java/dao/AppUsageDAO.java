@@ -303,7 +303,7 @@ public class AppUsageDAO {
 			}
 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -341,10 +341,10 @@ public class AppUsageDAO {
 
 				result.add(new AppUsage(timestamp, macaddress, appid, new App(appid, appName, appCat)));
 
-
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -380,6 +380,7 @@ public class AppUsageDAO {
 				result.add(new AppUsage(timestamp, macaddress, appid));
 			}
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -396,7 +397,6 @@ public class AppUsageDAO {
 		try {
 
 			conn = ConnectionManager.getConnection();
-
 
 			ps = conn.prepareStatement("SELECT au.macaddress, name, password, email, gender,cca from appusage au, user u \n"
 					+ "where au.macaddress = u.macaddress\n"
@@ -432,7 +432,6 @@ public class AppUsageDAO {
 
 			rs = ps.executeQuery();
 
-
 			while (rs.next()) {
 				String macAdd = rs.getString(1);
 				String name = rs.getString(2);
@@ -444,6 +443,7 @@ public class AppUsageDAO {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -484,6 +484,7 @@ public class AppUsageDAO {
 			ConnectionManager.close(conn, ps, rs);
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -525,6 +526,7 @@ public class AppUsageDAO {
 			ConnectionManager.close(conn, ps);
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -566,7 +568,7 @@ public class AppUsageDAO {
 			}
 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
@@ -615,49 +617,49 @@ public class AppUsageDAO {
 			}
 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		} finally {
 			ConnectionManager.close(conn, ps, rs);
 		}
 		return aList;
 	}
-    
-    public ArrayList<AppUsage> getUserAppsForSocial(String date, String macAdd){ 
-        ArrayList<AppUsage> sList = new ArrayList<>();
 
-        String query = "SELECT appname, timestamp, a.appid, appcategory\n" +
-                        "FROM appusage au, user u, app a\n" +
-                        "WHERE au.macaddress = u.macaddress\n" +
-                        "AND a.appid = au.appid\n" +
-                        "AND date(timestamp) = ?\n" +
-                        "AND au.macaddress = ?\n" +
-                        "ORDER BY timestamp, a.appid;";
+	public ArrayList<AppUsage> getUserAppsForSocial(String date, String macAdd) {
+		ArrayList<AppUsage> sList = new ArrayList<>();
 
-        try {
-            Connection conn = ConnectionManager.getConnection();
-            PreparedStatement pStmt = conn.prepareStatement(query);
-            //Assumes that checks have been done prior already
-            pStmt.setString(1, date);
-            pStmt.setString(2, macAdd);
+		String query = "SELECT appname, timestamp, a.appid, appcategory\n"
+				+ "FROM appusage au, user u, app a\n"
+				+ "WHERE au.macaddress = u.macaddress\n"
+				+ "AND a.appid = au.appid\n"
+				+ "AND date(timestamp) = ?\n"
+				+ "AND au.macaddress = ?\n"
+				+ "ORDER BY timestamp, a.appid;";
 
-            ResultSet rs = pStmt.executeQuery();
-            
-            //NOTE: WHY DO WE NOT SET CATEGORY = SOCIAL. BECAUSE YOU NEED TO MINUS THE NEXT TO CHECK THE TOTAL USAGE TIME. Category check later
-            while (rs.next()) {
-                String appName = rs.getString(1);
-                String timeStamp = rs.getString(2);
-                int appId = rs.getInt(3);
-                String category = rs.getString(4);
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement pStmt = conn.prepareStatement(query);
+			//Assumes that checks have been done prior already
+			pStmt.setString(1, date);
+			pStmt.setString(2, macAdd);
 
-                sList.add(new AppUsage(timeStamp, macAdd, appId, new App(appId, appName, category)));
-            }
-            rs.close();
-            pStmt.close();
-            conn.close();
+			ResultSet rs = pStmt.executeQuery();
 
-        } catch (SQLException e) {
+			//NOTE: WHY DO WE NOT SET CATEGORY = SOCIAL. BECAUSE YOU NEED TO MINUS THE NEXT TO CHECK THE TOTAL USAGE TIME. Category check later
+			while (rs.next()) {
+				String appName = rs.getString(1);
+				String timeStamp = rs.getString(2);
+				int appId = rs.getInt(3);
+				String category = rs.getString(4);
 
-        }
-        return sList;
-    }
+				sList.add(new AppUsage(timeStamp, macAdd, appId, new App(appId, appName, category)));
+			}
+			rs.close();
+			pStmt.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sList;
+	}
 }

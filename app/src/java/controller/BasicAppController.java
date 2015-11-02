@@ -454,12 +454,10 @@ public class BasicAppController {
 		ArrayList<User> userList = new ArrayList<User>();
 
 		userList = auDAO.retrieveUsers(startDate, endDate);
-
 		for (int i = 0; i < userList.size(); i++) {
 
 			User currUser = userList.get(i);
 			ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
-
 			Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
 
 			Date oldTime = null;
@@ -519,6 +517,7 @@ public class BasicAppController {
 				oldTime = newTime;
 
 			}
+			System.out.print("appResult: " + appResult.size());
 			//get the appId of the last user usage
 			int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
@@ -551,7 +550,7 @@ public class BasicAppController {
 			}
 
 			//DIVIDE TO GET INTO DAYS
-			long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
+			long days = Utility.daysBetweenDates(startDate, endDate);
 
 			AppDAO app = new AppDAO();
 
