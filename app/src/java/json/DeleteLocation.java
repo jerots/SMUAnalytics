@@ -9,12 +9,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import controller.DeleteController;
 import dao.AdminDAO;
 import entity.Admin;
+import entity.LocationUsage;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -39,41 +43,92 @@ public class DeleteLocation extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonObject output = new JsonObject();
-            JsonArray arrayErr = new JsonArray();
+            JsonArray errorArr = new JsonArray();
 
             String token = request.getParameter("token");
+            String startDate = request.getParameter("startdate");
+            String endDate = request.getParameter("enddate");
+            String startTime = request.getParameter("starttime");
+            String endTime = request.getParameter("endtime");
+            String locationId = request.getParameter("locationid");
+            String semanticPl = request.getParameter("semanticplace");
+            String macAdd = request.getParameter("macadd");
 
             //TOKEN VALIDATION
             if (token == null) {
-                arrayErr.add("missing token");
+                errorArr.add("missing token");
             } else if (token.length() == 0) {
-                arrayErr.add("blank token");
+                errorArr.add("blank token");
             } else {
                 try {
                     String username = JWTUtility.verify(token, "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
-                        arrayErr.add("invalid token");
+                        errorArr.add("invalid token");
                     } else {
                         AdminDAO adminDAO = new AdminDAO();
                         Admin admin = adminDAO.retrieve(username);
                         if (admin == null) {
-                            arrayErr.add("invalid token");
+                            errorArr.add("invalid token");
                         }
                     }
 
                 } catch (JWTException e) {
                     //failed
-                    arrayErr.add("invalid token");
+                    errorArr.add("invalid token");
                 }
 
             }
+            //ALL OTHER VALIDATIONS ARE DONE BY THE CONTROLLER
+            DeleteController dCntrl = new DeleteController();
+            ArrayList<String> error = new ArrayList<String>();
+            ArrayList<LocationUsage> lList = null;
+            try {
 
+                lList = dCntrl.delete(macAdd, startDate, endDate, startTime, endTime, locationId, semanticPl, error);
+            } catch (SQLException e) {
+            }
+
+            if (error != null && error.size() != 0) {
+                String[] errorsStr = error.get(0).split(",\\s");
+                for (String str : errorsStr) {
+                    errorArr.add(str);
+                }
+            }
+
+            //PRINT ERROR AND EXIT IF ERRORS EXIST
+            if (errorArr.size() > 0) {
+                output.addProperty("status", "error");
+                output.add("errors", errorArr);
+                out.println(gson.toJson(output));
+                return;
+            }
+
+            if (lList != null && lList.size() != 0) {
+                output.addProperty("status", "success");
+                output.addProperty("num-records-deleted", lList.size());
+                JsonArray arr = new JsonArray();
+                for (LocationUsage lu : lList) {
+                    JsonObject obj = new JsonObject();
+                    obj.addProperty("location-id", lu.getLocation().getLocationId());
+                    obj.addProperty("mac-address", lu.getMacAddress());
+                    obj.addProperty("timestamp", lu.getTimestamp());
+                    arr.add(obj);
+                }
+                output.add("rows-deleted", arr);
+                out.println(gson.toJson(output));
+            } else {
+                output.addProperty("status", "success");
+                output.addProperty("num-records-deleted", 0);
+                JsonArray arr = new JsonArray();
+                output.add("rows-deleted", arr);
+                out.println(gson.toJson(output));
+            }
         }
     }
 

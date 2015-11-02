@@ -347,7 +347,7 @@ public class LocationUsageDAO {
             if (macAdd != null) {
                 sql += " AND macaddress = ?";
             }
-            sql += ";";
+            sql += " ;";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, startDate);
             if (endDate != null) {
@@ -368,11 +368,11 @@ public class LocationUsageDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                locationId = rs.getInt(1);
-                macAdd = rs.getString(2);
+                int locId = rs.getInt(1);
+                String macAddress = rs.getString(2);
                 String timestamp = rs.getString(3);
-                semanticPlace = rs.getString(4);
-                lList.add(new LocationUsage(timestamp, macAdd, new Location(locationId, semanticPlace)));
+                String semPlace = rs.getString(4);
+                lList.add(new LocationUsage(timestamp, macAddress, new Location(locId, semPlace)));
             }
             rs.close();
             stmt.close();
@@ -389,7 +389,7 @@ public class LocationUsageDAO {
             if (macAdd != null) {
                 sql += " AND macaddress = ?";
             }
-            sql += ";";
+            sql += " ;";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, startDate);
             if (endDate != null) {
@@ -413,6 +413,7 @@ public class LocationUsageDAO {
             ConnectionManager.close(conn, stmt);
 
         } catch (NullPointerException e) {
+            
         } catch (SQLException e) {
         }
         return lList;
