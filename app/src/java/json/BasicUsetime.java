@@ -98,7 +98,7 @@ public class BasicUsetime extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(startdate)) {
+                    if (dateFormatted == null) {
                         errors.add("invalid startdate");
                     }
                 }
@@ -115,7 +115,7 @@ public class BasicUsetime extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(enddate, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(enddate)) {
+                    if (dateFormatted == null) {
                         errors.add("invalid enddate");
                     }
                 }

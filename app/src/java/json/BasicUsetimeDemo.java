@@ -100,7 +100,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(startdate)) {
+                    if (dateFormatted == null) {
                         errors.add("invalid startdate");
                     }
                 }
@@ -117,7 +117,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(enddate, new ParsePosition(0));
-                    if (dateFormatted == null || !Utility.checkDate(enddate)) {
+                    if (dateFormatted == null) {
                         errors.add("invalid enddate");
                     }
                 }
@@ -132,7 +132,7 @@ public class BasicUsetimeDemo extends HttpServlet {
 
                 String[] orderArr = order.split(",");
 
-                if (orderArr.length > 3) {
+                if (orderArr.length > 4) {
                     //INVALID
                     errors.add("invalid order");
                 } else {
@@ -141,6 +141,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                     toCheck.add("year");
                     toCheck.add("gender");
                     toCheck.add("school");
+					toCheck.add("cca");
 
                     for (String s : orderArr) {
                         if (!toCheck.contains(s)) {
@@ -201,6 +202,8 @@ public class BasicUsetimeDemo extends HttpServlet {
                 obj.addProperty("year", map.get("year").getMessage());
             } else if (map.get("school") != null) {
                 obj.addProperty("school", map.get("school").getMessage());
+            }else if (map.get("cca") != null) {
+                obj.addProperty("cca", map.get("cca").getMessage());
             }
 
             Breakdown count = map.get("count");
