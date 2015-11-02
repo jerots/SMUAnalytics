@@ -19,7 +19,7 @@ public class AppUsage implements Comparable<AppUsage>{
 		this.appId = appId;
 	}
         
-        public AppUsage(String timestamp, String macAddress, App app) {
+        public AppUsage(String timestamp, String macAddress, int appId, App app) {
 		this.timestamp = timestamp;
 		this.macAddress = macAddress;
 		this.app = app;
