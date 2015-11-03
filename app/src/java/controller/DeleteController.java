@@ -132,13 +132,15 @@ public class DeleteController {
         }
         
         //SEMANTIC PLACE VALIDATION
-        if(semanticPl != null && semanticPl.length() != 0){
+        if(semanticPl != null && semanticPl.length() > 7){
             String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
             int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
 
             if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
                 errors += ", invalid semantic place";
             }
+        } else {
+            errors += ", invalid semantic place";
         }
         
         if(errors.length() == 0){
