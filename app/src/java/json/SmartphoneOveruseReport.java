@@ -9,28 +9,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import controller.HeatmapController;
 import controller.SmartphoneOveruseController;
 import dao.UserDAO;
 import dao.Utility;
-import entity.LocationUsage;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -72,7 +65,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 				errors.add("blank token");
 			} else {
 				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
 					if (username == null) {
 						//failed
 						errors.add("invalid token");
@@ -97,7 +90,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			} else if (macAdd.length() == 0) {
 				errors.add("blank macaddress");
 			} else {
-				macAdd = macAdd.toLowerCase();
+				macAdd = macAdd.toLowerCase().trim();
 				UserDAO userDAO = new UserDAO();
 				user = userDAO.retrieveByMac(macAdd);
 				if (user == null) {
@@ -112,6 +105,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			} else if (startDateStr.length() == 0) {
 				errors.add("blank startdate");
 			} else {
+				startDateStr = startDateStr.trim();
 				if (startDateStr.length() != 10) {
 					errors.add("invalid startdate");
 				} else {
@@ -128,6 +122,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			} else if (endDateStr.length() == 0) {
 				errors.add("blank enddate");
 			} else {
+				endDateStr = endDateStr.trim();
 				if (endDateStr.length() != 10) {
 					errors.add("invalid enddate");
 				} else {

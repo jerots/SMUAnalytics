@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package json;
 
 import com.google.gson.Gson;
@@ -11,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
 import dao.UserDAO;
-import dao.Utility;
 import entity.Breakdown;
 import entity.User;
 import is203.JWTException;
@@ -23,30 +17,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author jeremyongts92
- */
 @WebServlet(name = "BasicUsetimeDemo", urlPatterns = {"/json/basic-usetime-demographics-report"})
 public class BasicUsetimeDemo extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -70,7 +49,7 @@ public class BasicUsetimeDemo extends HttpServlet {
                 errors.add("blank token");
             } else {
                 try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
@@ -95,6 +74,7 @@ public class BasicUsetimeDemo extends HttpServlet {
             } else if (startdate.length() == 0) {
                 errors.add("blank startdate");
             } else {
+				startdate = startdate.trim();
                 if (startdate.length() != 10) {
                     errors.add("invalid startdate");
                 } else {
@@ -112,6 +92,7 @@ public class BasicUsetimeDemo extends HttpServlet {
             } else if (enddate.length() == 0) {
                 errors.add("blank enddate");
             } else {
+				enddate = enddate.trim();
                 if (enddate.length() != 10) {
                     errors.add("invalid enddate");
                 } else {
@@ -129,7 +110,7 @@ public class BasicUsetimeDemo extends HttpServlet {
             } else if (order.length() == 0) {
                 errors.add("blank order");
             } else {
-				order = order.toLowerCase();
+				order = order.toLowerCase().trim();
                 String[] orderArr = order.split(",");
 
                 if (orderArr.length > 4) {

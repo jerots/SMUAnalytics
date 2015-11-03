@@ -59,7 +59,7 @@ public class TopKStudent extends HttpServlet {
 				errors.add("blank token");
 			} else {
 				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
 					if (username == null) {
 						//failed
 						errors.add("invalid token");
@@ -94,6 +94,7 @@ public class TopKStudent extends HttpServlet {
 			} else if (startdate.length() == 0) {
 				errors.add("blank startdate");
 			} else {
+				startdate = startdate.trim();
 				if (startdate.length() != 10) {
 					errors.add("invalid startdate");
 				} else {
@@ -111,6 +112,7 @@ public class TopKStudent extends HttpServlet {
 			} else if (enddate.length() == 0) {
 				errors.add("blank enddate");
 			} else {
+				enddate = enddate.trim();
 				if (enddate.length() != 10) {
 					errors.add("invalid enddate");
 				} else {
@@ -131,7 +133,7 @@ public class TopKStudent extends HttpServlet {
 			} else if (selected.length() == 0) {
 				errors.add("blank appcategory");
 			} else {
-				selected = selected.toLowerCase();
+				selected = selected.toLowerCase().trim();
 				if (!Utility.checkCategory(selected)) {
 					errors.add("invalid appcategory");
 

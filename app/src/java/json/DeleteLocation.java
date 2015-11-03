@@ -18,7 +18,10 @@ import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -73,7 +76,7 @@ public class DeleteLocation extends HttpServlet {
                 errorArr.add("blank token");
             } else {
                 try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
                         errorArr.add("invalid token");
@@ -91,6 +94,26 @@ public class DeleteLocation extends HttpServlet {
                 }
 
             }
+			
+			//STARTDATE VALIDATION (mandatory)
+            if (startDate == null) {
+                errorArr.add("missing startdate");
+            } else if (startDate.length() == 0) {
+                errorArr.add("blank startdate");
+            } else {
+				startDate = startDate.trim();
+                if (startDate.length() != 10) {
+                    errorArr.add("invalid startdate");
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+                    Date dateFormatted = sdf.parse(startDate, new ParsePosition(0));
+                    if (dateFormatted == null) {
+                        errorArr.add("invalid startdate");
+                    }
+                }
+            }
+			
+			
             //ALL OTHER VALIDATIONS ARE DONE BY THE CONTROLLER
             DeleteController dCntrl = new DeleteController();
             ArrayList<String> error = new ArrayList<String>();

@@ -65,7 +65,7 @@ public class SocialActiveness extends HttpServlet {
 				errors.add("blank token");
 			} else {
 				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
 					if (username == null) {
 						//failed
 						errors.add("invalid token");
@@ -89,6 +89,7 @@ public class SocialActiveness extends HttpServlet {
 			} else if (date.length() == 0) {
 				errors.add("blank date");
 			} else {
+				date = date.trim();
 				if (date.length() != 10) {
 					errors.add("invalid date");
 				} else {
@@ -111,7 +112,7 @@ public class SocialActiveness extends HttpServlet {
 			} else if (macAdd.length() == 0) {
 				errors.add("blank macaddress");
 			} else {
-				macAdd = macAdd.toLowerCase();
+				macAdd = macAdd.toLowerCase().trim();
 				user = userDAO.retrieveByMac(macAdd);
 				if (user == null) {
 					errors.add("invalid macaddress");

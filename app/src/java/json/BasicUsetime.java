@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package json;
 
 import com.google.gson.Gson;
@@ -30,22 +25,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author jeremyongts92
- */
 @WebServlet(name = "BasicUsetimeReport", urlPatterns = {"/json/basic-usetime-report"})
 public class BasicUsetime extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -68,7 +50,7 @@ public class BasicUsetime extends HttpServlet {
                 errors.add("blank token");
             } else {
                 try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
@@ -93,6 +75,7 @@ public class BasicUsetime extends HttpServlet {
             } else if (startdate.length() == 0) {
                 errors.add("blank startdate");
             } else {
+				startdate = startdate.trim();
                 if (startdate.length() != 10) {
                     errors.add("invalid startdate");
                 } else {
@@ -110,6 +93,7 @@ public class BasicUsetime extends HttpServlet {
             } else if (enddate.length() == 0) {
                 errors.add("blank enddate");
             } else {
+				enddate = enddate.trim();
                 if (enddate.length() != 10) {
                     errors.add("invalid enddate");
                 } else {

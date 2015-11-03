@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package json;
 
 import com.google.gson.Gson;
@@ -29,22 +24,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author jeremyongts92
- */
 @WebServlet(name = "BasicDiurnalPattern", urlPatterns = {"/json/basic-diurnalpattern-report"})
 public class BasicDiurnalPattern extends HttpServlet {
 
-	/**
-	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-	 * methods.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("application/json");
@@ -69,7 +51,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 				errors.add("blank token");
 			} else {
 				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
 					if (username == null) {
 						//failed
 						errors.add("invalid token");
@@ -94,6 +76,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (date.length() == 0) {
 				errors.add("blank date");
 			} else {
+				date = date.trim();
 				if (date.length() != 10) {
 					errors.add("invalid date");
 				} else {
@@ -113,7 +96,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (yearFilter.length() == 0) {
 				errors.add("blank yearfilter");
 			} else {
-				yearFilter = yearFilter.toLowerCase();
+				yearFilter = yearFilter.toLowerCase().trim();
 				if (!years.contains(yearFilter) && !yearFilter.equals("na")) {
 					errors.add("invalid yearfilter");
 				}
@@ -126,7 +109,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (genderFilter.length() == 0) {
 				errors.add("blank genderfilter");
 			} else {
-				genderFilter = genderFilter.toLowerCase();
+				genderFilter = genderFilter.toLowerCase().trim();
 				if (!genders.contains(genderFilter) && !genderFilter.equals("na")) {
 					errors.add("invalid genderfilter");
 				}
@@ -139,7 +122,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (schoolFilter.length() == 0) {
 				errors.add("blank schoolfilter");
 			} else {
-				schoolFilter = schoolFilter.toLowerCase();
+				schoolFilter = schoolFilter.toLowerCase().trim();
 				if (!schools.contains(schoolFilter) && !schoolFilter.equals("na")) {
 					errors.add("invalid schoolfilter");
 				}

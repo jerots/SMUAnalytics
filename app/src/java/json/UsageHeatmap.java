@@ -68,7 +68,7 @@ public class UsageHeatmap extends HttpServlet {
                 errors.add("blank token");
             } else {
                 try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
@@ -94,6 +94,7 @@ public class UsageHeatmap extends HttpServlet {
                 errors.add("blank floor");
             } else {
                 try {
+					floor = floor.trim();
                     int floorInt = Integer.parseInt(floor);
                     if (floorInt < 0 || floorInt > 5) {
                         errors.add("invalid floor");
@@ -117,6 +118,7 @@ public class UsageHeatmap extends HttpServlet {
             } else if (date.length() == 0) {
                 errors.add("blank date");
             } else {
+				date = date.trim();
                 if (date.length() != 10) {
                     errors.add("invalid date");
                 } else {
@@ -134,6 +136,7 @@ public class UsageHeatmap extends HttpServlet {
             } else if (time.length() == 0) {
                 errors.add("blank time");
             } else {
+				time = time.trim();
                 if (time.length() != 8) {
                     errors.add("invalid time");
                 } else {

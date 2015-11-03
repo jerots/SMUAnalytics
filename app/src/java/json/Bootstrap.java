@@ -82,7 +82,7 @@ public class Bootstrap extends HttpServlet {
 				errors.add("blank token");
 			} else {
 				try {
-					String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+					String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
 					if (username == null) {
 						//failed
 						errors.add("invalid token");

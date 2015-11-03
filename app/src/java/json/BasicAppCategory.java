@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package json;
 
 import com.google.gson.Gson;
@@ -11,8 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
 import dao.UserDAO;
-import dao.Utility;
-import entity.LocationUsage;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -20,9 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import javax.servlet.ServletException;
@@ -31,22 +22,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author zhihui
- */
 @WebServlet(name = "BasicAppCategory", urlPatterns = {"/json/basic-appcategory-report"})
 public class BasicAppCategory extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -69,7 +47,7 @@ public class BasicAppCategory extends HttpServlet {
                 errors.add("blank token");
             } else {
                 try {
-                    String username = JWTUtility.verify(token, "nabjemzhdarrensw");
+                    String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
                         errors.add("invalid token");
@@ -94,9 +72,11 @@ public class BasicAppCategory extends HttpServlet {
             } else if (startdate.length() == 0) {
                 errors.add("blank startdate");
             } else {
+				startdate = startdate.trim();
                 if (startdate.length() != 10) {
                     errors.add("invalid startdate");
                 } else {
+					
                     SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
                     Date dateFormatted = sdf.parse(startdate, new ParsePosition(0));
                     if (dateFormatted == null) {
@@ -111,6 +91,7 @@ public class BasicAppCategory extends HttpServlet {
             } else if (enddate.length() == 0) {
                 errors.add("blank enddate");
             } else {
+				enddate = enddate.trim();
                 if (enddate.length() != 10) {
                     errors.add("invalid enddate");
                 } else {
