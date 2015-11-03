@@ -48,7 +48,7 @@
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-                                        <li><a href="top-kstudent">Top-k students with most app usage (given an app category)</a></li>
+                                        <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
                                         <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
                                     </ul>
                                 </li>

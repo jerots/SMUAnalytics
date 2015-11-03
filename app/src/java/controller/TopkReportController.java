@@ -227,6 +227,7 @@ public class TopkReportController {
         }else if(returnList.isEmpty()){
             errors += "there is no data";
         }
+        System.out.println(returnList.size());
         return returnList;
     }
     
@@ -345,6 +346,7 @@ public class TopkReportController {
         }else if(returnList.isEmpty()){
             errors += "there is no data";
         }
+        System.out.println(returnList.size());
         return returnList;
     }
 }

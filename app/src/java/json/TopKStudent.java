@@ -153,9 +153,7 @@ public class TopKStudent extends HttpServlet {
 
 			//IF PASSED VALIDATION, PROCEED TO GENERATE REPORT
 			output.addProperty("status", "success");
-
 			ArrayList<HashMap<String, String>> catValues = ctrl.getTopkStudents(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
-
 			if (catValues != null) {
 				Iterator<HashMap<String, String>> iter = catValues.iterator();
 				JsonArray param = new JsonArray();
