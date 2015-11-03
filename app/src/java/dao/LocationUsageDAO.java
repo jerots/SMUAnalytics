@@ -67,6 +67,7 @@ public class LocationUsageDAO {
                     errorMsg += ",invalid mac address";
                     err = true;
                 }
+                macAdd = macAdd.toLowerCase();
 
                 //check locid
                 int locationId = Utility.parseInt(reader.get("location-id"));
@@ -157,6 +158,7 @@ public class LocationUsageDAO {
                     }
                     err = true;
                 }
+                macAdd = macAdd.toLowerCase();
 
                 //check appid
                 int locationId = Utility.parseInt(reader.get("location-id"));
@@ -297,6 +299,7 @@ public class LocationUsageDAO {
                     }
                     err = true;
                 }
+                macAdd = macAdd.toLowerCase();
 
                 if (!err) {
                     found++;
@@ -413,7 +416,7 @@ public class LocationUsageDAO {
             ConnectionManager.close(conn, stmt);
 
         } catch (NullPointerException e) {
-            
+
         } catch (SQLException e) {
         }
         return lList;
@@ -593,83 +596,83 @@ public class LocationUsageDAO {
         }
 
     }
-    
-    public ArrayList<LocationUsage> retrieveUserLocationUsage(String date, String macAdd){
-            ArrayList<LocationUsage> locList = new ArrayList<>();
-           // This method gets a Single user's locationusage
-            try{
-                //Note the query is already tailored to just check or date
-                String sql = "SELECT timestamp, semanticplace, l.locationid \n"
-                        + "FROM location l, locationusage lu \n"
-                        + "WHERE date(timestamp) = ?\n"
-                        + "AND l.locationid = lu.locationid\n"
-                        + "AND macaddress = ?\n"
-                        + "ORDER BY timestamp;";
-                
-                Connection conn = ConnectionManager.getConnection();
-		PreparedStatement ps = conn.prepareStatement(sql);
-                
-                ps.setString(1, date);
-                ps.setString(2, macAdd);
-                
-                ResultSet rs = ps.executeQuery();
-                
-                while(rs.next()){
-                    String timestamp = rs.getString(1);
-                    String place = rs.getString(2);
-                    int locId = rs.getInt(3);
 
-                    //Location id is NOT impt when you have the place already.
-                    locList.add(new LocationUsage(timestamp, macAdd, new Location(locId, place)));
-                }
-                rs.close();
-                ps.close();
-                conn.close();
-                
-            }catch (SQLException e) {
-                e.printStackTrace();
+    public ArrayList<LocationUsage> retrieveUserLocationUsage(String date, String macAdd) {
+        ArrayList<LocationUsage> locList = new ArrayList<>();
+        // This method gets a Single user's locationusage
+        try {
+            //Note the query is already tailored to just check or date
+            String sql = "SELECT timestamp, semanticplace, l.locationid \n"
+                    + "FROM location l, locationusage lu \n"
+                    + "WHERE date(timestamp) = ?\n"
+                    + "AND l.locationid = lu.locationid\n"
+                    + "AND macaddress = ?\n"
+                    + "ORDER BY timestamp;";
+
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, date);
+            ps.setString(2, macAdd);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String timestamp = rs.getString(1);
+                String place = rs.getString(2);
+                int locId = rs.getInt(3);
+
+                //Location id is NOT impt when you have the place already.
+                locList.add(new LocationUsage(timestamp, macAdd, new Location(locId, place)));
             }
-            return locList;
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        
-        public ArrayList<LocationUsage> retrievePeopleExceptUserLocationUsage(String date, String macAddress){
-            //This is to get EVERYONE's location usage
-            ArrayList<LocationUsage> locList = new ArrayList<>();
-            try{
-                //Note the query is already tailored to just check or date
-                String sql = "SELECT timestamp, semanticplace, macaddress, l.locationid \n"
-                        + "FROM location l, locationusage lu \n"
-                        + "WHERE date(timestamp) = ?\n"
-                        + "AND macaddress != ?\n"
-                        + "AND l.locationid = lu.locationid\n"
-                        + "ORDER BY macaddress, timestamp\n";
-                
-                Connection conn = ConnectionManager.getConnection();
-		PreparedStatement ps = conn.prepareStatement(sql);
-                
-                ps.setString(1, date);
-                //Ensures that the User's macadd doesnt return
-                ps.setString(2, macAddress);
-                
-                ResultSet rs = ps.executeQuery();
-                
-                while(rs.next()){
-                    String timestamp = rs.getString(1);
-                    String place = rs.getString(2);
-                    String macAdd = rs.getString(3);
-                    int locId = rs.getInt(4);
-                    
-                    //Location id is NOT impt when you have the place already.
-                    locList.add(new LocationUsage(timestamp, macAdd, new Location(locId, place)));
-                }
-                rs.close();
-                ps.close();
-                conn.close();
-                
-            }catch (SQLException e) {
-                e.printStackTrace();
+        return locList;
+    }
+
+    public ArrayList<LocationUsage> retrievePeopleExceptUserLocationUsage(String date, String macAddress) {
+        //This is to get EVERYONE's location usage
+        ArrayList<LocationUsage> locList = new ArrayList<>();
+        try {
+            //Note the query is already tailored to just check or date
+            String sql = "SELECT timestamp, semanticplace, macaddress, l.locationid \n"
+                    + "FROM location l, locationusage lu \n"
+                    + "WHERE date(timestamp) = ?\n"
+                    + "AND macaddress != ?\n"
+                    + "AND l.locationid = lu.locationid\n"
+                    + "ORDER BY macaddress, timestamp\n";
+
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, date);
+            //Ensures that the User's macadd doesnt return
+            ps.setString(2, macAddress);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String timestamp = rs.getString(1);
+                String place = rs.getString(2);
+                String macAdd = rs.getString(3);
+                int locId = rs.getInt(4);
+
+                //Location id is NOT impt when you have the place already.
+                locList.add(new LocationUsage(timestamp, macAdd, new Location(locId, place)));
             }
-            return locList;
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return locList;
+    }
 
 }
