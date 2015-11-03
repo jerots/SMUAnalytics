@@ -58,7 +58,14 @@ public class DeleteLocation extends HttpServlet {
             String locationId = request.getParameter("locationid");
             String semanticPl = request.getParameter("semanticplace");
             String macAdd = request.getParameter("macadd");
-
+			
+			if (semanticPl != null){
+				semanticPl = semanticPl.toUpperCase();
+			}
+			if (macAdd != null){
+				macAdd = macAdd.toLowerCase();
+			}
+			
             //TOKEN VALIDATION
             if (token == null) {
                 errorArr.add("missing token");

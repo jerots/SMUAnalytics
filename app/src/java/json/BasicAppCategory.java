@@ -143,7 +143,6 @@ public class BasicAppCategory extends HttpServlet {
 
             JsonArray basicAppCat = new JsonArray();
             Iterator<String> iter = resultMap.keySet().iterator();
-            System.out.println(resultMap.size());
             while (iter.hasNext()) {
                 JsonObject currLoc = new JsonObject();
 

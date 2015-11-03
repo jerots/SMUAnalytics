@@ -52,6 +52,7 @@ public class TopK extends HttpServlet {
             String token = request.getParameter("token");
             String startdate = request.getParameter("startdate");
             String enddate = request.getParameter("enddate");
+            String selected = request.getParameter("school");
 
             //TOKEN VALIDATION
             if (token == null) {
@@ -127,15 +128,18 @@ public class TopK extends HttpServlet {
             }
             //NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
             //All the values are from the same select place. It only changes based on the report selected
-            String selected = request.getParameter("school");
             //Checks school/appcategory (Actually this is chosen)
-            if (selected == null){
+            if (selected == null) {
 				errors.add("missing school");
-			} else if (selected.length() == 0){
+			} else if (selected.length() == 0) {
 				errors.add("blank school");
-			} else if(!Utility.checkSchools(selected)){
-                errors.add("invalid school");
-            }
+			} else {
+				selected = selected.toLowerCase();
+				if (!Utility.checkSchools(selected)) {
+					errors.add("invalid school");
+
+				}
+			}
             
             //PRINT ERROR AND EXIT IF ERRORS EXIST
             if (errors.size() > 0) {

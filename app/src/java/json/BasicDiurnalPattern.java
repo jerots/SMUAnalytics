@@ -113,8 +113,8 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (yearFilter.length() == 0) {
 				errors.add("blank yearfilter");
 			} else {
-
-				if (!years.contains(yearFilter) && !yearFilter.equals("NA")) {
+				yearFilter = yearFilter.toLowerCase();
+				if (!years.contains(yearFilter) && !yearFilter.equals("na")) {
 					errors.add("invalid yearfilter");
 				}
 			}
@@ -126,8 +126,8 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (genderFilter.length() == 0) {
 				errors.add("blank genderfilter");
 			} else {
-				genderFilter = genderFilter.toUpperCase();
-				if (!genders.contains(genderFilter) && !genderFilter.equals("NA")) {
+				genderFilter = genderFilter.toLowerCase();
+				if (!genders.contains(genderFilter) && !genderFilter.equals("na")) {
 					errors.add("invalid genderfilter");
 				}
 			}
@@ -139,8 +139,8 @@ public class BasicDiurnalPattern extends HttpServlet {
 			} else if (schoolFilter.length() == 0) {
 				errors.add("blank schoolfilter");
 			} else {
-
-				if (!schools.contains(schoolFilter) && !schoolFilter.equals("NA")) {
+				schoolFilter = schoolFilter.toLowerCase();
+				if (!schools.contains(schoolFilter) && !schoolFilter.equals("na")) {
 					errors.add("invalid schoolfilter");
 				}
 			}

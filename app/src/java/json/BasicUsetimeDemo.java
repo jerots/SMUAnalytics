@@ -129,7 +129,7 @@ public class BasicUsetimeDemo extends HttpServlet {
             } else if (order.length() == 0) {
                 errors.add("blank order");
             } else {
-
+				order = order.toLowerCase();
                 String[] orderArr = order.split(",");
 
                 if (orderArr.length > 4) {

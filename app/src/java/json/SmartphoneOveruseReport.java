@@ -97,6 +97,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			} else if (macAdd.length() == 0) {
 				errors.add("blank macaddress");
 			} else {
+				macAdd = macAdd.toLowerCase();
 				UserDAO userDAO = new UserDAO();
 				user = userDAO.retrieveByMac(macAdd);
 				if (user == null) {
@@ -149,7 +150,6 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
 
 			output.addProperty("status", "success");
-			System.out.println("" + user + dateFormattedStart + dateFormattedEnd);
 			TreeMap<String, String> results = ctrl.generateReport(user, dateFormattedStart, dateFormattedEnd);
 
 			JsonArray metrics = new JsonArray();

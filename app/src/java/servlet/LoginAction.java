@@ -45,7 +45,8 @@ public class LoginAction extends HttpServlet {
 			
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
-
+			
+			
 			//CHECK WHETHER ADMIN LOGIN SUCCESS
 			AdminDAO adminDAO = new AdminDAO();
 			Admin admin = adminDAO.retrieve(username, password);

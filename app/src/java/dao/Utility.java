@@ -135,8 +135,7 @@ public final class Utility {
      public static boolean checkCategory(String chk) {
         String check = parseString(chk);
 	        if(check != null){
-            String str = check.substring(0, 1).toUpperCase() + check.substring(1).toLowerCase();
-            return categories.contains(str);
+            return categories.contains(chk);
         }
         return false;
      }
@@ -203,17 +202,17 @@ public final class Utility {
 
     public static void loadCategories() {
         categories = new ArrayList<>();
-        categories.add("Books");
-        categories.add("Social");
-        categories.add("Education");
-        categories.add("Entertainment");
-        categories.add("Information");
-        categories.add("Library");
-        categories.add("Local");
-        categories.add("Tools");
-        categories.add("Fitness");
-        categories.add("Games");
-        categories.add("Others");
+        categories.add("books");
+        categories.add("social");
+        categories.add("education");
+        categories.add("entertainment");
+        categories.add("information");
+        categories.add("library");
+        categories.add("local");
+        categories.add("tools");
+        categories.add("fitness");
+        categories.add("games");
+        categories.add("others");
     }
 
 }

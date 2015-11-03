@@ -50,6 +50,10 @@ public class Authenticate extends HttpServlet {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			
+			if (username != null){
+				username = username.toLowerCase();
+			}
+			
 			String token = JWTUtility.sign("nabjemzhdarrensw", username);
 
 			//CHECK WHETHER ADMIN LOGIN SUCCESS
