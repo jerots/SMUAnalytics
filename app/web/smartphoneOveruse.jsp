@@ -55,9 +55,9 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-								<li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-								<li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
-							</ul>
+                                <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                            </ul>
                         </li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li><a href="heatmap.jsp">Smartphone Usage Heatmap</a></li>
@@ -77,17 +77,17 @@
 
         <!--START OF CONTENT-->
         <%
-			
-			String startDate = request.getParameter("startDate");
-			String endDate = request.getParameter("endDate");
-			
-			if (startDate == null){
-				startDate = "";
-			}
-			if (endDate == null){
-				endDate = "";
-			}
-			
+
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+
+            if (startDate == null) {
+                startDate = "";
+            }
+            if (endDate == null) {
+                endDate = "";
+            }
+
         %>
 
 
@@ -112,26 +112,26 @@
                 <div class="theme-div theme-content" style="width:60%">
                     <%
 
-						TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
+                        TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
 
-						if (result != null) {
-							out.print("Overuse results: ");
+                        if (result != null) {
+                            out.print("Overuse results: ");
 
-							out.print(result.get("overuse-index") + "<br>");
+                            out.print(result.get("overuse-index") + "<br>");
 
-							out.print("Usage results: ");
-							out.print(result.get("usage-category") + "<br>");
-							out.print(result.get("usage-duration") + "<br>");
+                            out.print("Usage results: ");
+                            out.print(result.get("usage-category") + "<br>");
+                            out.print(result.get("usage-duration") + "<br>");
 
-							out.print("Gaming Usage results: ");
-							out.print(result.get("gaming-category") + "<br>");
-							out.print(result.get("gaming-duration") + "<br>");
+                            out.print("Gaming Usage results: ");
+                            out.print(result.get("gaming-category") + "<br>");
+                            out.print(result.get("gaming-duration") + "<br>");
 
-							out.print("Access Frequency results: ");
-							out.print(result.get("accessfrequency-category") + "<br>");
-							out.print(result.get("accessfrequency") + "<br>");
+                            out.print("Access Frequency results: ");
+                            out.print(result.get("accessfrequency-category") + "<br>");
+                            out.print(result.get("accessfrequency") + "<br>");
 
-						}
+                        }
 
 
                     %>
