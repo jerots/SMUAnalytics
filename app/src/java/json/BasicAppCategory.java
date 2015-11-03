@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import dao.AdminDAO;
 import dao.UserDAO;
+import entity.Admin;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -54,7 +56,9 @@ public class BasicAppCategory extends HttpServlet {
                     } else {
                         UserDAO userDAO = new UserDAO();
                         User user = userDAO.retrieve(username);
-                        if (user == null) {
+						AdminDAO adminDAO = new AdminDAO();
+						Admin admin = adminDAO.retrieve(username);
+                        if (user == null && admin == null) {
                             errors.add("invalid token");
                         }
                     }

@@ -5,8 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.BasicAppController;
+import dao.AdminDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.Admin;
 import entity.Breakdown;
 import entity.User;
 import is203.JWTException;
@@ -56,12 +58,14 @@ public class BasicDiurnalPattern extends HttpServlet {
 						//failed
 						errors.add("invalid token");
 					} else {
-                                            UserDAO userDAO = new UserDAO();
-                                            User user = userDAO.retrieve(username);
-                                            if (user == null){
-                                                errors.add("invalid token");
-                                            }
-                                        }
+						UserDAO userDAO = new UserDAO();
+						User user = userDAO.retrieve(username);
+						AdminDAO adminDAO = new AdminDAO();
+						Admin admin = adminDAO.retrieve(username);
+                        if (user == null && admin == null) {
+							errors.add("invalid token");
+						}
+					}
 
 				} catch (JWTException e) {
 					//failed
@@ -149,8 +153,8 @@ public class BasicDiurnalPattern extends HttpServlet {
 
 			BasicAppController ctrl = new BasicAppController();
 			Breakdown breakdown = null;
-			
-                        breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
+
+			breakdown = ctrl.generateDiurnalReport(startDate, demoArr);
 			output.addProperty("status", "success");
 			JsonArray arr = new JsonArray();
 			output.add("breakdown", arr);
@@ -172,7 +176,6 @@ public class BasicDiurnalPattern extends HttpServlet {
 			if (map.get("duration") != null) {
 				obj.addProperty("duration", map.get("duration").getMessage());
 			}
-
 
 			arr.add(obj);
 

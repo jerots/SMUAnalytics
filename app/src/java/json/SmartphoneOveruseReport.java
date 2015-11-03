@@ -10,8 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.SmartphoneOveruseController;
+import dao.AdminDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.Admin;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -72,7 +74,9 @@ public class SmartphoneOveruseReport extends HttpServlet {
 					} else {
 						UserDAO userDAO = new UserDAO();
 						user = userDAO.retrieve(username);
-						if (user == null) {
+						AdminDAO adminDAO = new AdminDAO();
+						Admin admin = adminDAO.retrieve(username);
+                        if (user == null && admin == null) {
 							errors.add("invalid token");
 						}
 					}

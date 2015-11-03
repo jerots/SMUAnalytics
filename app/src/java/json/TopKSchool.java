@@ -10,8 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.TopkReportController;
+import dao.AdminDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.Admin;
 import entity.User;
 import is203.JWTException;
 import is203.JWTUtility;
@@ -67,7 +69,9 @@ public class TopKSchool extends HttpServlet {
 					} else {
 						UserDAO userDAO = new UserDAO();
 						User user = userDAO.retrieve(username);
-						if (user == null) {
+						AdminDAO adminDAO = new AdminDAO();
+						Admin admin = adminDAO.retrieve(username);
+						if (user == null && admin == null) {
 							errors.add("invalid token");
 						}
 					}
@@ -83,11 +87,10 @@ public class TopKSchool extends HttpServlet {
 				entry = "3";
 			}
 			int entryInt = Utility.parseInt(entry);
-			if (entryInt < 1 || entryInt > 10 ){
+			if (entryInt < 1 || entryInt > 10) {
 				errors.add("invalid k");
 			}
-			
-			
+
 			//START DATE VALIDATION
 			Date dateFormattedStart = null;
 			if (startdate == null) {
@@ -123,9 +126,9 @@ public class TopKSchool extends HttpServlet {
 					}
 				}
 			}
-			if(dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
-                errors.add("invalid startdate");
-            }
+			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
+				errors.add("invalid startdate");
+			}
 			//NOTE: SINCE IT IS A DROPDOWN, CATEGORY AND SCHOOL CAN NEVER BE WRONG. EVEN K. But we will check as well.
 			//All the values are from the same select place. It only changes based on the report selected
 
@@ -141,9 +144,6 @@ public class TopKSchool extends HttpServlet {
 
 				}
 			}
-			
-			
-
 
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {

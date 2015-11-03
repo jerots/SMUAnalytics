@@ -10,8 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import controller.SocialActivenessController;
+import dao.AdminDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.Admin;
 import entity.Breakdown;
 import entity.User;
 import is203.JWTException;
@@ -71,7 +73,9 @@ public class SocialActiveness extends HttpServlet {
 						errors.add("invalid token");
 					} else {
 						user = userDAO.retrieve(username);
-						if (user == null) {
+						AdminDAO adminDAO = new AdminDAO();
+						Admin admin = adminDAO.retrieve(username);
+                        if (user == null && admin == null) {
 							errors.add("invalid token");
 						}
 					}
