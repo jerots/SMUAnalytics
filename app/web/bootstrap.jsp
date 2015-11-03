@@ -77,42 +77,42 @@
 
 
                     <%
-						String timeTaken = (String) request.getAttribute("timeTaken");
-						if (timeTaken != null) {
-							out.println("Bootstrap time taken: " + timeTaken + " seconds");
-						}
-						TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
-						if (recordMap != null) {
-							if (recordMap.containsKey("app-lookup.csv")) {
+                        String timeTaken = (String) request.getAttribute("timeTaken");
+                        if (timeTaken != null) {
+                            out.println("Bootstrap time taken: " + timeTaken + " seconds");
+                        }
+                        TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
+                        if (recordMap != null) {
+                            if (recordMap.containsKey("app-lookup.csv")) {
                     %>
                     <%---app---%>
                     <h4><b> App</b> </h4>
                     <hr>
                     <%
-							out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-							out.println("<b>App</b>" + "</td></tr><tr><td>");
-							out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("app-lookup.csv"));
-							out.println("</td></tr><tr><td>");
-							TreeMap<Integer, String> appErrMap = (TreeMap<Integer, String>) request.getAttribute("appErrMap");
-							Iterator<Integer> appiter = appErrMap.keySet().iterator();
+                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                            out.println("<b>App</b>" + "</td></tr><tr><td>");
+                            out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("app-lookup.csv"));
+                            out.println("</td></tr><tr><td>");
+                            TreeMap<Integer, String> appErrMap = (TreeMap<Integer, String>) request.getAttribute("appErrMap");
+                            Iterator<Integer> appiter = appErrMap.keySet().iterator();
 
-							out.println("<b>Number of rows with error </b> " + "</td><td>" + appErrMap.size() + "</td></tr>");
-							if (appErrMap != null && appErrMap.size() != 0) {
-								out.println("<tr><td><b>" + "Row");
-								out.println("</b></td><td><b>" + "Error Messages");
-								out.println("</b></td></tr>");
-								while (appiter.hasNext()) {
-									out.println("<tr><td>");
-									int rowWithErr = appiter.next();
-									String errAtThatRow = appErrMap.get(rowWithErr);
-									out.println(rowWithErr);
-									out.println("</td><td>");
-									out.println(errAtThatRow);
-									out.println("</td></tr>");
-								}
-							}
-							out.println("</table>");
-						}
+                            out.println("<b>Number of rows with error </b> " + "</td><td>" + appErrMap.size() + "</td></tr>");
+                            if (appErrMap != null && appErrMap.size() != 0) {
+                                out.println("<tr><td><b>" + "Row");
+                                out.println("</b></td><td><b>" + "Error Messages");
+                                out.println("</b></td></tr>");
+                                while (appiter.hasNext()) {
+                                    out.println("<tr><td>");
+                                    int rowWithErr = appiter.next();
+                                    String errAtThatRow = appErrMap.get(rowWithErr);
+                                    out.println(rowWithErr);
+                                    out.println("</td><td>");
+                                    out.println(errAtThatRow);
+                                    out.println("</td></tr>");
+                                }
+                            }
+                            out.println("</table>");
+                        }
                     %>
 
                     <p>
@@ -123,159 +123,166 @@
 
 
                     <%
-						out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-						out.println("<b>User</b>" + "</td></tr><tr><td>");
-						out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("demographics.csv"));
-						out.println("</td></tr><tr><td>");
-						TreeMap<Integer, String> userErrMap = (TreeMap<Integer, String>) request.getAttribute("userErrMap");
-						Iterator<Integer> useriter = userErrMap.keySet().iterator();
+                        out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>User</b>" + "</td></tr><tr><td>");
+                        out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("demographics.csv"));
+                        out.println("</td></tr><tr><td>");
+                        TreeMap<Integer, String> userErrMap = (TreeMap<Integer, String>) request.getAttribute("userErrMap");
+                        Iterator<Integer> useriter = userErrMap.keySet().iterator();
 
-						out.println("<b>Number of rows with error </b> " + "</td><td>" + userErrMap.size() + "</td></tr>");
-						if (userErrMap != null && userErrMap.size() != 0) {
-							out.println("<tr><td><b>" + "Row");
-							out.println("</b></td><td><b>" + "Error Messages");
-							out.println("</b></td></tr>");
-							while (useriter.hasNext()) {
-								out.println("<tr><td>");
-								int rowWithErr = useriter.next();
-								String errAtThatRow = userErrMap.get(rowWithErr);
-								out.println(rowWithErr);
-								out.println("</td><td>");
-								out.println(errAtThatRow);
-								out.println("</td></tr>");
-							}
-						}
-						out.println("</table>");
-						if (recordMap.containsKey("location-lookup.csv")) {
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + userErrMap.size() + "</td></tr>");
+                        if (userErrMap != null && userErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (useriter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = useriter.next();
+                                String errAtThatRow = userErrMap.get(rowWithErr);
+                                out.println(rowWithErr);
+                                out.println("</td><td>");
+                                out.println(errAtThatRow);
+                                out.println("</td></tr>");
+                            }
+                        }
+                        out.println("</table>");
+                        if (recordMap.containsKey("location-lookup.csv")) {
                     %>
 
                     <P>
                         <%---location---%>
+                    <%int locationCount = recordMap.get("location-lookup.csv");
+                            if (locationCount > 0) { %>    
                     <h4><b> Location</b> </h4>
                     <hr>
-                    <%
-							out.println("<table border=1px  class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-							out.println("<b>Location</b>" + "</td></tr><tr><td>");
-							out.println("<b>Location updated </b> " + "</td><td>" + recordMap.get("location-lookup.csv"));
-							out.println("</td></tr><tr><td>");
-							TreeMap<Integer, String> locErrMap = (TreeMap<Integer, String>) request.getAttribute("locErrMap");
-							Iterator<Integer> lociter = locErrMap.keySet().iterator();
+                    <%                              
+                                out.println("<table border=1px  class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                                out.println("<b>Location</b>" + "</td></tr><tr><td>");
+                                out.println("<b>Location updated </b> " + "</td><td>" + locationCount);
+                                out.println("</td></tr><tr><td>");
+                                TreeMap<Integer, String> locErrMap = (TreeMap<Integer, String>) request.getAttribute("locErrMap");
+                                Iterator<Integer> lociter = locErrMap.keySet().iterator();
 
-							out.println("<b>Number of rows with error </b> " + "</td><td>" + locErrMap.size() + "</td></tr>");
-							if (locErrMap != null && locErrMap.size() != 0) {
-								out.println("<tr><td><b>" + "Row");
-								out.println("</b></td><td><b>" + "Error Messages");
-								out.println("</b></td></tr>");
-								while (lociter.hasNext()) {
-									out.println("<tr><td>");
-									int rowWithErr = lociter.next();
-									String errAtThatRow = locErrMap.get(rowWithErr);
-									out.println(rowWithErr);
-									out.println("</td><td>");
-									out.println(errAtThatRow);
-									out.println("</td></tr>");
-								}
-							}
-							out.println("</table>");
-						}
+                                out.println("<b>Number of rows with error </b> " + "</td><td>" + locErrMap.size() + "</td></tr>");
+                                if (locErrMap != null && locErrMap.size() != 0) {
+                                    out.println("<tr><td><b>" + "Row");
+                                    out.println("</b></td><td><b>" + "Error Messages");
+                                    out.println("</b></td></tr>");
+                                    while (lociter.hasNext()) {
+                                        out.println("<tr><td>");
+                                        int rowWithErr = lociter.next();
+                                        String errAtThatRow = locErrMap.get(rowWithErr);
+                                        out.println(rowWithErr);
+                                        out.println("</td><td>");
+                                        out.println(errAtThatRow);
+                                        out.println("</td></tr>");
+                                    }
+                                }
+                                out.println("</table>");
+                            }
+                        }
                     %>
                     <P>
                         <%---appUsage---%>
                     <h4><b> AppUsage</b> </h4>
                     <hr>
                     <%
-						TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
-						Iterator<Integer> auiter = auErrMap.keySet().iterator();
-						int auErrorSize = auErrMap.size();
+                        TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
+                        Iterator<Integer> auiter = auErrMap.keySet().iterator();
+                        int auErrorSize = auErrMap.size();
 
-						out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-						out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-						out.println("<b>AppUsage updated </b> " + "</td><td>" + (recordMap.get("app.csv") - auErrorSize));
-						out.println("</td></tr><tr><td>");
+                        out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                        out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + (recordMap.get("app.csv") - auErrorSize));
+                        out.println("</td></tr><tr><td>");
 
-						out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
-						if (auErrMap != null && auErrMap.size() != 0) {
-							out.println("<tr><td><b>" + "Row");
-							out.println("</b></td><td><b>" + "Error Messages");
-							out.println("</b></td></tr>");
-							while (auiter.hasNext()) {
-								out.println("<tr><td>");
-								int rowWithErr = auiter.next();
-								String errAtThatRow = auErrMap.get(rowWithErr);
-								out.println(rowWithErr);
-								out.println("</td><td>");
-								out.println(errAtThatRow);
-								out.println("</td></tr>");
-							}
-						}
-						out.println("</table>");
+                        out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
+                        if (auErrMap != null && auErrMap.size() != 0) {
+                            out.println("<tr><td><b>" + "Row");
+                            out.println("</b></td><td><b>" + "Error Messages");
+                            out.println("</b></td></tr>");
+                            while (auiter.hasNext()) {
+                                out.println("<tr><td>");
+                                int rowWithErr = auiter.next();
+                                String errAtThatRow = auErrMap.get(rowWithErr);
+                                out.println(rowWithErr);
+                                out.println("</td><td>");
+                                out.println(errAtThatRow);
+                                out.println("</td></tr>");
+                            }
+                        }
+                        out.println("</table>");
                     %>
                     <P>
                         <%---locationUsage---%>
-                    <h4><b> LocationUsage</b> </h4>
-                    <hr>
-                    <%
-						out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-						out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
-						out.println("<b>LocationUsage updated </b> " + "</td><td>" + recordMap.get("location.csv"));
-						out.println("</td></tr><tr><td>");
-						TreeMap<Integer, String> luErrMap = (TreeMap<Integer, String>) request.getAttribute("luErrMap");
-						Iterator<Integer> luiter = luErrMap.keySet().iterator();
+                    
+                    
+                    <%                          int locationUsageCount = recordMap.get("location.csv");
+                        if (locationUsageCount > 0) { %>
+                        <h4><b> LocationUsage</b> </h4><hr>
+                    <%    
+                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                            out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
+                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationUsageCount);
+                            out.println("</td></tr><tr><td>");
+                            TreeMap<Integer, String> luErrMap = (TreeMap<Integer, String>) request.getAttribute("luErrMap");
+                            Iterator<Integer> luiter = luErrMap.keySet().iterator();
 
-						out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
-						if (luErrMap != null && luErrMap.size() != 0) {
-							out.println("<tr><td><b>" + "Row");
-							out.println("</b></td><td><b>" + "Error Messages");
-							out.println("</b></td></tr>");
-							while (luiter.hasNext()) {
-								out.println("<tr><td>");
-								int rowWithErr = luiter.next();
-								String errAtThatRow = luErrMap.get(rowWithErr);
-								out.println(rowWithErr);
-								out.println("</td><td>");
-								out.println(errAtThatRow);
-								out.println("</td></tr>");
-							}
-						}
-						out.println("</table>");
+                            out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
+                            if (luErrMap != null && luErrMap.size() != 0) {
+                                out.println("<tr><td><b>" + "Row");
+                                out.println("</b></td><td><b>" + "Error Messages");
+                                out.println("</b></td></tr>");
+                                while (luiter.hasNext()) {
+                                    out.println("<tr><td>");
+                                    int rowWithErr = luiter.next();
+                                    String errAtThatRow = luErrMap.get(rowWithErr);
+                                    out.println(rowWithErr);
+                                    out.println("</td><td>");
+                                    out.println(errAtThatRow);
+                                    out.println("</td></tr>");
+                                }
+                            }
+                        }
+                        out.println("</table>");
 
                     %>
                     <P>
                         <%---locationUsageDelete---%>
 
-						<%		int locationDeleteCount = recordMap.get("location-delete.csv");
-								if (locationDeleteCount > 0) {
-									out.println("<h4><b> LocationUsageDelete</b> </h4><hr>");
-									out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-									out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
-									out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationDeleteCount);
-									out.println("</td></tr><tr><td>");
-									TreeMap<Integer, String> delErrMap = (TreeMap<Integer, String>) request.getAttribute("delErrMap");
-									Iterator<Integer> deliter = delErrMap.keySet().iterator();
+                        <%		int locationDeleteCount = recordMap.get("location-delete.csv");
+                                if (locationDeleteCount > 0) {
+                                    out.println("<h4><b> LocationUsageDelete</b> </h4><hr>");
+                                    out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                                    out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
+                                    out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationDeleteCount);
+                                    out.println("</td></tr><tr><td>");
+                                    TreeMap<Integer, String> delErrMap = (TreeMap<Integer, String>) request.getAttribute("delErrMap");
+                                    Iterator<Integer> deliter = delErrMap.keySet().iterator();
 
-									out.println("<b>Number of rows with error </b> " + "</td><td>" + delErrMap.size() + "</td></tr>");
-									if (delErrMap != null && delErrMap.size() != 0) {
-										out.println("<tr><td><b>" + "Row");
-										out.println("</b></td><td><b>" + "Error Messages");
-										out.println("</b></td></tr>");
-										while (deliter.hasNext()) {
-											out.println("<tr><td>");
-											int rowWithErr = deliter.next();
-											String errAtThatRow = delErrMap.get(rowWithErr);
-											out.println(rowWithErr);
-											out.println("</td><td>");
-											out.println(errAtThatRow);
-											out.println("</td></tr>");
-										}
-									}
-									out.println("</table>");
-								}
+                                    out.println("<b>Number of rows with error </b> " + "</td><td>" + delErrMap.size() + "</td></tr>");
+                                    if (delErrMap != null && delErrMap.size() != 0) {
+                                        out.println("<tr><td><b>" + "Row");
+                                        out.println("</b></td><td><b>" + "Error Messages");
+                                        out.println("</b></td></tr>");
+                                        while (deliter.hasNext()) {
+                                            out.println("<tr><td>");
+                                            int rowWithErr = deliter.next();
+                                            String errAtThatRow = delErrMap.get(rowWithErr);
+                                            out.println(rowWithErr);
+                                            out.println("</td><td>");
+                                            out.println(errAtThatRow);
+                                            out.println("</td></tr>");
+                                        }
+                                    }
+                                    out.println("</table>");
+                                }
 
-							} else {
-								out.println("You have not uploaded any files.");
-							}
+                            } else {
+                                out.println("You have not uploaded any files.");
+                            }
 
-						%>
+                        %>
                 </div>
 
             </div>
