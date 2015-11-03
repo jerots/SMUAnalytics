@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.TreeMap;
 
 /**
@@ -27,7 +28,8 @@ import java.util.TreeMap;
  * @author Boyofthefuture
  */
 public class SocialActivenessController {
-    public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress, String errors){
+
+    public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress, String errors) {
         System.out.println("meme");
         //THIS METHOD is going to store first for the user all his apps and THEN check for social
         //DATE and MACADD have already been checked before
@@ -57,10 +59,10 @@ public class SocialActivenessController {
         long diff = 0;
         //Gets Ready the end of the period of interest
         Date date = Utility.parseOnlyDate(onlyDate);
-        long endDateTime = date.getTime() + (60*60*24*1000); //Adds up till the end of the day
+        long endDateTime = date.getTime() + (60 * 60 * 24 * 1000); //Adds up till the end of the day
         //Uses an iterator for the ArrayList for more accurate gets. This works as they are ordered.
-        
-        while(iter.hasNext()){
+
+        while (iter.hasNext()) {
             AppUsage aUsage = iter.next();
             //Current App
             App app = aUsage.getApp();
@@ -69,33 +71,33 @@ public class SocialActivenessController {
             //This takes the date (Date) inside the system and places it into a date object
             long time = appDate.getTime();
             //When prevTime is more than time, it signals that it is a new user.
-            if(thatApp == null){
+            if (thatApp == null) {
                 //Instantiates for first time running.
                 thatApp = app;
                 prevTime = appDate.getTime();
             }
             //WE TAKE THE DIFFERENCE FIRST. Why? Because no matter what is the next app, we take the diff first then we will check whether to continue.
-            
+
             //time difference between prevTime and time
             diff = time - prevTime;
             //If the difference is more than 120s, sets as 10s
-            if(diff > 120000){
+            if (diff > 120000) {
                 diff = 10000;
             }
             total += diff;
             //This is a duplicate if it entered the if loop.
             prevTime = time;
-            if(!app.equals(thatApp)){
+            if (!app.equals(thatApp)) {
                 //This means it is not the first instance
                 //Before reset, stores into HashMap the current data values. AppId is stored before time for retrieval
                 //IMMEDIATELY REMOVES THOSE THAT ARE NOT SOCIAL.
-                if(thatApp.getAppCategory().equals("Social")){
+                if (thatApp.getAppCategory().equals("Social")) {
                     overall += total;
                     storage.put(thatApp, total);
                 }
                 //Now checks the treemap whether it exists this new appId
                 total = 0;
-                if(storage.containsKey(app)){
+                if (storage.containsKey(app)) {
                     total = storage.get(app);
                 }
                 overall -= total; //Everytime it is retrieved, overall can minus to continue to keep track.
@@ -105,30 +107,30 @@ public class SocialActivenessController {
         }
         //This is for the last app.
         //Ensures that it is also the number of seconds from end of day
-        if(thatApp != null){
+        if (thatApp != null) {
             diff = endDateTime - prevTime;
-            if(diff > 120000){
+            if (diff > 120000) {
                 diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
             }
             total += diff;
-            if(thatApp.getAppCategory().equals("Social")){
+            if (thatApp.getAppCategory().equals("Social")) {
                 overall += total;
                 storage.put(thatApp, total);
             }
         }
         //Swapping is so that the top values can be on top. additionally, change them into percentages.
-       //From here, starts to get the top few 
+        //From here, starts to get the top few 
         DecimalFormat df = new DecimalFormat("#");
         ArrayList<Long> valuesArr = new ArrayList<Long>(storage.values());
         Collections.sort(valuesArr);
-        for(int i = valuesArr.size() - 1; i >= 0 ; i+=0){//reverse checking
+        for (int i = valuesArr.size() - 1; i >= 0; i += 0) {//reverse checking
             Iterator<App> iterApp = storage.keySet().iterator();
-            while(iterApp.hasNext() && i >= 0){
+            while (iterApp.hasNext() && i >= 0) {
                 App app = iterApp.next();
                 long time = storage.get(app);
-                if(time == valuesArr.get(i)){
+                if (time == valuesArr.get(i)) {
                     //helps to round off the percentage
-                    String strPercent = df.format((double) time/overall * 100);
+                    String strPercent = df.format((double) time / overall * 100);
                     jsonMap.put("app-name", new Breakdown(app.getAppName()));
                     jsonMap.put("percent", new Breakdown("" + Utility.parseInt(strPercent)));
                     jsonResults.add(jsonMap);
@@ -139,9 +141,9 @@ public class SocialActivenessController {
         }
         //Final addition for overall for Part 1 of Social Category
         //Makes overall into seconds, then concats to a string to add to breakdown so that it can be stored. breakdown is used to simul arraylist and string
-        overallMap.put("total-social-app-usage-duration", new Breakdown("" + (overall/1000)));
+        overallMap.put("total-social-app-usage-duration", new Breakdown("" + (overall / 1000)));
         overallMap.put("individual-social-app-usage", new Breakdown(jsonResults));
-        
+
         //--------------------------------------------HERE ONWARDS IS THE PHYSICAL BREAKDOWN----------------------------------------------------------------
         //----------------------------------------PART I: GROUPING OF LOCATION AND TIME -- USER.--------------------------------------------------------------------
         prevTime = 0;
@@ -159,7 +161,7 @@ public class SocialActivenessController {
         //This hashmap is for the User
         HashMap<Location, ArrayList<Activeness>> userList = new HashMap<>(); //The arraylist will make sure the numbers are in order
         //Can reuse app variables because they are stored already
-        while(locIter.hasNext()){
+        while (locIter.hasNext()) {
             LocationUsage lu = locIter.next();
             //Gets the date from the LocationUsage
             Date locDate = Utility.parseDate(lu.getTimestamp());
@@ -167,23 +169,23 @@ public class SocialActivenessController {
             //This takes the date (Date) inside the system and places it into a date object
             long time = locDate.getTime();
             //For first time instantiation
-            if(loc == null){
+            if (loc == null) {
                 //Instantiates for first time running.
                 loc = l;
                 startDateSecs = time;
-            }else{
+            } else {
                 //Groups by locations:
                 diff = time - prevTime;
-                if(diff > 300000){
+                if (diff > 300000) {
                     diff = 300000;
                 }
                 total += diff;
             }
             //If similar, dont need reinstantiate
-            if(!loc.equals(l)){
+            if (!loc.equals(l) || (time - prevTime) > 300000) {
                 //Checks if the arraylist exists.
-                ArrayList<Activeness> activeArr= new ArrayList<>();
-                if(userList.containsKey(loc)){
+                ArrayList<Activeness> activeArr = new ArrayList<>();
+                if (userList.containsKey(loc)) {
                     activeArr = userList.get(loc);
                 }
                 activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc));
@@ -198,17 +200,17 @@ public class SocialActivenessController {
             //Needed because of startDateSecs, so pushed here.
             prevTime = time;
         }
-        
-        if(loc != null){
+
+        if (loc != null) {
             //Ensures that it is also the number of seconds from end of day
             diff = endDateTime - prevTime;
-            if(diff > 300000){
+            if (diff > 300000) {
                 diff = 300000; //Can just be 300000 because there is NOT a subsequent update and therefore assume 300000
             }
             total += diff;
             //Checks if it exists already.
-            ArrayList<Activeness> activeArr= new ArrayList<>();
-            if(userList.containsKey(loc)){
+            ArrayList<Activeness> activeArr = new ArrayList<>();
+            if (userList.containsKey(loc)) {
                 activeArr = userList.get(loc);
             }
             activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc));
@@ -216,7 +218,7 @@ public class SocialActivenessController {
             overall += total; //adds to overall time
             //--------------------------------------PART II: GROUPING OF LOCATION AND TIME -- INDIVIDUALS.------------------------------------------------------------
             //Do the same thing for each user again, however, this time, toss users out who dont fit the criteria.
-            
+
             ArrayList<LocationUsage> luList = luDao.retrievePeopleExceptUserLocationUsage(onlyDate, macAddress);
             Iterator<LocationUsage> iterLoc = luList.iterator();
             //THIS IS THE FINAL ARRAYLIST FOR OVERLAP. Here tallies ALL the overlaps with the user
@@ -230,7 +232,7 @@ public class SocialActivenessController {
             total = 0;
             //Goes through the entire list by person. Arranged by person, macadd, and compares immediately to throw.
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CHECK TILL HERE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            while(iterLoc.hasNext()){
+            while (iterLoc.hasNext()) {
                 LocationUsage lUsage = iterLoc.next();
                 //Gets the date from the LocationUsage
                 Date locDate = Utility.parseDate(lUsage.getTimestamp());
@@ -241,18 +243,18 @@ public class SocialActivenessController {
                 String currentMacAdd = lUsage.getMacAddress();
 
                 //For first time instantiation and for new macaddresses
-                if(loc == null){
+                if (loc == null) {
                     //Instantiates for first time running.
                     loc = l;
                     macAdd = currentMacAdd;
                     startDateSecs = time;
-                }else if(macAdd.equals(currentMacAdd)){
+                } else if (macAdd.equals(currentMacAdd)) {
                     diff = time - prevTime;
-                    if(time > 300000){
+                    if (diff > 300000) {
                         diff = 300000;
                     }
                     total += diff;
-                    if(!loc.equals(l)){
+                    if (!loc.equals(l) || (time - prevTime) > 300000) {
                         //Creates a new activeness based on what has been calculated
                         Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc);
                         //Checks if the location is an overlap to see if it is worth to be stored.
@@ -263,10 +265,10 @@ public class SocialActivenessController {
                         //Stores the start for the next location
                         startDateSecs = time;
                     }
-                //here checks for new user. Therefore, dont even bother checking if locations are similar
-                }else{
+                    //here checks for new user. Therefore, dont even bother checking if locations are similar
+                } else {
                     diff = endDateTime - prevTime;
-                    if(diff > 300000){
+                    if (diff > 300000) {
                         diff = 300000; //Can just be 300000 because there is NOT a subsequent update and therefore assume 300000
                     }
                     total += diff;
@@ -275,13 +277,17 @@ public class SocialActivenessController {
                     //This method is below. it helps to tally all the overlaps of a single user. Once overlap is completed, we can start checking for overlap within the 
                     //userOverlapList
                     overlapUser(userList, singleList, ac, loc);
+                    if (singleList.size() > 0) { //Makes sure that there is something inside
+                        //Always checking the last one.
+                        checkMinutes(userList, singleList, ac, loc);
+                    }
                     //This part here checks for overlap with the masterlist.
-                    for(Activeness temp: singleList){
+                    for (Activeness temp : singleList) {
                         //The equals method checks for overlap, and therefore if there is an overlap, it will return.
                         Iterator<Activeness> iterA = userOverlapList.iterator();
-                        while(iterA.hasNext()){
+                        while (iterA.hasNext()) {
                             Activeness temporary = iterA.next();
-                            if(temp.equals(temporary)){
+                            if (temp.equals(temporary)) {
                                 temp = temp.combine(temporary);
                                 iterA.remove();
                             }
@@ -299,10 +305,10 @@ public class SocialActivenessController {
                 //At the end of it, sets it to prevTime
                 prevTime = time;
             }
-            if(loc != null){
+            if (loc != null) {
                 //Do outside the while loop for the last addition
                 diff = endDateTime - prevTime;
-                if(diff > 300000){
+                if (diff > 300000) {
                     diff = 300000; //Can just be 300000 because there is NOT a subsequent update and therefore assume 300000
                 }
                 total += diff;
@@ -311,13 +317,17 @@ public class SocialActivenessController {
                 //This method is below. it helps to tally all the overlaps of a single user. Once overlap is completed, we can start checking for overlap within the 
                 //userOverlapList
                 overlapUser(userList, singleList, ac, loc);
+                if (singleList.size() > 0) { //Makes sure that there is something inside
+                    //Always checking the last one.
+                    checkMinutes(userList, singleList, ac, loc);
+                }
                 //This part here checks for overlap with the masterlist.
-                for(Activeness temp: singleList){
+                for (Activeness temp : singleList) {
                     //The equals method checks for overlap, and therefore if there is an overlap, it will return.
                     Iterator<Activeness> iterA = userOverlapList.iterator();
-                    while(iterA.hasNext()){
+                    while (iterA.hasNext()) {
                         Activeness temporary = iterA.next();
-                        if(temp.equals(temporary)){
+                        if (temp.equals(temporary)) {
                             temp = temp.combine(temporary);
                             iterA.remove();
                         }
@@ -328,75 +338,78 @@ public class SocialActivenessController {
             //--------------------------------------PART III: PUTTING THE PUZZLE PIECES TOGETHER.------------------------------------------------------------
             //Looking at the userOverlapList, the entire list with overlaps have been accounted for. Adds to the arraylists/hashmaps for JSON
             long group = 0;
-            for(Activeness active: userOverlapList){
+            for (Activeness active : userOverlapList) {
                 group += active.getTime();
                 System.out.println(group);
             }
             System.out.println(overall);
-            String groupPercent = df.format((double) group/overall * 100);
-            System.out.println(((double) group)/overall);
+            String groupPercent = df.format((double) group / overall * 100);
+            System.out.println(((double) group) / overall);
             long soloPercent = 100 - Utility.parseInt(groupPercent);
-            overallMap.put("total-time-spent-in-sis", new Breakdown("" + overall/1000));
+            overallMap.put("total-time-spent-in-sis", new Breakdown("" + overall / 1000));
             overallMap.put("group-percent", new Breakdown("" + groupPercent));
             overallMap.put("solo-percent", new Breakdown("" + soloPercent));
-        }else{
+        } else {
             overallMap.put("total-time-spent-in-sis", new Breakdown("" + 0));
             overallMap.put("group-percent", new Breakdown("" + 0));
             overallMap.put("solo-percent", new Breakdown("" + 0));
         }
-        
+
         return overallMap;
     }
 
-        //This method will check whether there is an overlap between this user and the current user in process.
-    public void overlapUser(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc){
-        if(userList.containsKey(loc)){
+    //This method will check whether there is an overlap between this user and the current user in process.
+    public void overlapUser(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
+        if (userList.containsKey(loc)) {
             ArrayList<Activeness> activeList = userList.get(loc);
             //Runs through to find if there is an overlap. These arraylists will be pretty small, if any. Deletes all data if they are not longer than 5 mins.
-            for(Activeness active: activeList){
+            for (Activeness active : activeList) {
                 //This portion returns the period of overlap as an activeness. Maccaddress is of the individual overlapping
                 Activeness overlap = active.overlap(ac);
-                if(overlap != null){
+                if (overlap != null) {
                     //PART II.1, before that we have to work backwards to check if the user has 5minutes in total for an activity of overlap.
                     //First part is to store if the end date matches the start date.
-                    if(singleList.size() > 0){ //Makes sure that there is something inside
+                    if (singleList.size() > 0) { //Makes sure that there is something inside
                         Activeness single = singleList.get(singleList.size() - 1);
                         //Always checking the last one.
-                        if(!single.continuation(overlap)){
-                            //If it is NOT a continuation, you will check the entire makeup of the previous set to check if it is 5 minutes. If not, delete.
-                            //Reverse to check the last few if they make up 5 minutes, if not DELETE.
-                            Collections.reverse(singleList);
-                            //First iterator is for removing, 2nd iterator is for checking
-                            Iterator<Activeness> iterA = singleList.iterator();
-                            long totalTime = 0;
-                            //Activeness is for the prev one to check continuation
-                            Activeness activity = null;
-                            //int i is for the number of things that have been gone through.
-                            int i = 0;
-                            for(Activeness a: singleList){
-                                if(activity != null){
-                                    //Check if it is still a continuation.
-                                    if(!a.continuation(activity) || totalTime >= 300000){
-                                        break;//This is to save time going through the whole loop
-                                    }
-                                }
-                                totalTime += a.getTime();
-                                i++;
-                                activity = a;
-                            }
-                            if(totalTime < 300000){
-                                while(i > 0 && iterA.hasNext()){
-                                    //Deletes all records that have no continuation.
-                                    iterA.next();
-                                    iterA.remove();
-                                    i--;
-                                }
-                            }
-                            Collections.reverse(singleList); //Reverses back the list
+                        if (!single.continuation(overlap)) {
+                            checkMinutes(userList, singleList, ac, loc);
                         }
                     }
                     singleList.add(overlap);
                 }
+            }
+        }
+    }
+
+    public void checkMinutes(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
+        //If it is NOT a continuation, you will check the entire makeup of the previous set to check if it is 5 minutes. If not, delete.
+        //Reverse to check the last few if they make up 5 minutes, if not DELETE.
+        long totalTime = 0;
+        //Activeness is for the prev one to check continuation
+        Activeness activity = null;
+        //int i is for the number of things that have been gone through.
+        int index = 0;
+        for (int j = singleList.size() - 1; j >= 0; j--) {
+            Activeness a = singleList.get(j);
+            if (activity != null) {
+                //Check if it is still a continuation.
+                if (!a.continuation(activity) || totalTime >= 300000) {
+                    break;//This is to save time going through the whole loop
+                }
+            }
+            totalTime += a.getTime();
+            index++;
+            activity = a;
+        }
+        if (totalTime < 300000) {
+            //First iterator is for removing, 2nd iterator is for checking
+            ListIterator iterA = singleList.listIterator(singleList.size());
+            while (index > 0 && iterA.hasPrevious()) {
+                //Deletes all records that have no continuation.
+                iterA.previous();
+                iterA.remove();
+                index--;
             }
         }
     }
