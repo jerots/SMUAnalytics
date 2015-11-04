@@ -178,9 +178,9 @@ public class TopK extends HttpServlet {
 					JsonObject indiv = new JsonObject();
 					param.add(indiv);
 
-					indiv.addProperty("rank", map.get("rank"));
+					indiv.addProperty("rank", Integer.parseInt(map.get("rank")));
 					indiv.addProperty("app-name", map.get("app-name"));
-					indiv.addProperty("duration", map.get("duration"));
+					indiv.addProperty("duration", Integer.parseInt(map.get("duration")));
 
 				}
 				output.addProperty("status", "success");

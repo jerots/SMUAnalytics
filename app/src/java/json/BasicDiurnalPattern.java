@@ -177,7 +177,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 				obj.addProperty("period", map.get("period").getMessage());
 			}
 			if (map.get("duration") != null) {
-				obj.addProperty("duration", map.get("duration").getMessage());
+				obj.addProperty("duration", Integer.parseInt(map.get("duration").getMessage()));
 			}
 
 			arr.add(obj);

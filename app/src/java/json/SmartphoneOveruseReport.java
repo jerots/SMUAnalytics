@@ -165,17 +165,17 @@ public class SmartphoneOveruseReport extends HttpServlet {
 
 			JsonObject usageObj = new JsonObject();
 			usageObj.addProperty("usage-category", results.get("usage-category"));
-			usageObj.addProperty("usage-duration", results.get("usage-duration"));
+			usageObj.addProperty("usage-duration", Integer.parseInt(results.get("usage-duration")));
 			metrics.add(usageObj);
 
 			JsonObject gamingObj = new JsonObject();
 			gamingObj.addProperty("gaming-category", results.get("gaming-category"));
-			gamingObj.addProperty("gaming-duration", results.get("gaming-duration"));
+			gamingObj.addProperty("gaming-duration", Integer.parseInt(results.get("gaming-duration")));
 			metrics.add(gamingObj);
 
 			JsonObject accessObj = new JsonObject();
 			accessObj.addProperty("accessfrequency-category", results.get("accessfrequency-category"));
-			accessObj.addProperty("accessfrequency", results.get("accessfrequency"));
+			accessObj.addProperty("accessfrequency", Double.parseDouble(results.get("accessfrequency")));
 			metrics.add(accessObj);
 
 			output.add("metrics", metrics);

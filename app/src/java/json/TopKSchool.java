@@ -182,9 +182,9 @@ public class TopKSchool extends HttpServlet {
 					JsonObject indiv = new JsonObject();
 					param.add(indiv);
 
-					indiv.addProperty("rank", map.get("rank"));
+					indiv.addProperty("rank", Integer.parseInt(map.get("rank")));
 					indiv.addProperty("school", map.get("school"));
-					indiv.addProperty("duration", map.get("duration"));
+					indiv.addProperty("duration", Integer.parseInt(map.get("duration")));
 				}
 				output.add("results", param);
 				out.println(gson.toJson(output));

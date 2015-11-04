@@ -141,21 +141,21 @@ public class SocialActiveness extends HttpServlet {
 			output.addProperty("status", "success");
 			JsonObject results = new JsonObject();
 			//Prints the total social app usage first
-			results.addProperty("total-social-app-usage-duration", printMap.get("total-social-app-usage-duration").getMessage());
+			results.addProperty("total-social-app-usage-duration", Integer.parseInt(printMap.get("total-social-app-usage-duration").getMessage()));
 			//Starts printing the results for each app and the percentage
 			ArrayList<HashMap<String, Breakdown>> appList = printMap.get("individual-social-app-usage").getBreakdown();
 			JsonArray arr = new JsonArray();
 			JsonObject eachApp = new JsonObject();
 			for (HashMap<String, Breakdown> appDetails : appList) {
 				eachApp.addProperty("app-name", appDetails.get("app-name").getMessage());
-				eachApp.addProperty("percent", appDetails.get("percent").getMessage());
+				eachApp.addProperty("percent", Integer.parseInt(appDetails.get("percent").getMessage()));
 				arr.add(eachApp);
 				eachApp = new JsonObject();
 			}
 			results.add("individual-social-app-usage", arr);
-			results.addProperty("total-time-spent-in-sis", printMap.get("total-time-spent-in-sis").getMessage());
-			results.addProperty("group-percent", printMap.get("group-percent").getMessage());
-			results.addProperty("solo-percent", printMap.get("solo-percent").getMessage());
+			results.addProperty("total-time-spent-in-sis", Integer.parseInt(printMap.get("total-time-spent-in-sis").getMessage()));
+			results.addProperty("group-percent", Integer.parseInt(printMap.get("group-percent").getMessage()));
+			results.addProperty("solo-percent", Integer.parseInt(printMap.get("solo-percent").getMessage()));
 			output.add("results", results);
 			out.println(gson.toJson(output));
 		}
