@@ -407,7 +407,7 @@ public class BasicAppController {
 			// Filter by M and F
 			while (iter.hasNext()) {
 				User user = iter.next();
-				if (!user.getGender().toUpperCase().equals(demo)) {
+				if (!user.getGender().toLowerCase().equals(demo)) {
 					iter.remove();
 				}
 			}
