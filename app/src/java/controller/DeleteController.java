@@ -10,6 +10,7 @@ import dao.LocationDAO;
 import dao.LocationUsageDAO;
 import dao.UserDAO;
 import dao.Utility;
+import entity.Location;
 import entity.LocationUsage;
 import java.io.IOException;
 import java.sql.Connection;
@@ -132,16 +133,14 @@ public class DeleteController {
         }
         
         //SEMANTIC PLACE VALIDATION
-        if(semanticPl != null && semanticPl.length() > 7){
-            String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
-            int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
-
-            if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
-                errors += ", invalid semantic place";
+        if(semanticPl != null && semanticPl.length() != 0){
+            LocationDAO lDao = new LocationDAO(); 
+            Location semPl = lDao.retrieveSemPl(semanticPl);
+            if(semPl == null) {
+                errors += ", invalid semantic-place"; 
             }
-        } else {
-            errors += ", invalid semantic place";
-        }
+
+        } 
         
         if(errors.length() == 0){
             //System.out.println(macAdd);

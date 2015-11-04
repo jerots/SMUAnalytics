@@ -1,6 +1,7 @@
 package dao;
 
 import com.csvreader.CsvReader;
+import entity.Location;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -161,5 +162,32 @@ public class LocationDAO {
         }
         return null;
     }
+    
+    public Location retrieveSemPl(String semanticPlace) {
+		
+		String sql = "SELECT * FROM location WHERE semanticplace=?";
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			conn = ConnectionManager.getConnection();
+			ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, semanticPlace);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+                            return new Location(rs.getInt(1), rs.getString(2));
+			}
+			
+		} catch (SQLException e) {
+			
+		} finally {
+			ConnectionManager.close(conn, ps, rs);
+		}
+		
+		return null;
+	}
 
 }

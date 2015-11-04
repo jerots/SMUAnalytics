@@ -159,7 +159,7 @@ public class TopKSchool extends HttpServlet {
 				output.addProperty("status", "error");
 				Collections.sort(errors);
 				output.add("messages", gson.toJsonTree(errors));
-				out.println(gson.toJson(errors));
+				out.println(gson.toJson(output));
 				return;
 			}
 
