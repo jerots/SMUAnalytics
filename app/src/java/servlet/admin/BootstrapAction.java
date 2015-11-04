@@ -84,7 +84,7 @@ public class BootstrapAction extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        
+        request.setAttribute("option", option);
 		long timeAfter = System.currentTimeMillis();
 		
 		long timeTaken = (timeAfter - timeBefore) / 1000;

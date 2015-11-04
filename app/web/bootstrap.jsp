@@ -76,14 +76,18 @@
                     <h1>Result</h1>
 
 
-                    <%
+                    <%  String option = (String) request.getAttribute("option");
                         String timeTaken = (String) request.getAttribute("timeTaken");
-                        if (timeTaken != null) {
+                        if (timeTaken != null && option.equals("bootstrap")) {
                             out.println("Bootstrap time taken: " + timeTaken + " seconds");
+                        } else if(timeTaken != null){
+                            out.println("Additional Files time taken: " + timeTaken + " seconds");
                         }
                         TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
                         if (recordMap != null) {
                             if (recordMap.containsKey("app-lookup.csv")) {
+                                int appCount = recordMap.get("app-lookup.csv");
+                                if (appCount >= 0) {
                     %>
                     <%---app---%>
                     <h4><b> App</b> </h4>
@@ -91,7 +95,7 @@
                     <%
                             out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                             out.println("<b>App</b>" + "</td></tr><tr><td>");
-                            out.println("<b>Apps updated </b> " + "</td><td>" + recordMap.get("app-lookup.csv"));
+                            out.println("<b>Apps updated </b> " + "</td><td>" + appCount);
                             out.println("</td></tr><tr><td>");
                             TreeMap<Integer, String> appErrMap = (TreeMap<Integer, String>) request.getAttribute("appErrMap");
                             Iterator<Integer> appiter = appErrMap.keySet().iterator();
@@ -113,6 +117,11 @@
                             }
                             out.println("</table>");
                         }
+                        }
+                        
+                            if (recordMap.containsKey("demographics.csv")) {
+                                int demoCount = recordMap.get("demographics.csv");
+                           if (demoCount >= 0) {
                     %>
 
                     <p>
@@ -125,7 +134,7 @@
                     <%
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>User</b>" + "</td></tr><tr><td>");
-                        out.println("<b>User updated </b> " + "</td><td>" + recordMap.get("demographics.csv"));
+                        out.println("<b>User updated </b> " + "</td><td>" + demoCount);
                         out.println("</td></tr><tr><td>");
                         TreeMap<Integer, String> userErrMap = (TreeMap<Integer, String>) request.getAttribute("userErrMap");
                         Iterator<Integer> useriter = userErrMap.keySet().iterator();
@@ -146,13 +155,15 @@
                             }
                         }
                         out.println("</table>");
+                            }
+                            }
                         if (recordMap.containsKey("location-lookup.csv")) {
                     %>
 
                     <P>
                         <%---location---%>
                     <%int locationCount = recordMap.get("location-lookup.csv");
-                            if (locationCount > 0) { %>    
+                            if (locationCount >= 0) { %>    
                     <h4><b> Location</b> </h4>
                     <hr>
                     <%                              
@@ -181,6 +192,9 @@
                                 out.println("</table>");
                             }
                         }
+                        if (recordMap.containsKey("app.csv")) {
+                            int appUsageCount = recordMap.get("app.csv");
+                            if (appUsageCount >= 0) {
                     %>
                     <P>
                         <%---appUsage---%>
@@ -193,7 +207,7 @@
 
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-                        out.println("<b>AppUsage updated </b> " + "</td><td>" + (recordMap.get("app.csv") - auErrorSize));
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + appUsageCount );
                         out.println("</td></tr><tr><td>");
 
                         out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
@@ -212,13 +226,16 @@
                             }
                         }
                         out.println("</table>");
+                        }
+                        }
+                        if (recordMap.containsKey("location.csv")) {
                     %>
                     <P>
                         <%---locationUsage---%>
                     
                     
                     <%                          int locationUsageCount = recordMap.get("location.csv");
-                        if (locationUsageCount > 0) { %>
+                        if (locationUsageCount >= 0) { %>
                         <h4><b> LocationUsage</b> </h4><hr>
                     <%    
                             out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
@@ -243,15 +260,17 @@
                                     out.println("</td></tr>");
                                 }
                             }
-                        }
+                        
                         out.println("</table>");
-
+                        }
+                        }
+                        if (recordMap.containsKey("location-delete.csv")) {
                     %>
                     <P>
                         <%---locationUsageDelete---%>
 
                         <%		int locationDeleteCount = recordMap.get("location-delete.csv");
-                                if (locationDeleteCount > 0) {
+                                if (locationDeleteCount >= 0) {
                                     out.println("<h4><b> LocationUsageDelete</b> </h4><hr>");
                                     out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                                     out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
@@ -277,7 +296,7 @@
                                     }
                                     out.println("</table>");
                                 }
-
+                            }
                             } else {
                                 out.println("You have not uploaded any files.");
                             }

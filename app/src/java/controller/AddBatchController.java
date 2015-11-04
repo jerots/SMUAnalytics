@@ -27,104 +27,114 @@ import javax.servlet.http.Part;
  */
 public class AddBatchController {
 
-	public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
-			TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
-		Connection conn = ConnectionManager.getConnection();
-                conn.setAutoCommit(false);
-		InputStream fileContent = filePart.getInputStream();
-		ZipEntry entry = null;
+    public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
+            TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
+        Connection conn = ConnectionManager.getConnection();
+        conn.setAutoCommit(false);
+        InputStream fileContent = filePart.getInputStream();
+        ZipEntry entry = null;
 
-		CsvReader reader = null;
-		
-		// initialise the number of rows updated
-		int userUpdated = 0;
-		int delUpdated = 0;
-		int auUpdated = 0;
-		int luUpdated = 0;
-		//put the results into aa hashmap to return to bootstrap action
-		TreeMap<String, Integer> result = new TreeMap<String, Integer>();
+        CsvReader reader = null;
 
-		//initialised dao
-		LocationUsageDAO luDao = new LocationUsageDAO();
-		UserDAO uDao = new UserDAO();
-		AppUsageDAO auDao = new AppUsageDAO();
+        // initialise the number of rows updated
+        int userUpdated = -1;
+        int delUpdated = -1;
+        int auUpdated = -1;
+        int luUpdated = -1;
+        //put the results into aa hashmap to return to bootstrap action
+        TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
-		//demographics.csv
-		fileContent = filePart.getInputStream();
-		ZipInputStream zipInputStream = new ZipInputStream(fileContent);
-		InputStreamReader isr = new InputStreamReader(zipInputStream);
-		BufferedReader br = new BufferedReader(isr);
-		entry = null;
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                        String fileName = entry.getName();
-                        if (fileName.equals("demographics.csv")) {
-                                reader = new CsvReader(br);
-                                int[] updatedRecords = uDao.add(reader, userErrMap, conn);
-                                userUpdated = updatedRecords.length;
-                                break;
-                        } else {
-                                zipInputStream.closeEntry();
-                        }
-                }
+        //initialised dao
+        LocationUsageDAO luDao = new LocationUsageDAO();
+        UserDAO uDao = new UserDAO();
+        AppUsageDAO auDao = new AppUsageDAO();
 
-		//app.csv
-		fileContent = filePart.getInputStream();
-		zipInputStream = new ZipInputStream(fileContent);
-		isr = new InputStreamReader(zipInputStream);
-		br = new BufferedReader(isr);
-		entry = null;
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                        String fileName = entry.getName();
-                        if (fileName.equals("app.csv")) {
-                                reader = new CsvReader(br);
-                                auUpdated = auDao.add(reader, auErrMap, conn);
-                                break;
-                        } else {
-                                zipInputStream.closeEntry();
-                        }
-                }
+        //demographics.csv
+        ZipInputStream zipInputStream = new ZipInputStream(fileContent);
+        InputStreamReader isr = new InputStreamReader(zipInputStream);
+        BufferedReader br = new BufferedReader(isr);
+        entry = null;
+        while ((entry = zipInputStream.getNextEntry()) != null) {
+            String fileName = entry.getName();
+            if (fileName.equals("demographics.csv")) {
+                reader = new CsvReader(br);
+                int[] updatedRecords = uDao.add(reader, userErrMap, conn);
+                userUpdated = updatedRecords.length;
+                break;
+            } else {
+                zipInputStream.closeEntry();
+            }
+        }
 
-		//locationUsage
-		fileContent = filePart.getInputStream();
-		zipInputStream = new ZipInputStream(fileContent);
-		isr = new InputStreamReader(zipInputStream);
-		br = new BufferedReader(isr);
-		entry = null;
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("location.csv")) {
-                            reader = new CsvReader(br);
-                            luUpdated = luDao.add(reader, luErrMap, conn);
+        //app.csv
+        fileContent = filePart.getInputStream();
+        zipInputStream = new ZipInputStream(fileContent);
+        isr = new InputStreamReader(zipInputStream);
+        br = new BufferedReader(isr);
+        entry = null;
+        System.out.println("e");
+        while ((entry = zipInputStream.getNextEntry()) != null) {
+            System.out.println("d");
+            String fileName = entry.getName();
+            System.out.println("c");
+            if (fileName.equals("app.csv")) {
+                System.out.println("b");
+                reader = new CsvReader(br);
+                System.out.println("A");
+                auUpdated = auDao.add(reader, auErrMap, conn);
+                break;
+            } else {
+                zipInputStream.closeEntry();
+            }
+        }
 
-                    } else {
-                            zipInputStream.closeEntry();
-                    }
-                }
+        //locationUsage
+        fileContent = filePart.getInputStream();
+        zipInputStream = new ZipInputStream(fileContent);
+        isr = new InputStreamReader(zipInputStream);
+        br = new BufferedReader(isr);
+        entry = null;
+        while ((entry = zipInputStream.getNextEntry()) != null) {
+            String fileName = entry.getName();
+            if (fileName.equals("location.csv")) {
+                reader = new CsvReader(br);
+                luUpdated = luDao.add(reader, luErrMap, conn);
+                break;
+            } else {
+                zipInputStream.closeEntry();
+            }
+        }
 
-		//location-delete.csv
-		fileContent = filePart.getInputStream();
-		zipInputStream = new ZipInputStream(fileContent);
-		isr = new InputStreamReader(zipInputStream);
-		br = new BufferedReader(isr);
-		entry = null;
-                while ((entry = zipInputStream.getNextEntry()) != null) {
-                    String fileName = entry.getName();
-                    if (fileName.equals("location-delete.csv")) {
-                            reader = new CsvReader(br);
-                            int[] updatedRecords = luDao.delete(reader, delErrMap, conn);
-                            delUpdated = updatedRecords[0];
-                    } else {
-                            zipInputStream.closeEntry();
-                    }
-                }
-		
-		ConnectionManager.close(conn);
+        //location-delete.csv
+        fileContent = filePart.getInputStream();
+        zipInputStream = new ZipInputStream(fileContent);
+        isr = new InputStreamReader(zipInputStream);
+        br = new BufferedReader(isr);
+        entry = null;
+        while ((entry = zipInputStream.getNextEntry()) != null) {
+            String fileName = entry.getName();
+            if (fileName.equals("location-delete.csv")) {
+                reader = new CsvReader(br);
+                int[] updatedRecords = luDao.delete(reader, delErrMap, conn);
+                delUpdated = updatedRecords[0];
+            } else {
+                zipInputStream.closeEntry();
+            }
+        }
 
-		result.put("demographics.csv", userUpdated);
-		result.put("app.csv", auUpdated);
-		result.put("location.csv", luUpdated);
-		result.put("location-delete.csv", delUpdated);
-
-		return result;
-	}
+        ConnectionManager.close(conn);
+        if (userUpdated >= 0) {
+            result.put("demographics.csv", userUpdated);
+        }
+        if (auUpdated >= 0) {
+            result.put("app.csv", auUpdated);
+        }
+        if (luUpdated >= 0) {
+            result.put("location.csv", luUpdated);
+        }
+        if (delUpdated >= 0) {
+            result.put("location-delete.csv", delUpdated);
+        }
+        return result;
+    }
 }

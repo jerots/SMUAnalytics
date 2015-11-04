@@ -105,6 +105,7 @@ public class AppUsageDAO {
     }
 
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException, SQLException {
+        System.out.println("LALALALA");
         int updateCounts = 0;
         try {
             int index = 2;
@@ -117,40 +118,32 @@ public class AppUsageDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 boolean err = false;
+                String errorMsg = "";
+                
+                
+                if(errMap.containsKey(index)){
+                    errorMsg = errMap.get(index);
+                }
 
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
                 if (date == null || !Utility.checkDate(date)) {
                     err = true;
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid timestamp");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid timestamp");
-                    }
+                    errorMsg += ",invalid timestamp";
                 }
 
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "mac add cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "mac add cannot be blank");
-                    }
+                    errorMsg += ",mac add cannot be blank";
                     err = true;
                 } else {
                     macAdd = macAdd.toLowerCase();
 
                     if (!Utility.checkHexadecimal(macAdd)) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "invalid mac add");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "invalid mac add");
-                        }
+                        errorMsg += ",invalid mac add";
                         err = true;
+
                     } else {
                         query = "select macaddress from user where macaddress = ?;";
                         pStmt = conn.prepareStatement(query);
@@ -158,12 +151,7 @@ public class AppUsageDAO {
 
                         rs = pStmt.executeQuery();
                         if (!rs.next()) {
-                            String errorMsg = errMap.get(index);
-                            if (errorMsg == null) {
-                                errMap.put(index, "no matching mac address");
-                            } else {
-                                errMap.put(index, errorMsg + "," + "no matching mac address");
-                            }
+                            errorMsg += ",no matching mac address";
                             err = true;
                         }
                         pStmt.close();
@@ -172,12 +160,7 @@ public class AppUsageDAO {
                 //check appid
                 int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "app id cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "app id cannot be blank");
-                    }
+                    errorMsg += ",app id cannot be blank";
                     err = true;
                 } else {
                     query = "select appid from app where appid = ?;";
@@ -185,24 +168,24 @@ public class AppUsageDAO {
                     pStmt.setInt(1, appId);
                     rs = pStmt.executeQuery();
                     if (!rs.next()) {
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "invalid app");
-                        } else {
-                            errMap.put(index, errorMsg + "," + "invalid app");
-                        }
+                        errorMsg += ",invalid app";
                         err = true;
+
                     }
                     pStmt.close();
                 }
 
                 if (!err) {
                     if (duplicate.containsKey(date + macAdd)) {
-                        String errorMsg = errMap.get(index);
-                        errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(date + macAdd));
+                        errorMsg += ",duplicate row" + duplicate.get(date + macAdd);
+                        err = true;
                     }
                     duplicate.put(date + macAdd, index);
                     appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
+                }
+                if(errorMsg != null && errorMsg.length()!= 0){
+                    errorMsg = errorMsg.substring(1, errorMsg.length());
+                    errMap.put(index, errorMsg);
                 }
                 index++;
             }
@@ -227,12 +210,17 @@ public class AppUsageDAO {
                 for (int i = 0; i < updateArr.length; i++) {
                     if (updateArr[i] == Statement.EXECUTE_FAILED) {
                         // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate TreeMap to find the offending row.
-                        String errorMsg = errMap.get(index);
-                        if (errorMsg == null) {
-                            errMap.put(index, "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
-                        } else {
-                            errMap.put(index, errorMsg + "," + "duplicate row " + duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress()));
+                        int row = duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress());
+                        String errorMsg = "";
+                        if(errMap.containsKey(row)){
+                            errorMsg = errMap.get(row);
                         }
+                        if(errorMsg != null && errorMsg.length() != 0){
+                            errorMsg += ",duplicate row";
+                        }else{
+                            errorMsg += "duplicate row";
+                        }
+                        errMap.put(row, errorMsg);
                     }
 
                     if (updateArr[i] >= 0) {
@@ -247,6 +235,8 @@ public class AppUsageDAO {
         } catch (NullPointerException e) {
 //            e.printStackTrace();
         }
+        System.out.println(updateCounts + "DARRENNNNN");
+
         return updateCounts;
     }
 

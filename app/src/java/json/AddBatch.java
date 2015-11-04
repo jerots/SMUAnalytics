@@ -10,58 +10,81 @@ import entity.Admin;
 import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.Iterator;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-@WebServlet(name = "AddBatch", urlPatterns = {"/AddBatch"})
+@WebServlet(name = "AddBatch", urlPatterns = {"/json/update"})
+@MultipartConfig
 public class AddBatch extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonObject output = new JsonObject();
-            JsonArray arrayErr = new JsonArray();
+            JsonArray errors = new JsonArray();
 
+            InputStream fis = null;
             String token = request.getParameter("token");
+            Part filePart = null;
+            try {
+                filePart = request.getPart("addbatch-file");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //TOKEN VALIDATION
             if (token == null) {
-                arrayErr.add("missing token");
+                errors.add("missing token");
             } else if (token.length() == 0) {
-                arrayErr.add("blank token");
+                errors.add("blank token");
             } else {
                 try {
                     String username = JWTUtility.verify(token.trim(), "nabjemzhdarrensw");
                     if (username == null) {
                         //failed
-                        arrayErr.add("invalid token");
+                        errors.add("invalid token");
                     } else {
                         AdminDAO adminDAO = new AdminDAO();
                         Admin admin = adminDAO.retrieve(username);
                         if (admin == null) {
-                            arrayErr.add("invalid token");
+                            errors.add("invalid token");
                         }
                     }
 
                 } catch (JWTException e) {
                     //failed
-                    arrayErr.add("invalid token");
+                    errors.add("invalid token");
                 }
 
+                //IF bootstrap-file field not found
+                if (filePart == null && filePart.getSize() < 0) {
+                    errors.add("missing file");
+                }
+
+                //If not zip file
             }
 
-            Part filePart = request.getPart("zipFile"); // Retrieves <in addProperty type="file" name="zipFile">
-            if (filePart != null && filePart.getSize() > 0 && arrayErr.size() <= 0) {
+            if (errors.size() > 0) {
+                output.addProperty("status", "error");
+                output.add("errors", errors);
+                out.println(gson.toJson(output));
+                return;
+            }
+
+            if (filePart != null && filePart.getSize() > 0 && errors.size() <= 0) {
                 //Create ERROR MAPS - and pass to boostrapController to generate
                 TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
@@ -89,100 +112,118 @@ public class AddBatch extends HttpServlet {
                     while (iter.hasNext()) {
                         String fileName = iter.next();
                         list.addProperty(fileName, recordMap.get(fileName));
-                        arr.add(list);
                     }
+                    arr.add(list);
                     output.add("num-record-uploaded", arr);
-
                     if (!success) { //This only occurs when there is an error in the upload
-
-                        //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
-                        Iterator<Integer> iterInt = userErrMap.keySet().iterator();
-                        arr = new JsonArray();
-                        list = new JsonObject();
-                        JsonArray errors = new JsonArray();
-                        //Goes through the list to split all the error messages into a jsonarray
-                        while (iterInt.hasNext()) {
-                            int id = iterInt.next();
-                            list.addProperty("file", "demographics.csv");
-                            list.addProperty("line", id);
-                            String[] messages = userErrMap.get(id).split(",");
-                            for (String msg : messages) {
-                                errors.add(msg);
+                        if(userErrMap != null && userErrMap.size() != 0 ){
+                            //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
+                            Iterator<Integer> iterInt = userErrMap.keySet().iterator();
+                            arr = new JsonArray();
+                            list = new JsonObject();
+                            errors = new JsonArray();
+                            //Goes through the list to split all the error messages into a jsonarray
+                            while (iterInt.hasNext()) {
+                                int id = iterInt.next();
+                                list.addProperty("file", "demographics.csv");
+                                list.addProperty("line", id);
+                                String[] messages = userErrMap.get(id).split(",");
+                                for (String msg : messages) {
+                                    errors.add(msg);
+                                }
+                                list.add("message", errors);
+                                errors = new JsonArray();
+                                arr.add(list);
+                                list = new JsonObject();
                             }
-                            list.add("message", arr);
                         }
-                        arr.add(list);
-
-                        //Iterates through to find the unique row numbers that are affected. This is for App-lookup.csv/AppUsageDAO
-                        iterInt = auErrMap.keySet().iterator();
-                        arr = new JsonArray();
-                        list = new JsonObject();
-                        errors = new JsonArray();
-                        //Goes through the list to split all the error messages into a jsonarray
-                        while (iterInt.hasNext()) {
-                            int id = iterInt.next();
-                            list.addProperty("file", "app.csv");
-                            list.addProperty("line", id);
-                            String[] messages = auErrMap.get(id).split(",");
-                            for (String msg : messages) {
-                                errors.add(msg);
+                        
+                        if(auErrMap != null && auErrMap.size() != 0){
+                            System.out.println("haha");
+                            //Iterates through to find the unique row numbers that are affected. This is for App-lookup.csv/AppUsageDAO
+                            Iterator<Integer> iterInt = auErrMap.keySet().iterator();
+                            arr = new JsonArray();
+                            list = new JsonObject();
+                            errors = new JsonArray();
+                            //Goes through the list to split all the error messages into a jsonarray
+                            while (iterInt.hasNext()) {
+                                int id = iterInt.next();
+                                list.addProperty("file", "app.csv");
+                                list.addProperty("line", id);
+                                String[] messages = auErrMap.get(id).split(",");
+                                for (String msg : messages) {
+                                    errors.add(msg);
+                                }
+                                list.add("message", errors);
+                                errors = new JsonArray();
+                                arr.add(list);
+                                list = new JsonObject();
                             }
-                            list.add("message", arr);
                         }
-                        arr.add(list);
-
-                        //Iterates through to find the unique row numbers that are affected. This is for LocationUsageDAO/location.csv
-                        iterInt = luErrMap.keySet().iterator();
-                        arr = new JsonArray();
-                        list = new JsonObject();
-                        errors = new JsonArray();
-                        //Goes through the list to split all the error messages into a jsonarray
-                        while (iterInt.hasNext()) {
-                            int id = iterInt.next();
-                            list.addProperty("file", "location.csv");
-                            list.addProperty("line", id);
-                            String[] messages = luErrMap.get(id).split(",");
-                            for (String msg : messages) {
-                                errors.add(msg);
+                        if(luErrMap != null && luErrMap.size() != 0){
+                            System.out.println("hoho");
+                            //Iterates through to find the unique row numbers that are affected. This is for LocationUsageDAO/location.csv
+                            Iterator<Integer> iterInt = luErrMap.keySet().iterator();
+                            arr = new JsonArray();
+                            list = new JsonObject();
+                            errors = new JsonArray();
+                            //Goes through the list to split all the error messages into a jsonarray
+                            while (iterInt.hasNext()) {
+                                int id = iterInt.next();
+                                list.addProperty("file", "location.csv");
+                                list.addProperty("line", id);
+                                String[] messages = luErrMap.get(id).split(",");
+                                for (String msg : messages) {
+                                    errors.add(msg);
+                                }
+                                list.add("message", errors);
+                                errors = new JsonArray();
+                                arr.add(list);
+                                list = new JsonObject();
                             }
-                            list.add("message", arr);
+                            
                         }
-                        arr.add(list);
-
-                        //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
-                        iterInt = delErrMap.keySet().iterator();
-                        arr = new JsonArray();
-                        list = new JsonObject();
-                        errors = new JsonArray();
-                        //Goes through the list to split all the error messages into a jsonarray
-                        while (iterInt.hasNext()) {
-                            int id = iterInt.next();
-                            list.addProperty("file", "location-delete.csv");
-                            list.addProperty("line", id);
-                            String[] messages = delErrMap.get(id).split(",");
-                            for (String msg : messages) {
-                                errors.add(msg);
+                        
+                        if(delErrMap != null && delErrMap.size() != 0){
+                            //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
+                            Iterator<Integer> iterInt = delErrMap.keySet().iterator();
+                            arr = new JsonArray();
+                            list = new JsonObject();
+                            errors = new JsonArray();
+                            //Goes through the list to split all the error messages into a jsonarray
+                            while (iterInt.hasNext()) {
+                                int id = iterInt.next();
+                                list.addProperty("file", "location-delete.csv");
+                                list.addProperty("line", id);
+                                String[] messages = delErrMap.get(id).split(",");
+                                for (String msg : messages) {
+                                    errors.add(msg);
+                                }
+                                list.add("message", errors);
+                                errors = new JsonArray();
+                                arr.add(list);
+                                list = new JsonObject();
                             }
-                            list.add("message", arr);
                         }
-                        arr.add(list);
-
+                        
                         output.add("error", arr);
                     }
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
             } else {
                 //For errors, will throw the errors back IMMEDIATELY without checking the files.
                 output.addProperty("status", "error");
-                output.add("errors", arrayErr);
+                output.add("errors", errors);
                 out.println(gson.toJson(output));
                 return;
             }
 
             out.println(gson.toJson(output));
         }
+    
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
