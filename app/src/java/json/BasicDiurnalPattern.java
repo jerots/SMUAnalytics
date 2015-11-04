@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import javax.servlet.ServletException;
@@ -38,7 +39,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 
 			JsonObject output = new JsonObject();
 
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String date = request.getParameter("date");
@@ -62,7 +63,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 						User user = userDAO.retrieve(username);
 						AdminDAO adminDAO = new AdminDAO();
 						Admin admin = adminDAO.retrieve(username);
-                        if (user == null && admin == null) {
+						if (user == null && admin == null) {
 							errors.add("invalid token");
 						}
 					}
@@ -140,7 +141,9 @@ public class BasicDiurnalPattern extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
+
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
 				out.println(gson.toJson(output));
 				return;
 			}

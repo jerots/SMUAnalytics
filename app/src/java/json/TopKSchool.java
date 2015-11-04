@@ -20,6 +20,7 @@ import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,13 +49,16 @@ public class TopKSchool extends HttpServlet {
 
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject output = new JsonObject();
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String startdate = request.getParameter("startdate");
 			String enddate = request.getParameter("enddate");
 			String selected = request.getParameter("appcategory");
-
+			
+			
+			
+			
 			//TOKEN VALIDATION
 			if (token == null) {
 				errors.add("missing token");
@@ -82,13 +86,18 @@ public class TopKSchool extends HttpServlet {
 
 			}
 			//Gets the number of (top) K that the individual wants displayed
+			int entryInt = 3;
 			String entry = request.getParameter("k");
-			if (entry == null || entry.length() == 0) {
+			if (entry == null) {
 				entry = "3";
-			}
-			int entryInt = Utility.parseInt(entry);
-			if (entryInt < 1 || entryInt > 10) {
-				errors.add("invalid k");
+			} else if (entry.length() == 0) {
+				errors.add("blank k");
+			} else {
+				entryInt = Utility.parseInt(entry);
+				if (entryInt < 1 || entryInt > 10) {
+					errors.add("invalid k");
+				}
+
 			}
 
 			//START DATE VALIDATION
@@ -148,8 +157,9 @@ public class TopKSchool extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
-				out.println(gson.toJson(errors));
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
+				out.println(gson.toJson(output));
 				return;
 			}
 

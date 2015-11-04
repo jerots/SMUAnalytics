@@ -40,8 +40,8 @@ public class UserDAO {
         years.add("2015");
 
         genders = new ArrayList<String>();
-        genders.add("M");
-        genders.add("F");
+        genders.add("m");
+        genders.add("f");
     }
 
     public ArrayList<String> getSchools() {

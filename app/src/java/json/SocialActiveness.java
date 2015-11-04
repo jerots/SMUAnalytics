@@ -21,6 +21,7 @@ import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +53,7 @@ public class SocialActiveness extends HttpServlet {
 		try (PrintWriter out = response.getWriter()) {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject output = new JsonObject();
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String date = request.getParameter("date");
@@ -126,7 +127,8 @@ public class SocialActiveness extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
 				out.println(gson.toJson(output));
 				return;
 			}

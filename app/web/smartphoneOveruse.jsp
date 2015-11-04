@@ -110,6 +110,7 @@
                 </div>
 
                 <div class="theme-div theme-content" style="width:60%">
+                    <h4><b>Smartphone Overuse</b> </h4> <hr>
                     <%
 
                         TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");

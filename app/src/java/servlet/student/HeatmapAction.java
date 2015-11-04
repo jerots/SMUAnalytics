@@ -59,7 +59,7 @@ public class HeatmapAction extends HttpServlet {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date datetime = dateFormat.parse(dateStr + " " + timeStr, new ParsePosition(0));
 			if (datetime == null){
-				request.setAttribute("error", "You have entered an invalid date!");
+				request.setAttribute("error", "You have entered an invalid date or time!");
 				RequestDispatcher rd = request.getRequestDispatcher("heatmap.jsp");
 				rd.forward(request, response);
 				return;

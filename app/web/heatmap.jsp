@@ -152,6 +152,7 @@
                     </form>
                 </div>
                 <div class="theme-div theme-content" style="width:60%">
+                    <h4><b>Smartphone Usage Heatmap</b> </h4> <hr>
                     <%						TreeMap<String, ArrayList<LocationUsage>> heatmap = (TreeMap<String, ArrayList<LocationUsage>>) request.getAttribute("heatmap");
                         String error = (String) request.getAttribute("error");
                         if (error != null) {

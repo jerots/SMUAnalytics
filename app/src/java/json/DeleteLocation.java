@@ -134,7 +134,7 @@ public class DeleteLocation extends HttpServlet {
             //PRINT ERROR AND EXIT IF ERRORS EXIST
             if (errorArr.size() > 0) {
                 output.addProperty("status", "error");
-                output.add("errors", errorArr);
+                output.add("messages", errorArr);
                 out.println(gson.toJson(output));
                 return;
             }
