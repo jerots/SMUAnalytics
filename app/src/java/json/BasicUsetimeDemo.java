@@ -190,9 +190,9 @@ public class BasicUsetimeDemo extends HttpServlet {
 		for (HashMap<String, Breakdown> map : breakdownList) {
 			JsonObject obj = new JsonObject();
 			if (map.get("gender") != null) {
-				obj.addProperty("gender", map.get("gender").getMessage());
+				obj.addProperty("gender", map.get("gender").getMessage().toUpperCase());
 			} else if (map.get("year") != null) {
-				obj.addProperty("year", map.get("year").getMessage());
+				obj.addProperty("year", Integer.parseInt(map.get("year").getMessage()));
 			} else if (map.get("school") != null) {
 				obj.addProperty("school", map.get("school").getMessage());
 			} else if (map.get("cca") != null) {
@@ -201,13 +201,13 @@ public class BasicUsetimeDemo extends HttpServlet {
 
 			Breakdown count = map.get("count");
 			if (count != null) {
-				obj.addProperty("count", count.getMessage());
+				obj.addProperty("count", Integer.parseInt(count.getMessage()));
 
 			}
 
 			Breakdown percent = map.get("percent");
 			if (percent != null) {
-				obj.addProperty("percent", percent.getMessage());
+				obj.addProperty("percent", Integer.parseInt(percent.getMessage()));
 			}
 
 			Breakdown further = map.get("breakdown");
@@ -224,16 +224,16 @@ public class BasicUsetimeDemo extends HttpServlet {
 				Breakdown mildPercent = map.get("mild-percent");
 
 				if (intenseCount != null) {
-					obj.addProperty("intense-count", intenseCount.getMessage());
-					obj.addProperty("intense-percent", intensePercent.getMessage());
+					obj.addProperty("intense-count", Integer.parseInt(intenseCount.getMessage()));
+					obj.addProperty("intense-percent", Integer.parseInt(intensePercent.getMessage()));
 				}
 				if (normalCount != null) {
-					obj.addProperty("normal-count", normalCount.getMessage());
-					obj.addProperty("normal-percent", normalPercent.getMessage());
+					obj.addProperty("normal-count", Integer.parseInt(normalCount.getMessage()));
+					obj.addProperty("normal-percent", Integer.parseInt(normalPercent.getMessage()));
 				}
 				if (mildCount != null) {
-					obj.addProperty("mild-count", mildCount.getMessage());
-					obj.addProperty("mild-percent", mildPercent.getMessage());
+					obj.addProperty("mild-count", Integer.parseInt(mildCount.getMessage()));
+					obj.addProperty("mild-percent", Integer.parseInt(mildPercent.getMessage()));
 				}
 			}
 

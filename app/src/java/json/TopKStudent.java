@@ -175,10 +175,10 @@ public class TopKStudent extends HttpServlet {
 
 					JsonObject indiv = new JsonObject();
 
-					indiv.addProperty("rank", map.get("rank"));
+					indiv.addProperty("rank", Integer.parseInt(map.get("rank")));
 					indiv.addProperty("name", map.get("name"));
 					indiv.addProperty("mac-address", map.get("mac-address"));
-					indiv.addProperty("duration", map.get("duration"));
+					indiv.addProperty("duration", Integer.parseInt(map.get("duration")));
 					param.add(indiv);
 
 				}

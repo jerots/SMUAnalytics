@@ -144,16 +144,16 @@ public class BasicUsetime extends HttpServlet {
 			JsonArray breakdownArr = new JsonArray();
 
 			JsonObject intense = new JsonObject();
-			intense.addProperty("intense-count", intenseMap.get("intense-count").getMessage());
-			intense.addProperty("intense-percent", intenseMap.get("intense-percent").getMessage());
+			intense.addProperty("intense-count", Integer.parseInt(intenseMap.get("intense-count").getMessage()));
+			intense.addProperty("intense-percent", Integer.parseInt(intenseMap.get("intense-percent").getMessage()));
 
 			JsonObject normal = new JsonObject();
-			normal.addProperty("normal-count", normalMap.get("normal-count").getMessage());
-			normal.addProperty("normal-percent", normalMap.get("normal-percent").getMessage());
+			normal.addProperty("normal-count", Integer.parseInt(normalMap.get("normal-count").getMessage()));
+			normal.addProperty("normal-percent", Integer.parseInt(normalMap.get("normal-percent").getMessage()));
 
 			JsonObject mild = new JsonObject();
-			mild.addProperty("mild-count", mildMap.get("mild-count").getMessage());
-			mild.addProperty("mild-percent", mildMap.get("mild-percent").getMessage());
+			mild.addProperty("mild-count", Integer.parseInt(mildMap.get("mild-count").getMessage()));
+			mild.addProperty("mild-percent", Integer.parseInt(mildMap.get("mild-percent").getMessage()));
 
 			breakdownArr.add(intense);
 			breakdownArr.add(normal);
