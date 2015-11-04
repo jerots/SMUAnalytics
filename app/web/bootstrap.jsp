@@ -207,7 +207,7 @@
 
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-                        out.println("<b>AppUsage updated </b> " + "</td><td>" + appUsageCount );
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + (appUsageCount - auErrorSize) );
                         out.println("</td></tr><tr><td>");
 
                         out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
