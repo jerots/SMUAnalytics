@@ -155,8 +155,8 @@ public class UsageHeatmap extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
-				out.println(gson.toJson(errors));
+				output.add("messages", errors);
+				out.println(gson.toJson(output));
 				return;
 			}
 
