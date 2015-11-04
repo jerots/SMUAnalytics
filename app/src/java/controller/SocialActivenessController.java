@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.TreeMap;
 
 /**
  *
@@ -146,7 +145,7 @@ public class SocialActivenessController {
         //--------------------------------------------HERE ONWARDS IS THE PHYSICAL BREAKDOWN----------------------------------------------------------------
         //----------------------------------------PART I: GROUPING OF LOCATION AND TIME -- USER.--------------------------------------------------------------------
         total = 0;
-		prevTime = 0;
+        prevTime = 0;
         //First, gets the User's locationUsage
         LocationUsageDAO luDao = new LocationUsageDAO();
         ArrayList<LocationUsage> locList = luDao.retrieveUserLocationUsage(onlyDate, macAddress);
@@ -340,11 +339,11 @@ public class SocialActivenessController {
             long group = 0;
             for (Activeness active : userOverlapList) {
                 group += active.getTime();
-                System.out.println(group);
+                
             }
-            System.out.println(overall);
+            
             String groupPercent = df.format((double) group / overall * 100);
-            System.out.println(((double) group) / overall);
+            
             long soloPercent = 100 - Utility.parseInt(groupPercent);
             overallMap.put("total-time-spent-in-sis", new Breakdown("" + overall / 1000));
             overallMap.put("group-percent", new Breakdown("" + groupPercent));
