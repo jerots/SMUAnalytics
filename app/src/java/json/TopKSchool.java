@@ -54,7 +54,10 @@ public class TopKSchool extends HttpServlet {
 			String startdate = request.getParameter("startdate");
 			String enddate = request.getParameter("enddate");
 			String selected = request.getParameter("appcategory");
-
+			
+			
+			
+			
 			//TOKEN VALIDATION
 			if (token == null) {
 				errors.add("missing token");
@@ -82,13 +85,18 @@ public class TopKSchool extends HttpServlet {
 
 			}
 			//Gets the number of (top) K that the individual wants displayed
+			int entryInt = 3;
 			String entry = request.getParameter("k");
-			if (entry == null || entry.length() == 0) {
+			if (entry == null) {
 				entry = "3";
-			}
-			int entryInt = Utility.parseInt(entry);
-			if (entryInt < 1 || entryInt > 10) {
-				errors.add("invalid k");
+			} else if (entry.length() == 0) {
+				errors.add("blank k");
+			} else {
+				entryInt = Utility.parseInt(entry);
+				if (entryInt < 1 || entryInt > 10) {
+					errors.add("invalid k");
+				}
+
 			}
 
 			//START DATE VALIDATION
@@ -148,7 +156,7 @@ public class TopKSchool extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
+				output.add("messages", errors);
 				out.println(gson.toJson(errors));
 				return;
 			}

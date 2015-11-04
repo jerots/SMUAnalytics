@@ -30,7 +30,6 @@ import java.util.TreeMap;
 public class SocialActivenessController {
 
     public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress, String errors) {
-        System.out.println("meme");
         //THIS METHOD is going to store first for the user all his apps and THEN check for social
         //DATE and MACADD have already been checked before
         //--------------------------------------------HERE ONWARDS IS THE ONLINE BREAKDOWN----------------------------------------------------------------
@@ -91,7 +90,7 @@ public class SocialActivenessController {
                 //This means it is not the first instance
                 //Before reset, stores into HashMap the current data values. AppId is stored before time for retrieval
                 //IMMEDIATELY REMOVES THOSE THAT ARE NOT SOCIAL.
-                if (thatApp.getAppCategory().equals("Social")) {
+                if (thatApp.getAppCategory().equals("social")) {
                     overall += total;
                     storage.put(thatApp, total);
                 }
@@ -113,7 +112,7 @@ public class SocialActivenessController {
                 diff = 10000; //Can just be 10000 because there is NOT a subsequent update and therefore assume 10000
             }
             total += diff;
-            if (thatApp.getAppCategory().equals("Social")) {
+            if (thatApp.getAppCategory().equals("social")) {
                 overall += total;
                 storage.put(thatApp, total);
             }
@@ -146,7 +145,8 @@ public class SocialActivenessController {
 
         //--------------------------------------------HERE ONWARDS IS THE PHYSICAL BREAKDOWN----------------------------------------------------------------
         //----------------------------------------PART I: GROUPING OF LOCATION AND TIME -- USER.--------------------------------------------------------------------
-        prevTime = 0;
+        total = 0;
+		prevTime = 0;
         //First, gets the User's locationUsage
         LocationUsageDAO luDao = new LocationUsageDAO();
         ArrayList<LocationUsage> locList = luDao.retrieveUserLocationUsage(onlyDate, macAddress);

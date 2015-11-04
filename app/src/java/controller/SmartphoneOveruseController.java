@@ -125,7 +125,12 @@ public class SmartphoneOveruseController {
 			oldTime = newTime;
 		}
 		if (appUsageList.size() > 0) {
-			frequency += 1;
+			if (oldTime.before(nextHour)) {
+				frequency += 1;
+
+			} else {
+				frequency += 2;
+			}
 		}
 
 		//Calculate average across days
@@ -182,7 +187,6 @@ public class SmartphoneOveruseController {
 			overuseIndex = "ToBeCautious";
 		}
 		result2.put("overuse-index", overuseIndex);
-
 
 		return result2;
 	}

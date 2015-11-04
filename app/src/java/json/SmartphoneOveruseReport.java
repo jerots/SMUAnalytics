@@ -136,11 +136,16 @@ public class SmartphoneOveruseReport extends HttpServlet {
 					}
 				}
 			}
+			
+			
+			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+				errors.add("invalid startdate");
+			}
 
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("errors", errors);
+				output.add("messages", errors);
 				out.println(gson.toJson(output));
 				return;
 			}
