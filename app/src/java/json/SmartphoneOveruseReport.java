@@ -19,6 +19,8 @@ import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TreeMap;
 import javax.servlet.ServletException;
@@ -50,7 +52,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			/* TODO output your page here. You may use following sample code. */
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject output = new JsonObject();
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String startDateStr = request.getParameter("startdate");
@@ -76,7 +78,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 						user = userDAO.retrieve(username);
 						AdminDAO adminDAO = new AdminDAO();
 						Admin admin = adminDAO.retrieve(username);
-                        if (user == null && admin == null) {
+						if (user == null && admin == null) {
 							errors.add("invalid token");
 						}
 					}
@@ -136,16 +138,17 @@ public class SmartphoneOveruseReport extends HttpServlet {
 					}
 				}
 			}
-			
-			
-			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)){
+
+			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
 				errors.add("invalid startdate");
 			}
 
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("messages", errors);
+
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
 				out.println(gson.toJson(output));
 				return;
 			}
@@ -158,9 +161,8 @@ public class SmartphoneOveruseReport extends HttpServlet {
 
 			JsonArray metrics = new JsonArray();
 
-			
 			output.addProperty("overuse-index", results.get("overuse-index"));
-			
+
 			JsonObject usageObj = new JsonObject();
 			usageObj.addProperty("usage-category", results.get("usage-category"));
 			usageObj.addProperty("usage-duration", results.get("usage-duration"));

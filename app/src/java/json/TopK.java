@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +50,7 @@ public class TopK extends HttpServlet {
 		try (PrintWriter out = response.getWriter()) {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject output = new JsonObject();
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String startdate = request.getParameter("startdate");
@@ -153,8 +154,10 @@ public class TopK extends HttpServlet {
 
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
+				
 				output.addProperty("status", "error");
-				output.add("messages", errors);
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
 				out.println(gson.toJson(output));
 				return;
 			}

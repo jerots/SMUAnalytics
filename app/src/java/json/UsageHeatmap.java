@@ -56,7 +56,7 @@ public class UsageHeatmap extends HttpServlet {
 		try (PrintWriter out = response.getWriter()) {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject output = new JsonObject();
-			JsonArray errors = new JsonArray();
+			ArrayList<String> errors = new ArrayList<String>();
 
 			String token = request.getParameter("token");
 			String date = request.getParameter("date");
@@ -155,7 +155,8 @@ public class UsageHeatmap extends HttpServlet {
 			//PRINT ERROR AND EXIT IF ERRORS EXIST
 			if (errors.size() > 0) {
 				output.addProperty("status", "error");
-				output.add("messages", errors);
+				Collections.sort(errors);
+				output.add("messages", gson.toJsonTree(errors));
 				out.println(gson.toJson(output));
 				return;
 			}
