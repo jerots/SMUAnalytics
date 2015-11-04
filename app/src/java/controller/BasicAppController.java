@@ -605,7 +605,7 @@ public class BasicAppController {
 		Breakdown result = new Breakdown();
 		AppUsageDAO auDAO = new AppUsageDAO();
 		Date startHour = startDate;
-		SimpleDateFormat sdf = new SimpleDateFormat("HH.00");
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:00");
 		//for each hour (for 24 loop)
 		for (int i = 0; i < 24; i++) {
 
@@ -621,8 +621,6 @@ public class BasicAppController {
 			int targetCount = targetList.size();
 			//get userList for this hour, filtered by demo
 			ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
-			System.out.println(targetList.size());
-			System.out.println(userList.size());
 			int secondsThisHour = 0;
 
 			//for each user

@@ -420,19 +420,19 @@ public class AppUsageDAO {
             String gender = demoArr[1];
             String school = demoArr[2];
 
-            if (year.equals("NA")) {
+            if (year.toLowerCase().equals("na")) {
                 ps.setString(3, "%");
             } else {
                 ps.setString(3, "%." + year + "@%.smu.edu.sg");
             }
 
-            if (gender.equals("NA")) {
+            if (gender.toLowerCase().equals("na")) {
                 ps.setString(4, "%");
             } else {
                 ps.setString(4, gender.toLowerCase());
             }
 
-            if (school.equals("NA")) {
+            if (school.toLowerCase().equals("na")) {
                 ps.setString(5, "%");
             } else {
                 ps.setString(5, "%@" + school + ".smu.edu.sg");
