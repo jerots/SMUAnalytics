@@ -23,6 +23,11 @@ import java.util.HashMap;
  *
  * @author Shuwen
  */
+
+/**
+ * DeleteLocationController controls all actions related DeleteLocation related
+ * functionality
+ */
 public class DeleteController {
   
     public ArrayList<LocationUsage> delete(String macAdd, String startDate, String endDate, String startTime, String endTime, String locId, String semanticPl, ArrayList<String> error) throws SQLException {
