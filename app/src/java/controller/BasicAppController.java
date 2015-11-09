@@ -631,7 +631,7 @@ public class BasicAppController {
             int targetCount = targetList.size();
             //get userList for this hour, filtered by demo
             ArrayList<User> userList = auDAO.retrieveUserByDemo(startHour, endHour, demoArr);
-            int secondsThisHour = 0;
+            double secondsThisHour = 0;
 
             //for each user
             for (User user : userList) {
@@ -685,7 +685,8 @@ public class BasicAppController {
             }
 
             //store in breakdown
-            miniMap.put("duration", new Breakdown("" + secondsThisHour));
+            long time = Math.round(secondsThisHour);
+            miniMap.put("duration", new Breakdown("" + time));
 
             startHour = endHour;
         }
