@@ -87,7 +87,7 @@ public class BasicAppController {
                         totalSeconds += Utility.secondsBetweenDates(oldTime, newTime);
 
                     }
-                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 );
                 }
 
                 oldTime = newTime;
@@ -96,7 +96,7 @@ public class BasicAppController {
 
             if (oldTime.before(nextDay)) {
                 long difference = Utility.secondsBetweenDates(oldTime, nextDay);
-                if (difference <= 120) {
+                if (difference < 10) {
                     totalSeconds += difference;
                 } else {
                     totalSeconds += 10;
@@ -105,7 +105,9 @@ public class BasicAppController {
                 totalSeconds += 10;
 
             }
+            
             //DIVIDE TO GET INTO DAYS
+            System.out.println(totalSeconds + " total seconds");
             long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
             totalSeconds /= days;
 
@@ -518,14 +520,14 @@ public class BasicAppController {
                 oldTime = newTime;
 
             }
-            System.out.print("appResult: " + appResult.size());
+            //System.out.print("appResult: " + appResult.size());
             //get the appId of the last user usage
             int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
             if (oldTime.before(nextDay)) {
                 double difference = Utility.secondsBetweenDates(oldTime, nextDay);
                 //add the time difference to last appId
-                if (difference <= 120) {
+                if (difference < 10) {
                     if (appResult.containsKey(lastAppId)) {
                         double value = appResult.get(lastAppId);
                         appResult.put(lastAppId, (value + difference));
@@ -575,8 +577,9 @@ public class BasicAppController {
                     }
                     totCatTime += timePerApp;
                 }
-
+                System.out.println(key + " key " + totCatTime + " total time");
                 double avgCatTime = totCatTime / days;
+                System.out.println(key + " key " + avgCatTime + " total avg time");
                 totTime += avgCatTime;
                 result.put(key, avgCatTime);
             }
