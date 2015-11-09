@@ -181,7 +181,7 @@ public class SmartphoneOveruseController {
 		String overuseIndex = "";
 		if (appUsageCat.equals("Severe") || gamingCat.equals("Severe") || freqCat.equals("Severe")) {
 			overuseIndex = "Overusing";
-		} else if (appUsageCat.equals("Light") || gamingCat.equals("Light") || freqCat.equals("Light")) {
+		} else if (appUsageCat.equals("Light") && gamingCat.equals("Light") && freqCat.equals("Light")) {
 			overuseIndex = "Normal";
 		} else {
 			overuseIndex = "ToBeCautious";
