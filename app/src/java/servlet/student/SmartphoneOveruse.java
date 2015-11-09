@@ -7,6 +7,7 @@ package servlet.student;
 
 import controller.HeatmapController;
 import controller.SmartphoneOveruseController;
+import dao.Utility;
 import entity.User;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -42,8 +43,11 @@ public class SmartphoneOveruse extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            String errors = "";
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
+
+            
             TreeMap<String, String> result = new TreeMap<String, String>();
             HttpSession session = request.getSession();
             User loggedInUser = (User) session.getAttribute("user");
@@ -51,12 +55,22 @@ public class SmartphoneOveruse extends HttpServlet {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDatetime = dateFormat.parse(startDateStr + " 00:00:00", new ParsePosition(0));
             Date endDatetime = dateFormat.parse(endDateStr + " 23:59:59", new ParsePosition(0));
+            
+            if (startDatetime != null && endDatetime != null && startDatetime.after(endDatetime)) {
+		errors += "Your start date should be before your end date!";
+            }
+            if (errors.length() != 0) {
+		request.setAttribute("errors", errors);
+            }
             SmartphoneOveruseController ctrl = new SmartphoneOveruseController();
 
-			result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
+            result = ctrl.generateReport(loggedInUser, startDatetime, endDatetime);
+            
             request.setAttribute("result", result);
             RequestDispatcher view = request.getRequestDispatcher("smartphoneOveruse.jsp");
             view.forward(request, response);
+            
+            
 
         }
 

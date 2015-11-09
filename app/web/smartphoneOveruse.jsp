@@ -112,10 +112,13 @@
                 <div class="theme-div theme-content" style="width:60%">
                     <h4><b>Smartphone Overuse</b> </h4> <hr>
                     <%
-
                         TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
-
-                        if (result != null) {
+                        String errors = (String) request.getAttribute("errors");
+                        
+                        if(errors != null && errors.length() >0){
+                            out.println("<h3 style='color:red'>Warning:</h3>");
+                            out.println("<h3 style='color:red'>" + errors + "</h3>");
+                        } else if (result != null) {
                             out.print("Overuse results: ");
 
                             out.print(result.get("overuse-index") + "<br>");
@@ -132,7 +135,10 @@
                             out.print(result.get("accessfrequency-category") + "<br>");
                             out.print(result.get("accessfrequency") + "<br>");
 
-                        }
+                        } else{
+                            out.println("<h1>Result</h1>");
+                            out.println("You have not entered any input.");
+                        } 
 
 
                     %>
