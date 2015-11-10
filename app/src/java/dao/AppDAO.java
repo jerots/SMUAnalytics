@@ -39,42 +39,47 @@ public class AppDAO {
 
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {
-                        errMap.put(index, "invalid app id");
+                        errMap.put(index, "blank app-id");
                     } else {
-                        errMap.put(index, errorMsg + "," + "invalid app id");
+                        errMap.put(index, errorMsg + "," + "blank app-id");
                     }
 
                     err = true;
                 }
 
                 String name = Utility.parseString(reader.get("app-name"));
-                name = name.replace("\"", "");
+               
                 if (name == null) {
 
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {
-                        errMap.put(index, "name cannot be blank");
+                        errMap.put(index, "blank app-name");
                     } else {
-                        errMap.put(index, errorMsg + "," + "name cannot be blank");
+                        errMap.put(index, errorMsg + "," + "blank app-name");
                     }
                     err = true;
+                } else {
+                     name = name.replace("\"", "");
                 }
 
-                String cat = Utility.parseString(reader.get("app-category").toLowerCase());
-                cat = cat.replace("\"", "");
+                String cat = Utility.parseString(reader.get("app-category"));
+               
 
                 if (cat == null) {
 
                     String errorMsg = errMap.get(index);
                     if (errorMsg == null) {
-                        errMap.put(index, "category cannot be blank");
+                        errMap.put(index, "blank app-category");
                     } else {
-                        errMap.put(index, errorMsg + "," + "category cannot be blank");
+                        errMap.put(index, errorMsg + "," + "blank app-category");
                     }
 
                     err = true;
 
-                }
+                }else{
+                    cat = cat.toLowerCase();
+                     cat = cat.replace("\"", "");
+                
 
                 if (!Utility.checkCategory(cat)) {
 
@@ -85,6 +90,7 @@ public class AppDAO {
                         errMap.put(index, errorMsg + "," + "invalid category");
                     }
                     err = true;
+                }
                 }
 
                 if (!err) {

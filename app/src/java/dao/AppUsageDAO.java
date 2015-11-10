@@ -80,9 +80,10 @@ public class AppUsageDAO {
                 if (!err) {
 
                     if (duplicate.containsKey(date + macAdd)) {
-                        errMap.put(index, "duplicate row " + duplicate.get(date + macAdd));
+                        errMap.put(duplicate.get(date + macAdd), "duplicate row");
                     }
                     duplicate.put(date + macAdd, index);
+                    
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -135,13 +136,13 @@ public class AppUsageDAO {
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
-                    errorMsg += ",mac add cannot be blank";
+                    errorMsg += ",blank mac-address";
                     err = true;
                 } else {
                     macAdd = macAdd.toLowerCase();
 
                     if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac add";
+                        errorMsg += ",invalid mac-address";
                         err = true;
 
                     } else {
@@ -151,7 +152,7 @@ public class AppUsageDAO {
 
                         rs = pStmt.executeQuery();
                         if (!rs.next()) {
-                            errorMsg += ",no matching mac address";
+                            errorMsg += ",no matching mac-address";
                             err = true;
                         }
                         pStmt.close();
@@ -160,7 +161,7 @@ public class AppUsageDAO {
                 //check appid
                 int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
-                    errorMsg += ",app id cannot be blank";
+                    errorMsg += ",blank app-id";
                     err = true;
                 } else {
                     query = "select appid from app where appid = ?;";
@@ -177,7 +178,7 @@ public class AppUsageDAO {
 
                 if (!err) {
                     if (duplicate.containsKey(date + macAdd)) {
-                        errorMsg += ",duplicate row" + duplicate.get(date + macAdd);
+                        errMap.put(duplicate.get(date + macAdd), "duplicate row");
                         err = true;
                     }
                     duplicate.put(date + macAdd, index);

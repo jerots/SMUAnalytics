@@ -48,7 +48,7 @@ public class LocationUsageDAO {
                 //retrieving per row
                 boolean err = false;
                 String errorMsg = null;
-                if(errMap.containsKey(index)){
+                if (errMap.containsKey(index)) {
                     errorMsg = errMap.get(index);
                 }
                 if (errorMsg == null) {
@@ -67,12 +67,11 @@ public class LocationUsageDAO {
                     errorMsg += ",mac address cannot be blank";
                     err = true;
                 } else if (!Utility.checkHexadecimal(macAdd)) {
-
                     errorMsg += ",invalid mac address";
                     err = true;
+                } else {
+                    macAdd = macAdd.toLowerCase();
                 }
-                macAdd = macAdd.toLowerCase();
-
                 //check locid
                 int locationId = Utility.parseInt(reader.get("location-id"));
                 if (locationId <= 0) {
@@ -90,7 +89,7 @@ public class LocationUsageDAO {
                     Integer exisMac = duplicate.get(key);
                     if (exisMac != null) {
 
-                        errMap.put(index, "duplicate row " + exisMac);
+                        errMap.put(exisMac, "duplicate row");
 
                     }
                     duplicate.put(key, index);
@@ -174,13 +173,13 @@ public class LocationUsageDAO {
                 //IF ALL VALIDATIONS ARE PASSED
                 if (!err) {
                     if (duplicate.containsKey(date + macAdd)) {
-                        errorMsg += ",duplicate row " + duplicate.get(date + macAdd); 
+                        errMap.put(duplicate.get(date + macAdd), "duplicate row");
                         err = true;
                     }
                     duplicate.put(date + macAdd, index);
                     locationList.put(date + macAdd, new LocationUsage(date, macAdd, locationId));
                 }
-                if(errorMsg != null && errorMsg.length() > 0){
+                if (errorMsg != null && errorMsg.length() > 0) {
                     errorMsg = errorMsg.substring(1, errorMsg.length());
                     System.out.println(errorMsg);
                     errMap.put(index, errorMsg);
@@ -216,12 +215,12 @@ public class LocationUsageDAO {
                         // This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
                         int row = duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress());
                         String errorMsg = "";
-                        if(errMap.containsKey(index)){
+                        if (errMap.containsKey(index)) {
                             errorMsg = errMap.get(index);
                         }
-                        if(errorMsg != null && errorMsg.length() != 0){
+                        if (errorMsg != null && errorMsg.length() != 0) {
                             errorMsg += ",duplicate row";
-                        }else{
+                        } else {
                             errorMsg += "duplicate row";
                         }
                         errMap.put(row, errorMsg);
@@ -237,7 +236,6 @@ public class LocationUsageDAO {
         } catch (SQLException e) {
 
         }
-        Iterator<Integer> iter2 = errMap.keySet().iterator();
         return updateCounts;
     }
 
@@ -285,9 +283,9 @@ public class LocationUsageDAO {
                         errMap.put(index, errorMsg + "," + "invalid mac address");
                     }
                     err = true;
+                } else {
+                    macAdd = macAdd.toLowerCase();
                 }
-                macAdd = macAdd.toLowerCase();
-
                 if (!err) {
                     found++;
                     stmt.setString(1, date);

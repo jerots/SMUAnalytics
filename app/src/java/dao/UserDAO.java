@@ -77,17 +77,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "mac add cannot be blank");
                     }
                     err = true;
-                }
-
-                macAdd = macAdd.toLowerCase();
-
-                if (!Utility.checkHexadecimal(macAdd)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid mac address");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid mac address");
+                } else {
+                    macAdd = macAdd.toLowerCase();
+                    if (!Utility.checkHexadecimal(macAdd)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid mac address");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid mac address");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String name = Utility.parseString(reader.get("name"));
@@ -109,15 +108,15 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "password cannot be blank");
                     }
                     err = true;
-                }
-
-                if (!Utility.checkPassword(password)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid password");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid password");
+                } else {
+                    if (!Utility.checkPassword(password)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid password");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid password");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String email = Utility.parseString(reader.get("email"));
@@ -128,17 +127,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "email cannot be blank");
                     }
                     err = true;
-                }
-
-                email = email.toLowerCase();
-
-                if (!Utility.checkEmail(email)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid email");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid email");
+                } else {
+                    email = email.toLowerCase();
+                    if (!Utility.checkEmail(email)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid email");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid email");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String g = Utility.parseString(reader.get("gender"));
@@ -149,17 +147,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "gender cannot be blank");
                     }
                     err = true;
-                }
-
-                String gender = g.toLowerCase();
-
-                if (!gender.equals("f") && !gender.equals("m")) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid gender");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid gender");
+                } else {
+                    g = g.toLowerCase();
+                    if (!g.equals("f") && !g.equals("m")) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid gender");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid gender");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String cca = Utility.parseString(reader.get("cca"));
@@ -177,19 +174,19 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "cca record too long");
                     }
                     err = true;
+                } else {
+                    cca = cca.toLowerCase();
                 }
 
-                cca = cca.toLowerCase();
-
                 if (!err) {
-					//add to list
+                    //add to list
                     //insert into tables
                     macList.put(macAdd, "");
                     stmt.setString(1, macAdd);
                     stmt.setString(2, name);
                     stmt.setString(3, password);
                     stmt.setString(4, email);
-                    stmt.setString(5, gender);
+                    stmt.setString(5, g);
                     stmt.setString(6, cca);
                     stmt.addBatch();
                 }
@@ -226,17 +223,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "mac add cannot be blank");
                     }
                     err = true;
-                }
-
-                macAdd = macAdd.toLowerCase();
-
-                if (!Utility.checkHexadecimal(macAdd)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid mac address");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid mac address");
+                } else {
+                    macAdd = macAdd.toLowerCase();
+                    if (!Utility.checkHexadecimal(macAdd)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid mac address");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid mac address");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String name = Utility.parseString(reader.get("name"));
@@ -258,15 +254,15 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "password cannot be blank");
                     }
                     err = true;
-                }
-
-                if (!Utility.checkPassword(password)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid password");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid password");
+                } else {
+                    if (!Utility.checkPassword(password)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid password");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid password");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String email = Utility.parseString(reader.get("email"));
@@ -277,17 +273,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "email cannot be blank");
                     }
                     err = true;
-                }
-
-                email = email.toLowerCase();
-
-                if (!Utility.checkEmail(email)) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid email");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid email");
+                } else {
+                    email = email.toLowerCase();
+                    if (!Utility.checkEmail(email)) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid email");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid email");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String g = Utility.parseString(reader.get("gender"));
@@ -298,17 +293,16 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "gender cannot be blank");
                     }
                     err = true;
-                }
-
-                String gender = g.toLowerCase();
-
-                if (!gender.equals("f") && !gender.equals("m")) {
-                    if (errorMsg == null) {
-                        userMap.put(index, "invalid gender");
-                    } else {
-                        userMap.put(index, errorMsg + "," + "invalid gender");
+                } else {
+                     g = g.toLowerCase();
+                    if (!g.equals("f") && !g.equals("m")) {
+                        if (errorMsg == null) {
+                            userMap.put(index, "invalid gender");
+                        } else {
+                            userMap.put(index, errorMsg + "," + "invalid gender");
+                        }
+                        err = true;
                     }
-                    err = true;
                 }
 
                 String cca = Utility.parseString(reader.get("cca"));
@@ -326,17 +320,18 @@ public class UserDAO {
                         userMap.put(index, errorMsg + "," + "cca record too long");
                     }
                     err = true;
+                } else {
+                    cca = cca.toLowerCase();
                 }
-                cca = cca.toLowerCase();
 
                 if (!err) {
-					//add to list
+                    //add to list
                     //insert into tables
                     stmt.setString(1, macAdd);
                     stmt.setString(2, name);
                     stmt.setString(3, password);
                     stmt.setString(4, email);
-                    stmt.setString(5, gender);
+                    stmt.setString(5, g);
                     stmt.setString(6, cca);
                     stmt.addBatch();
                 }
