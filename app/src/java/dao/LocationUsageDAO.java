@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import com.csvreader.CsvReader;
@@ -18,13 +13,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.TreeMap;
 
-/**
- *
- * @author ASUS-PC
- */
 public class LocationUsageDAO {
 
     private TreeMap<String, LocationUsage> locationList;
@@ -98,10 +88,6 @@ public class LocationUsageDAO {
                     errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
-//			if (index % 10000 == 0){
-//				stmt.executeBatch();
-//			}
-
             }
             //insert into tables
 
@@ -440,8 +426,9 @@ public class LocationUsageDAO {
                     + "    where au.macaddress = lu.macaddress\n"
                     + "    and lu.locationid = l.locationid \n"
                     + "    and semanticplace like ?\n"
-                    + "    AND lu.timestamp >= ? and lu.timestamp <= ?\n"
-                    + "    and au.timestamp >= ? and au.timestamp <= ?\n"
+                    + "    AND lu.timestamp >= ? and lu.timestamp < ?\n"
+                    + "    and au.timestamp >= ? and au.timestamp < ?\n"
+                    + "    group by lu.macaddress \n"
                     + "    order by lu.macaddress, lu.timestamp;";
 
             conn = ConnectionManager.getConnection();
