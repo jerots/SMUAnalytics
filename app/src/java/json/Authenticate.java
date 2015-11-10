@@ -24,7 +24,6 @@ public class Authenticate extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("application/json");
 		try (PrintWriter out = response.getWriter()) {
-			out.println("test");
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			JsonObject result = new JsonObject();
 

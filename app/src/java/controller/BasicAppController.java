@@ -462,10 +462,13 @@ public class BasicAppController {
             User currUser = userList.get(i);
             ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
             Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
-
+            
             Date oldTime = null;
             if (userUsage.size() > 0) {
                 oldTime = userUsage.get(0).getDate();
+                if(oldTime.after(nextDay)) {
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                }
             }
 
             for (int j = 1; j < userUsage.size(); j++) {
@@ -477,6 +480,7 @@ public class BasicAppController {
                 boolean beforeAppeared = false;
                 if (newTime.before(nextDay)) {
                     beforeAppeared = true;
+                    System.out.println(newTime + " " + nextDay);
 
                     //difference = usage time of the oldTime appId
                     double difference = Utility.secondsBetweenDates(oldTime, newTime);
@@ -502,18 +506,32 @@ public class BasicAppController {
 
                     }
 
-                } else {  // NEW TIMING AFTER NEXT HOUR
-                    if (beforeAppeared) {
-                        double diff = Utility.secondsBetweenDates(oldTime, nextDay);
+                } else { 
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                    
+                    if (!beforeAppeared) {
+                        double diff = Utility.secondsBetweenDates(oldTime, newTime);
                         //add time to the appid
-                        if (appResult.containsKey(appId)) {
-                            double value = appResult.get(appId);
-                            appResult.put(appId, (value + diff));
+                        if (diff <= 2 * 60) {
+                        // add time to the appId
+                            if (appResult.containsKey(appId)) {
+                                double value = appResult.get(appId);
+                                appResult.put(appId, (value + diff));
+                            } else {
+                                appResult.put(appId, diff);
+                            }
+
                         } else {
-                            appResult.put(appId, diff);
+                            // add 10sec to appid if > 2 mins
+                            if (appResult.containsKey(appId)) {
+                                double value = appResult.get(appId);
+                                appResult.put(appId, (value + 10));
+                            } else {
+                                appResult.put(appId, 10.0);
+                            }
+
                         }
                     }
-                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
 
                 }
 
@@ -543,6 +561,8 @@ public class BasicAppController {
                     }
                 }
             } else {
+                //nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                
                 if (appResult.containsKey(lastAppId)) {
                     double value = appResult.get(lastAppId);
                     appResult.put(lastAppId, (value + 10));
@@ -551,6 +571,7 @@ public class BasicAppController {
                 }
 
             }
+            
 
             //DIVIDE TO GET INTO DAYS
             long days = Utility.daysBetweenDates(startDate, endDate);
