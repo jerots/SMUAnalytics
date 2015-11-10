@@ -32,32 +32,17 @@ public class AppDAO {
             //index starts at 2 because the headers count as a row.
             int index = 2;
             while (reader.readRecord()) {
-                boolean err = false;
+                String errorMsg = "";
 
                 int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
-
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "blank app-id");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "blank app-id");
-                    }
-
-                    err = true;
+                    errorMsg += ",blank app-id";
                 }
 
                 String name = Utility.parseString(reader.get("app-name"));
                
                 if (name == null) {
-
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "blank app-name");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "blank app-name");
-                    }
-                    err = true;
+                    errorMsg += ",blank app-name";
                 } else {
                      name = name.replace("\"", "");
                 }
@@ -66,40 +51,24 @@ public class AppDAO {
                
 
                 if (cat == null) {
-
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "blank app-category");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "blank app-category");
-                    }
-
-                    err = true;
-
+                    errorMsg += ",blank app-category";
                 }else{
                     cat = cat.toLowerCase();
                      cat = cat.replace("\"", "");
-                
-
-                if (!Utility.checkCategory(cat)) {
-
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid category");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid category");
+                    if (!Utility.checkCategory(cat)) {
+                        errorMsg += ",invalid category";
                     }
-                    err = true;
-                }
                 }
 
-                if (!err) {
+                if (errorMsg.length() == 0) {
                     //insert into tables
                     appIdList.put(appId, "");
                     stmt.setInt(1, appId);
                     stmt.setString(2, name);
                     stmt.setString(3, cat);
                     stmt.addBatch();
+                }else{
+                    errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
             }

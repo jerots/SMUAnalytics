@@ -25,7 +25,7 @@ public class AppUsageDAO {
         duplicate = new TreeMap<>();
     }
 
-    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException {
+    public int insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException {
         int[] updatedRecords = {};
         try {
             int index = 2;
@@ -36,48 +36,42 @@ public class AppUsageDAO {
 
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
-                String errorMsg = errMap.get(index);
-                if (errorMsg == null) {
-                    errorMsg = "";
-                }
+                String errorMsg = "";
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
                 if (date == null) {
-                    err = true;
 
-                    errorMsg += ",invalid timestamp";
+                    errorMsg += ",blank timestamp";
 
+                }else{
+                    if(!Utility.checkDate(date)){
+                        errorMsg += ",invalid timestamp";
+                    }
                 }
 
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
-                    errorMsg += ",mac add cannot be blank";
-                    err = true;
+                    errorMsg += ",blank mac-address";
                 } else {
                     macAdd = macAdd.toLowerCase();
 
                     if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac add";
-                        err = true;
+                        errorMsg += ",invalid mac-address";
                     } else if (!macList.containsKey(macAdd)) {
                         errorMsg += ",no matching mac address";
-                        err = true;
                     }
                 }
 
                 //check appid
                 int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
-                    errorMsg += ",app id cannot be blank";
-                    err = true;
+                    errorMsg += ",blank app-id";
                 } else if (!appIdList.containsKey(appId)) {
                     errorMsg += ",invalid app";
-                    err = true;
                 }
 
-                if (!err) {
+                if (errorMsg.length() == 0) {
 
                     if (duplicate.containsKey(date + macAdd)) {
                         errMap.put(duplicate.get(date + macAdd), "duplicate row");
@@ -96,17 +90,16 @@ public class AppUsageDAO {
                 }
                 index++;
             }
-            updatedRecords = stmt.executeBatch();
+            stmt.executeBatch();
             conn.commit();
             stmt.close();
         } catch (SQLException e) {
 
         }
-        return updatedRecords;
+        return duplicate.size();
     }
 
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException, SQLException {
-        System.out.println("LALALALA");
         int updateCounts = 0;
         try {
             int index = 2;
@@ -120,30 +113,26 @@ public class AppUsageDAO {
                 //retrieving per row
                 boolean err = false;
                 String errorMsg = "";
-                
-                
-                if(errMap.containsKey(index)){
-                    errorMsg = errMap.get(index);
-                }
 
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null || !Utility.checkDate(date)) {
-                    err = true;
-                    errorMsg += ",invalid timestamp";
+                if (date == null) {
+                    errorMsg += ",blank timestamp";
+                }else{
+                    if(!Utility.checkDate(date)){
+                        errorMsg += ",invalid timestamp";
+                    }
                 }
 
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
                     errorMsg += ",blank mac-address";
-                    err = true;
                 } else {
                     macAdd = macAdd.toLowerCase();
 
                     if (!Utility.checkHexadecimal(macAdd)) {
                         errorMsg += ",invalid mac-address";
-                        err = true;
 
                     } else {
                         query = "select macaddress from user where macaddress = ?;";
@@ -153,7 +142,6 @@ public class AppUsageDAO {
                         rs = pStmt.executeQuery();
                         if (!rs.next()) {
                             errorMsg += ",no matching mac-address";
-                            err = true;
                         }
                         pStmt.close();
                     }
@@ -162,7 +150,6 @@ public class AppUsageDAO {
                 int appId = Utility.parseInt(reader.get("app-id"));
                 if (appId <= 0) {
                     errorMsg += ",blank app-id";
-                    err = true;
                 } else {
                     query = "select appid from app where appid = ?;";
                     pStmt = conn.prepareStatement(query);
@@ -170,23 +157,19 @@ public class AppUsageDAO {
                     rs = pStmt.executeQuery();
                     if (!rs.next()) {
                         errorMsg += ",invalid app";
-                        err = true;
 
                     }
                     pStmt.close();
                 }
 
-                if (!err) {
+                if (errorMsg.length() == 0 ) {
                     if (duplicate.containsKey(date + macAdd)) {
                         errMap.put(duplicate.get(date + macAdd), "duplicate row");
-                        err = true;
                     }
                     duplicate.put(date + macAdd, index);
                     appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
-                }
-                if(errorMsg != null && errorMsg.length()!= 0){
-                    errorMsg = errorMsg.substring(1, errorMsg.length());
-                    errMap.put(index, errorMsg);
+                }else{
+                    errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
             }
@@ -201,7 +184,9 @@ public class AppUsageDAO {
                 //closing
                 int[] updatedArr = stmt.executeBatch();
                 for (int i : updatedArr) {
-                    updateCounts += i;
+                    if(i >= 0){
+                        updateCounts += i;
+                    }
                 }
 
                 conn.commit();
@@ -236,8 +221,6 @@ public class AppUsageDAO {
         } catch (NullPointerException e) {
 //            e.printStackTrace();
         }
-        System.out.println(updateCounts + "DARRENNNNN");
-
         return updateCounts;
     }
 

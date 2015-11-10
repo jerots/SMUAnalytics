@@ -129,10 +129,7 @@ public class BootstrapController {
 			if (fileName.equals("app.csv")) {
 				auUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-				updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
-				auUpdated = updatedRecords.length;
+				auUpdated = auDao.insert(reader, auErrMap, conn, macList, appIdList);
 				break;
 			} else {
 				zipInputStream.closeEntry();
@@ -173,10 +170,7 @@ public class BootstrapController {
 			if (fileName.equals("location.csv")) {
 				luUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-				updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
-				luUpdated = updatedRecords.length;
+				luUpdated = luDao.insert(reader, luErrMap, conn, locationIdList);
 				break;
 			} else {
 				zipInputStream.closeEntry();
