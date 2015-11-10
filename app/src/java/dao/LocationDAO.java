@@ -26,50 +26,34 @@ public class LocationDAO {
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
-
+                String errorMsg = "";
+                
                 int locationId = Utility.parseInt(reader.get("location-id"));
                 if (locationId <= 0) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid location id");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid location id");
-                    }
-                    err = true;
+                    errorMsg += ",invalid location-id";
                 }
 
                 String semanticPl = Utility.parseString(reader.get("semantic-place"));
                 if (semanticPl == null) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "semantic place cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "semantic place cannot be blank");
-                    }
-                    err = true;
-                }
-                semanticPl = semanticPl.toUpperCase();
+                    errorMsg += ",semantic place cannot be blank";
+                } else {
+                    semanticPl = semanticPl.toUpperCase();
+                    String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
+                    int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
 
-                String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
-                int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
-
-                if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid semantic place");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid semantic place");
+                    if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
+                        errorMsg += ",invalid semantic place";
                     }
-                    err = true;
                 }
 
-                if (!err) {
+                if (errorMsg.length() == 0) {
                     locationIdList.put(locationId, "");
                     //insert into tables
                     stmt.setInt(1, locationId);
                     stmt.setString(2, semanticPl);
                     stmt.addBatch();
+                }else{
+                    errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
 
@@ -162,32 +146,32 @@ public class LocationDAO {
         }
         return null;
     }
-    
+
     public Location retrieveSemPl(String semanticPlace) {
-		
-		String sql = "SELECT * FROM location WHERE semanticplace=?";
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			conn = ConnectionManager.getConnection();
-			ps = conn.prepareStatement(sql);
-			
-			ps.setString(1, semanticPlace);
-			
-			rs = ps.executeQuery();
-			
-			while (rs.next()) {
-                            return new Location(rs.getInt(1), rs.getString(2));
-			}
-			
-		} catch (SQLException e) {
-			
-		} finally {
-			ConnectionManager.close(conn, ps, rs);
-		}
-		
-		return null;
-	}
+
+        String sql = "SELECT * FROM location WHERE semanticplace=?";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = ConnectionManager.getConnection();
+            ps = conn.prepareStatement(sql);
+
+            ps.setString(1, semanticPlace);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                return new Location(rs.getInt(1), rs.getString(2));
+            }
+
+        } catch (SQLException e) {
+
+        } finally {
+            ConnectionManager.close(conn, ps, rs);
+        }
+
+        return null;
+    }
 
 }

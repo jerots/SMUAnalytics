@@ -13,12 +13,22 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
- * TopkReportController controls all actions related TopkReport related
- * functionality
+ * TopkReportController controls all actions related TopkReport related functionality
  */
 public class TopkReportController {
 
-
+    /**
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * belongs contains the Top-k most used apps(Given a school)
+     *
+     * @param topK The top-k apps for a given duration
+     * @param school The top-k apps for a given school
+     * @param strDate The top-k apps from the given start date
+     * @param endDate The top-k apps until the given end date
+     * @param errors The errors generated from the top-k apps
+     * @return A sorted ArrayList of Hashmap objects that belongs contains the
+     * Top-k most used apps(Given a school)
+     */
     public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors) {
         AppUsageDAO auDAO = new AppUsageDAO();
 
@@ -135,7 +145,18 @@ public class TopkReportController {
         return returnList;
     }
 
-
+    /**
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * belongs contains the Top-k student(Given a app category)
+     *
+     * @param topK The top-k students for a given duration
+     * @param category The top-k students for a given category
+     * @param strDate The top-k students from the given start date
+     * @param endDate The top-k students until the given end date
+     * @param errors The errors generated from the top-k students
+     * @return A sorted ArrayList of Hashmap objects that belongs contains the
+     * Top-k most used students(Given a app category)
+     */
     public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, String errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and student name
@@ -246,6 +267,18 @@ public class TopkReportController {
         return returnList;
     }
 
+        /**
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * belongs contains the Top-k most school(Given a app category)
+     *
+     * @param topK The top-k school for a given duration
+     * @param category The top-k school for a given category
+     * @param strDate The top-k school from the given start date
+     * @param endDate The top-k school until the given end date
+     * @param errors The errors generated from the top-k school
+     * @return A sorted ArrayList of Hashmap objects that belongs contains the
+     * Top-k most used school(Given a app category)
+     */
     public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, String errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and email

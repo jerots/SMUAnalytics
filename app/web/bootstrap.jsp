@@ -90,7 +90,7 @@
                                 if (appCount >= 0) {
                     %>
                     <%---app---%>
-                    <h4><b> App</b> </h4>
+                    <h4><b> app-lookup.csv</b> </h4>
                     <hr>
                     <%
                             out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
@@ -127,7 +127,7 @@
                     <p>
                     <P><p>
                         <%---user---%>
-                    <h4><b> User</b> </h4>
+                    <h4><b> demographics.csv</b> </h4>
                     <hr>
 
 
@@ -164,7 +164,7 @@
                         <%---location---%>
                     <%int locationCount = recordMap.get("location-lookup.csv");
                             if (locationCount >= 0) { %>    
-                    <h4><b> Location</b> </h4>
+                    <h4><b> location-lookup.csv</b> </h4>
                     <hr>
                     <%                              
                                 out.println("<table border=1px  class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
@@ -198,7 +198,7 @@
                     %>
                     <P>
                         <%---appUsage---%>
-                    <h4><b> AppUsage</b> </h4>
+                    <h4><b> app.csv</b> </h4>
                     <hr>
                     <%
                         TreeMap<Integer, String> auErrMap = (TreeMap<Integer, String>) request.getAttribute("auErrMap");
@@ -207,7 +207,7 @@
 
                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                         out.println("<b>AppUsage</b>" + "</td></tr><tr><td>");
-                        out.println("<b>AppUsage updated </b> " + "</td><td>" + (appUsageCount - auErrorSize) );
+                        out.println("<b>AppUsage updated </b> " + "</td><td>" + appUsageCount);
                         out.println("</td></tr><tr><td>");
 
                         out.println("<b>Number of rows with error </b> " + "</td><td>" + auErrorSize + "</td></tr>");
@@ -236,7 +236,7 @@
                     
                     <%                          int locationUsageCount = recordMap.get("location.csv");
                         if (locationUsageCount >= 0) { %>
-                        <h4><b> LocationUsage</b> </h4><hr>
+                        <h4><b> location.csv</b> </h4><hr>
                     <%    
                             out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                             out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
@@ -271,7 +271,7 @@
 
                         <%		int locationDeleteCount = recordMap.get("location-delete.csv");
                                 if (locationDeleteCount >= 0) {
-                                    out.println("<h4><b> LocationUsageDelete</b> </h4><hr>");
+                                    out.println("<h4><b> location-delete.csv</b> </h4><hr>");
                                     out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
                                     out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
                                     out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationDeleteCount);

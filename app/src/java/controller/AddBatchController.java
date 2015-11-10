@@ -72,15 +72,10 @@ public class AddBatchController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        System.out.println("e");
         while ((entry = zipInputStream.getNextEntry()) != null) {
-            System.out.println("d");
             String fileName = entry.getName();
-            System.out.println("c");
             if (fileName.equals("app.csv")) {
-                System.out.println("b");
                 reader = new CsvReader(br);
-                System.out.println("A");
                 auUpdated = auDao.add(reader, auErrMap, conn);
                 break;
             } else {
