@@ -13,8 +13,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 /**
- * TopkReportController controls all actions related TopkReport related
- * functionality
+ * TopkReportController controls all actions related TopkReport related functionality
  */
 public class TopkReportController {
 
