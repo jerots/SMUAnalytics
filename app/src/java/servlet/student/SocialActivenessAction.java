@@ -43,26 +43,32 @@ public class SocialActivenessAction extends HttpServlet {
             String macAdd = request.getParameter("macadd");
             //This Error means NOTHING ELSE is printed
             String errors = "";
-            //Checks startDate
+            //Checks Date
             //Places this outside to compare dates later
             Date dateFormatted = null;
             if(date == null){
-                errors += ",blank date";
+                errors += ",missing date";
             }else if (date.length() == 0) {
-                errors += ",invalid date";
+                errors += ",blank date";
             } else {
-                dateFormatted = Utility.parseOnlyDate(date);
-                if (dateFormatted == null) {
+                if(date.length() != 10){
                     errors += ",invalid date";
                 }else{
-                    date = Utility.formatOnlyDate(dateFormatted);
-                    if(date == null){
+                    dateFormatted = Utility.parseOnlyDate(date);
+                    if (dateFormatted == null) {
                         errors += ",invalid date";
+                    }else{
+                        date = Utility.formatOnlyDate(dateFormatted);
+                        if(date == null){
+                            errors += ",invalid date";
+                        }
                     }
                 }
             }
             //check macAdd
             if (macAdd == null) {
+                errors += ",missing mac-address";
+            }else if(macAdd.length() == 0){
                 errors += ",blank mac-address";
             }else if (!Utility.checkHexadecimal(macAdd)) {
                 errors += "invalid mac-address";

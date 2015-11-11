@@ -140,7 +140,7 @@ public class Bootstrap extends HttpServlet {
 				}
 
 			}
-			output.add("num-record-uploaded", updatedArr);
+			output.add("num-record-loaded", updatedArr);
                         
                         if(recordMap.get("location-delete.csv") >= 0){
                             output.addProperty("num-record-deleted", recordMap.get("location-delete.csv"));

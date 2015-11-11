@@ -8,10 +8,9 @@ package servlet.student;
 import controller.*;
 import dao.Utility;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.TreeMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,13 +33,6 @@ public class TopKAction extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
-
-		//Gets the number of (top) K that the individual wants displayed
-		String entry = request.getParameter("entries");
-		if(entry == null || entry.length() == 0){
-			entry = "3";
-		}
-
 		//This is the choice selection of which of the 3 option the user wants to be processed.
 		String selection = request.getParameter("category");
 		//Gets the start and end dates as necessary.
@@ -51,33 +43,55 @@ public class TopKAction extends HttpServlet {
 		String errors = "";
 		//This error means that data is still printed
 		String error = "";
-            //Checks startDate
-		//Places this outside to compare dates later
-		Date dateFormattedStart = null;
-		if (startDate == null) {
-			errors += ", invalid startdate";
-		} else if (startDate.length() == 0) {
-			errors += ", invalid startdate";
-		} else {
-			dateFormattedStart = Utility.parseDate(startDate + " 00:00:00");
-			if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
-				errors += ", invalid startdate";
-			}
-		}
+                
+                //Gets the number of (top) K that the individual wants displayed
+		String entry = request.getParameter("entries");
+                int topK = -1;
+		if(entry == null){
+                    entry = "3";
+		}else if(entry.length() == 0){
+                    errors += ", blank k";
+                }else{
+                    //Checks for K
+                    topK = Utility.parseInt(entry);
+                    if (topK > 10 || topK < 1) {
+                        errors += ", invalid k";
+                    }
+                }
+                
+                //START DATE VALIDATION
+                Date dateFormattedStart = null;
+                if (startDate == null) {
+                        errors += ", missing startdate";
+                } else if (startDate.length() == 0) {
+                        errors += ", blank startdate";
+                } else {
+                    if (startDate.length() != 10) {
+                            errors += ", invalid startdate";
+                    } else {
+                        dateFormattedStart = Utility.parseDate(startDate + " 00:00:00");
+                        if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
+                            errors += ", invalid startdate";
+                        }
+                    }
+                }
 
-            //Checks endDate
-		//Places this outside to compare dates later
-		Date dateFormattedEnd = null;
-		if (endDate == null) {
-			errors += ", invalid enddate";
-		} else if (endDate.length() == 0) {
-			errors += ", invalid enddate";
-		} else {
-			dateFormattedEnd = Utility.parseDate(endDate + " 23:59:59");
-			if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
-				errors += ", invalid enddate";
-			}
-		}
+                //END DATE VALIDATION
+                Date dateFormattedEnd = null;
+                if (endDate == null) {
+                        errors += ", missing enddate";
+                } else if (endDate.length() == 0) {
+                        errors += ", blank enddate";
+                } else {
+                    if (endDate.length() != 10) {
+                            errors += ", invalid enddate";
+                    } else {
+                        dateFormattedEnd = Utility.parseDate(endDate + " 23:59:59");
+                        if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
+                            errors += ", invalid enddate";
+                        }
+                    }
+                }
 
 		//Finally, makes sure the start date if after to add error, as if it is before or similar, no error
 		if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
@@ -88,23 +102,25 @@ public class TopKAction extends HttpServlet {
 		String selected = request.getParameter("choice");
 		//Checks school/appcategory (Actually this is chosen)
 		if (selection.equals("schoolapps")) {
-			if (!Utility.checkSchools(selected)) {
-				errors += ", invalid school";
-			}
+                    if(selected == null){
+                        errors += ", missing school";
+                    }else if(selected.length() == 0){
+                        errors += ", blank school";
+                    }else if (!Utility.checkSchools(selected)) {
+                        errors += ", invalid school";
+                    }
 		} else {
-			if (!Utility.checkCategory(selected)) {
-				errors += ", invalid app category";
-			}
-		}
-
-		//Checks for K
-		int topK = Utility.parseInt(entry);
-		if (topK > 10 || topK < 1) {
-			errors += ", invalid k";
+                    if(selected == null){
+                        errors += ", missing app category";
+                    }else if(selected.length() == 0){
+                        errors += ", blank app category";
+                    }else if (!Utility.checkCategory(selected)) {
+                        errors += ", invalid app category";
+                    }
 		}
 
 		//Delcares the values to return. Declares both in case of 
-		ArrayList<HashMap<String, String>> catValues = null;
+		ArrayList<TreeMap<String, String>> catValues = null;
 
 		//If all checks are passed:
 		if (errors.length() == 0) {

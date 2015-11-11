@@ -32,6 +32,7 @@ public final class Utility {
     }
 
     public static Date parseDate(String date) {
+        date = parseString(date);
         if (date != null && date.length() > 0) {
             try {
                 return df.parse(date);
@@ -52,7 +53,7 @@ public final class Utility {
     }
 
     public static Date parseOnlyDate(String date) {
-        
+        date = parseString(date);
         if (date != null && date.length() > 0) {
             try {
                 return sdf.parse(date);
