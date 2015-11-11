@@ -26,7 +26,7 @@ import javax.servlet.http.Part;
  * @author Boyofthefuture
  */
 /**
- * AddBatchController controls all actions related adding of additional data to the original
+ * AddBatchController controls all actions related to adding of additional data to the original
  * data that a user Bootstrapped
  */
 public class AddBatchController {
