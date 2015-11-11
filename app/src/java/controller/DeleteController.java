@@ -25,7 +25,7 @@ import java.util.HashMap;
  */
 
 /**
- * DeleteLocationController controls all actions related DeleteLocation related
+ * DeleteLocationController controls all actions relating to DeleteLocation
  * functionality
  */
 public class DeleteController {
