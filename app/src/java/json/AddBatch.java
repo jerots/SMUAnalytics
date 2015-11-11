@@ -71,6 +71,11 @@ public class AddBatch extends HttpServlet {
                 //IF bootstrap-file field not found
                 if (filePart == null && filePart.getSize() < 0) {
                     errors.add("missing file");
+                }else{
+                    String name = filePart.getName();
+                    if(!name.substring(name.length()-4 ,name.length()).equals(".zip")){
+                        errors.add("invalid file");
+                    }
                 }
 
                 //If not zip file

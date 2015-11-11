@@ -62,7 +62,7 @@ public class App implements Comparable<App>{
     @Override
     //NOT IMPLEMENTED
     public int compareTo(App o) {
-        return this.compareTo(o);
+        return appName.compareTo(o.appName);
     }
 
     @Override

@@ -4,6 +4,7 @@ import dao.AppUsageDAO;
 import dao.Utility;
 import entity.App;
 import entity.AppUsage;
+import entity.UserComparator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -233,6 +234,7 @@ public class TopkReportController {
             }
             userTime.put(macAdd, userTotal);
         }
+        
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
         HashMap<String, String> kDetails = new HashMap<>();
@@ -257,6 +259,7 @@ public class TopkReportController {
             }
             kFound = (returnList.size() + 1);
         }
+        Collections.sort(returnList, new UserComparator());
         if (returnList.size() < topK) {
             errors += "not enough data";
         } else if (returnList.isEmpty()) {
