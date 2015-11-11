@@ -22,8 +22,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -163,13 +163,13 @@ public class TopK extends HttpServlet {
 			String error = "";
 
 			//This parameter is only for the school function
-			ArrayList<TreeMap<String, String>> catValues = ctrl.getTopkApp(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
+			ArrayList<HashMap<String, String>> catValues = ctrl.getTopkApp(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
 
 			if (catValues != null) {
-				Iterator<TreeMap<String, String>> iter = catValues.iterator();
+				Iterator<HashMap<String, String>> iter = catValues.iterator();
 				JsonArray param = new JsonArray();
 				while (iter.hasNext()) {
-					TreeMap<String, String> map = iter.next();
+					HashMap<String, String> map = iter.next();
 					JsonObject indiv = new JsonObject();
 					param.add(indiv);
 

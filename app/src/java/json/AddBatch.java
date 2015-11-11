@@ -39,8 +39,7 @@ public class AddBatch extends HttpServlet {
             String token = request.getParameter("token");
             Part filePart = null;
             try {
-                filePart = request.getPart("addbatch-file");
-
+                filePart = request.getPart("bootstrap-file");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,7 +109,9 @@ public class AddBatch extends HttpServlet {
                     JsonObject list = new JsonObject();
                     while (iter.hasNext()) {
                         String fileName = iter.next();
-                        list.addProperty(fileName, recordMap.get(fileName));
+                        if(recordMap.get(fileName) >= 0){
+                            list.addProperty(fileName, recordMap.get(fileName));
+                        }
                     }
                     arr.add(list);
                     output.add("num-record-uploaded", arr);
@@ -184,28 +185,6 @@ public class AddBatch extends HttpServlet {
                             }
                             
                         }
-                        
-//                        if(delErrMap != null && delErrMap.size() != 0){
-//                            //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
-//                            Iterator<Integer> iterInt = delErrMap.keySet().iterator();
-//                            arr = new JsonArray();
-//                            list = new JsonObject();
-//                            errors = new JsonArray();
-//                            //Goes through the list to split all the error messages into a jsonarray
-//                            while (iterInt.hasNext()) {
-//                                int id = iterInt.next();
-//                                list.addProperty("file", "location-delete.csv");
-//                                list.addProperty("line", id);
-//                                String[] messages = delErrMap.get(id).split(",");
-//                                for (String msg : messages) {
-//                                    errors.add(msg);
-//                                }
-//                                list.add("message", errors);
-//                                errors = new JsonArray();
-//                                arr.add(list);
-//                                list = new JsonObject();
-//                            }
-//                        }
                         
                         output.add("error", arr);
                     }

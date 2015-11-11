@@ -129,7 +129,7 @@
 				<div class="theme-div theme-content" style="width:60%">
                                     <h4><b> Top-K App Report</b> </h4> <hr>
 					<%  
-                                            ArrayList<TreeMap<String, String>> values = (ArrayList<TreeMap<String, String>>) request.getAttribute("catvalues");
+                                            ArrayList<HashMap<String, String>> values = (ArrayList<HashMap<String, String>>) request.getAttribute("catvalues");
                                             String error = (String) request.getAttribute("error");
                                             String errors = (String) request.getAttribute("errors");
                                             if (error != null && error.length() > 0) {
@@ -143,14 +143,14 @@
                                                 out.println("<td><b>Rank (for most popular apps)</b></td><td><b>App Names</b></td><td><b>App usage Time</b></td></tr>");
                                                 for(int i = 0; i < values.size(); i++){
                                                     //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
-                                                    TreeMap<String, String> indiv = values.get(i);
+                                                    HashMap<String, String> indiv = values.get(i);
                                                     int rank = Utility.parseInt(indiv.get("rank"));
                                                     //Gets ready the appnames to add on.
                                                     String appNames = indiv.get("app-name");
                                                     String duration = indiv.get("duration");
                                                     out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
                                                     for(int j = i + 1; j < values.size(); j++){
-                                                        TreeMap<String, String> other = values.get(j);
+                                                        HashMap<String, String> other = values.get(j);
                                                         if(Utility.parseInt(other.get("rank")) == rank){
                                                             appNames += ", " + other.get("app-name");
                                                             i++;

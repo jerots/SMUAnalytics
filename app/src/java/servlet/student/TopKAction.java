@@ -10,7 +10,7 @@ import dao.Utility;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TreeMap;
+import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -120,7 +120,7 @@ public class TopKAction extends HttpServlet {
 		}
 
 		//Delcares the values to return. Declares both in case of 
-		ArrayList<TreeMap<String, String>> catValues = null;
+		ArrayList<HashMap<String, String>> catValues = null;
 
 		//If all checks are passed:
 		if (errors.length() == 0) {

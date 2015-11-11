@@ -58,7 +58,6 @@ public class Bootstrap extends HttpServlet {
 			Part filePart = null;
 			try {
 				filePart = request.getPart("bootstrap-file");
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -88,9 +87,11 @@ public class Bootstrap extends HttpServlet {
 				}
 
 				//IF bootstrap-file field not found
-				if (filePart == null && filePart.getSize() < 0) {
+				if (filePart == null || filePart.getSize() < 0) {
 					errors.add("missing file");
-				}
+				}else if(){
+                                    errors.add("")
+                                }
 
 				//If not zip file
 			}
