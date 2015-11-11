@@ -147,18 +147,16 @@ public class DeleteController {
         } 
         
         if(errors.length() == 0){
-            //System.out.println(macAdd);
+     
             
             deleted = luDao.delete(conn, macAdd, startDate, endDate, locationId, semanticPl);
-            //System.out.println(macAdd);
+           
         }else{
             error.add(errors.substring(2));
-            //System.out.println(errors);
+          
         }
         return deleted;
     }
-        //    errMap.put("Number of Valid records deleted: " + (index - notFound - 1));
-//                errMap.put("Number of Valid records not found in the database: " + notFound);
 
 }   
     
