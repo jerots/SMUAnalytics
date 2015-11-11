@@ -47,41 +47,33 @@ public class SocialActivenessAction extends HttpServlet {
             //Places this outside to compare dates later
             Date dateFormatted = null;
             if(date == null){
-                errors += ", invalid date";
+                errors += ",blank date";
             }else if (date.length() == 0) {
-                errors += ", invalid date";
+                errors += ",invalid date";
             } else {
                 dateFormatted = Utility.parseOnlyDate(date);
                 if (dateFormatted == null) {
-                    errors += ", invalid date";
+                    errors += ",invalid date";
                 }else{
                     date = Utility.formatOnlyDate(dateFormatted);
                     if(date == null){
-                        errors += "invalid date";
+                        errors += ",invalid date";
                     }
                 }
             }
             //check macAdd
             if (macAdd == null) {
-                if (errors == null) {
-                    errors = "mac add cannot be blank";
-                } else {
-                    errors += ",mac add cannot be blank";
-                }
-            }
-
-            if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-                if (errors == null) {
-                    errors = "invalid mac add";
-                } else {
-                    errors += ",invalid mac add";
-                }
+                errors += ",blank mac-address";
+            }else if (!Utility.checkHexadecimal(macAdd)) {
+                errors += "invalid mac-address";
             } 
             //If the previous few for Mac Address passes, the next will check from the inside to make sure the mac Address is accurate.
             HashMap<String, Breakdown> resultsMap = null;
             if(errors.length() == 0){
                 SocialActivenessController cntrl = new SocialActivenessController();
                 resultsMap = cntrl.generateAwarenessReport(date, macAdd, errors);
+            }else{
+                errors = errors.substring(1);
             }
             
             //Sends back the hashmap
