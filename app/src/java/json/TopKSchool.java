@@ -22,8 +22,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -107,15 +107,14 @@ public class TopKSchool extends HttpServlet {
 			} else if (startdate.length() == 0) {
 				errors.add("blank startdate");
 			} else {
-				startdate = startdate.trim();
-				if (startdate.length() != 10) {
-					errors.add("invalid startdate");
-				} else {
-					dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
-					if (dateFormattedStart == null) {
-						errors.add("invalid startdate");
-					}
-				}
+                            if (startdate.length() != 10) {
+                                    errors.add("invalid startdate");
+                            } else {
+                                dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
+                                if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
+                                    errors.add("invalid startdate");
+                                }
+                            }
 			}
 
 			//END DATE VALIDATION
@@ -125,15 +124,14 @@ public class TopKSchool extends HttpServlet {
 			} else if (enddate.length() == 0) {
 				errors.add("blank enddate");
 			} else {
-				enddate = enddate.trim();
-				if (enddate.length() != 10) {
-					errors.add("invalid enddate");
-				} else {
-					dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
-					if (dateFormattedEnd == null) {
-						errors.add("invalid enddate");
-					}
-				}
+                            if (enddate.length() != 10) {
+                                    errors.add("invalid enddate");
+                            } else {
+                                dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
+                                if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
+                                    errors.add("invalid enddate");
+                                }
+                            }
 			}
 			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
 				errors.add("invalid startdate");
@@ -172,13 +170,13 @@ public class TopKSchool extends HttpServlet {
 			output.addProperty("status", "success");
 
 			//This parameter is only for those who select App Category and return School
-			ArrayList<HashMap<String, String>> catValues = ctrl.getTopkSchool(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
+			ArrayList<TreeMap<String, String>> catValues = ctrl.getTopkSchool(entryInt, selected, dateFormattedStart, dateFormattedEnd, error);
 
 			if (catValues != null) {
-				Iterator<HashMap<String, String>> iter = catValues.iterator();
+				Iterator<TreeMap<String, String>> iter = catValues.iterator();
 				JsonArray param = new JsonArray();
 				while (iter.hasNext()) {
-					HashMap<String, String> map = iter.next();
+					TreeMap<String, String> map = iter.next();
 					JsonObject indiv = new JsonObject();
 					param.add(indiv);
 

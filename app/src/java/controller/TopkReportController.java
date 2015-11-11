@@ -29,7 +29,7 @@ public class TopkReportController {
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used apps(Given a school)
      */
-    public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors) {
+    public ArrayList<TreeMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors) {
         AppUsageDAO auDAO = new AppUsageDAO();
 
         /*Return an arraylist of AppUsage of interest (i.e. macAddress and timestamp related to the report), sorted by macAddress then timestamp */
@@ -115,8 +115,8 @@ public class TopkReportController {
             storage.put(app, total);
         }
         //ArrayList to store the variables and return
-        ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
-        HashMap<String, String> kDetails = new HashMap<>();
+        ArrayList<TreeMap<String, String>> returnList = new ArrayList<>();
+        TreeMap<String, String> kDetails = new TreeMap<>();
         //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(storage.values());
         Collections.sort(valuesArr);
@@ -131,7 +131,7 @@ public class TopkReportController {
                     kDetails.put("app-name", app.getAppName());
                     kDetails.put("duration", String.valueOf(time / 1000));
                     returnList.add(kDetails);
-                    kDetails = new HashMap<>();
+                    kDetails = new TreeMap<>();
                 }
             }
             kFound = (returnList.size() + 1);
@@ -157,7 +157,7 @@ public class TopkReportController {
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used students(Given a app category)
      */
-    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, String errors) {
+    public ArrayList<TreeMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, String errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and student name
         HashMap<String, String> linkMac = new HashMap<>();
@@ -235,8 +235,8 @@ public class TopkReportController {
             userTime.put(macAdd, userTotal);
         }
         //ArrayList to store the variables and return
-        ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
-        HashMap<String, String> kDetails = new HashMap<>();
+        ArrayList<TreeMap<String, String>> returnList = new ArrayList<>();
+        TreeMap<String, String> kDetails = new TreeMap<>();
         //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(userTime.values());
         Collections.sort(valuesArr);
@@ -253,7 +253,7 @@ public class TopkReportController {
                     kDetails.put("mac-address", macAdd);
                     kDetails.put("duration", String.valueOf(time / 1000));
                     returnList.add(kDetails);
-                    kDetails = new HashMap<>();
+                    kDetails = new TreeMap<>();
                 }
             }
             kFound = (returnList.size() + 1);
@@ -278,7 +278,7 @@ public class TopkReportController {
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used school(Given a app category)
      */
-    public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, String errors) {
+    public ArrayList<TreeMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, String errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and email
         HashMap<String, String> schoolList = new HashMap<>();
@@ -367,8 +367,8 @@ public class TopkReportController {
             }
         }
         //ArrayList to store the variables and return
-        ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
-        HashMap<String, String> kDetails = new HashMap<>();
+        ArrayList<TreeMap<String, String>> returnList = new ArrayList<>();
+        TreeMap<String, String> kDetails = new TreeMap<>();
         //From here, starts to get the top few 
         ArrayList<Long> valuesArr = new ArrayList<Long>(schoolTime.values());
         Collections.sort(valuesArr);
@@ -383,7 +383,7 @@ public class TopkReportController {
                     kDetails.put("school", school);
                     kDetails.put("duration", String.valueOf(time / 1000));
                     returnList.add(kDetails);
-                    kDetails = new HashMap<>();
+                    kDetails = new TreeMap<>();
                 }
             }
             kFound = (returnList.size() + 1);

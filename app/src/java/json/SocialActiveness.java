@@ -89,26 +89,26 @@ public class SocialActiveness extends HttpServlet {
 			user = null;
 
 			//DATE VALIDATION
-			if (date == null) {
-				errors.add("missing date");
-			} else if (date.length() == 0) {
-				errors.add("blank date");
-			} else {
-				date = date.trim();
-				if (date.length() != 10) {
-					errors.add("invalid date");
-				} else {
-					Date dateFormatted = Utility.parseOnlyDate(date);
-					if (dateFormatted == null) {
-						errors.add("invalid date");
-					} else {
-						date = Utility.formatOnlyDate(dateFormatted);
-						if (date == null) {
-							errors.add("invalid date");
-						}
-					}
-				}
-			}
+			Date dateFormatted = null;
+                        if(date == null){
+                            errors.add("missing date");
+                        }else if (date.length() == 0) {
+                            errors.add("blank date");
+                        } else {
+                            if(date.length() != 10){
+                                errors.add("invalid date");
+                            }else{
+                                dateFormatted = Utility.parseOnlyDate(date);
+                                if (dateFormatted == null) {
+                                    errors.add("invalid date");
+                                }else{
+                                    date = Utility.formatOnlyDate(dateFormatted);
+                                    if(date == null){
+                                        errors.add("invalid date");
+                                    }
+                                }
+                            }
+                        }
 
             //MACADD VALIDATION - since all the errors are the same, we can immediately retrieve the macadd from the system
 			//Username has already been checked
