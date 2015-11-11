@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import dao.LocationDAO;
@@ -10,18 +5,11 @@ import dao.LocationUsageDAO;
 import entity.Location;
 import entity.LocationUsage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-/**
- *
- * @author jeremyongts92
- */
 public class HeatmapController {
 
 	public TreeMap<String, ArrayList<LocationUsage>> generateHeatmap(Date datetime, String floor) {
@@ -55,16 +43,6 @@ public class HeatmapController {
 					locList.add(lu);
 				}
 			}
-//			for (int j = 0; j < luList.size(); j++) {
-//
-//				LocationUsage lu = luList.get(j);
-//				Location l = lu.getLocation();
-//
-//				if (loc.equals(l.getSemanticPlace())) {
-//					locList.add(lu);
-//				}
-//			}
-
 		}
 
 		return result;

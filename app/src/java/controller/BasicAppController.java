@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import dao.AppDAO;
@@ -20,10 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-/**
- *
- * @author jeremyongts92
- */
 public class BasicAppController {
 
     public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList, double total) {
@@ -61,7 +52,9 @@ public class BasicAppController {
             Date oldTime = null;
             if (userUsage.size() > 0) {
                 oldTime = userUsage.get(0).getDate();
-
+                if(oldTime.after(nextDay)) {
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                }
             }
 
             for (int j = 1; j < userUsage.size(); j++) {
@@ -83,11 +76,18 @@ public class BasicAppController {
                     }
 
                 } else {  // NEW TIMING AFTER NEXT DAY
-                    if (beforeAppeared) {
-                        totalSeconds += Utility.secondsBetweenDates(oldTime, newTime);
-
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                    
+                    if (!beforeAppeared) {
+                        long difference = Utility.secondsBetweenDates(oldTime, newTime);
+                        if (difference <= 2 * 60) {
+                            // add difference to totalSeconds if <= 2 mins
+                            totalSeconds += difference;
+                        } else {
+                            // add 10sec to totalSeconds if > 2 mins
+                            totalSeconds += 10;
+                        }
                     }
-                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 );
                 }
 
                 oldTime = newTime;
@@ -103,11 +103,9 @@ public class BasicAppController {
                 }
             } else {
                 totalSeconds += 10;
-
             }
             
             //DIVIDE TO GET INTO DAYS
-            System.out.println(totalSeconds + " total seconds");
             long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
             totalSeconds /= days;
 
@@ -165,9 +163,9 @@ public class BasicAppController {
 
         Breakdown result = new Breakdown();
 
-        ArrayList<String> schools = Utility.retrieveSchools();
+        ArrayList<String> schools = Utility.getSchools();
         ArrayList<String> years = Utility.getYears();
-        ArrayList<String> genders = Utility.getGenders();
+        ArrayList<String> genders = userDAO.getGenders();
         ArrayList<String> ccas = userDAO.getCCAs();
 
         ArrayList<String> demo1List = new ArrayList<String>();
@@ -462,10 +460,13 @@ public class BasicAppController {
             User currUser = userList.get(i);
             ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
             Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
-
+            
             Date oldTime = null;
             if (userUsage.size() > 0) {
                 oldTime = userUsage.get(0).getDate();
+                if(oldTime.after(nextDay)) {
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                }
             }
 
             for (int j = 1; j < userUsage.size(); j++) {
@@ -477,7 +478,7 @@ public class BasicAppController {
                 boolean beforeAppeared = false;
                 if (newTime.before(nextDay)) {
                     beforeAppeared = true;
-
+                    
                     //difference = usage time of the oldTime appId
                     double difference = Utility.secondsBetweenDates(oldTime, newTime);
 
@@ -502,25 +503,39 @@ public class BasicAppController {
 
                     }
 
-                } else {  // NEW TIMING AFTER NEXT HOUR
-                    if (beforeAppeared) {
-                        double diff = Utility.secondsBetweenDates(oldTime, nextDay);
+                } else { 
+                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
+                    
+                    if (!beforeAppeared) {
+                        double diff = Utility.secondsBetweenDates(oldTime, newTime);
                         //add time to the appid
-                        if (appResult.containsKey(appId)) {
-                            double value = appResult.get(appId);
-                            appResult.put(appId, (value + diff));
+                        if (diff <= 2 * 60) {
+                        // add time to the appId
+                            if (appResult.containsKey(appId)) {
+                                double value = appResult.get(appId);
+                                appResult.put(appId, (value + diff));
+                            } else {
+                                appResult.put(appId, diff);
+                            }
+
                         } else {
-                            appResult.put(appId, diff);
+                            // add 10sec to appid if > 2 mins
+                            if (appResult.containsKey(appId)) {
+                                double value = appResult.get(appId);
+                                appResult.put(appId, (value + 10));
+                            } else {
+                                appResult.put(appId, 10.0);
+                            }
+
                         }
                     }
-                    nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000);
 
                 }
 
                 oldTime = newTime;
 
             }
-            //System.out.print("appResult: " + appResult.size());
+            
             //get the appId of the last user usage
             int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
@@ -543,6 +558,7 @@ public class BasicAppController {
                     }
                 }
             } else {
+                
                 if (appResult.containsKey(lastAppId)) {
                     double value = appResult.get(lastAppId);
                     appResult.put(lastAppId, (value + 10));
@@ -551,6 +567,7 @@ public class BasicAppController {
                 }
 
             }
+            
 
             //DIVIDE TO GET INTO DAYS
             long days = Utility.daysBetweenDates(startDate, endDate);
@@ -577,9 +594,9 @@ public class BasicAppController {
                     }
                     totCatTime += timePerApp;
                 }
-                System.out.println(key + " key " + totCatTime + " total time");
+                
                 double avgCatTime = totCatTime / days;
-                System.out.println(key + " key " + avgCatTime + " total avg time");
+                
                 totTime += avgCatTime;
                 result.put(key, avgCatTime);
             }
@@ -651,7 +668,7 @@ public class BasicAppController {
                 for (int j = 1; j < auList.size(); j++) {
                     Date newTime = auList.get(j).getDate();
 
-					//calculate usageTime and add to secondsThisHour
+                    //calculate usageTime and add to secondsThisHour
                     //difference between app usage timing
                     long difference = Utility.secondsBetweenDates(oldTime, newTime);
 
