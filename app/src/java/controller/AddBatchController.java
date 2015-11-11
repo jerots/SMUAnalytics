@@ -25,8 +25,24 @@ import javax.servlet.http.Part;
  *
  * @author Boyofthefuture
  */
+/**
+ * AddBatchController controls all actions related adding of additional data to the original
+ * data that a user Bootstrapped
+ */
 public class AddBatchController {
 
+    
+     /**
+     * Retrieves a TreeMap<String, Integer> object for the data add additional data to the bootstrapped files
+     *
+     * @param filePart The zipped input file
+     * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
+     * @param delErrMap The map that contains error messages and its corresponding row from location-delete.csv
+     * @param auErrMap The map that contains error messages and its corresponding row from app.csv
+     * @param luErrMap The map that contains error messages and its corresponding row from location.csv
+     * @return A treemap objects that belongs contains the
+     * records successfully updated for each csv file in the input Zipped File
+     */
     public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap,
             TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
         Connection conn = ConnectionManager.getConnection();
