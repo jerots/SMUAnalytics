@@ -27,7 +27,7 @@ import javax.servlet.http.Part;
  */
 public class AddBatchController {
 
-    public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> delErrMap,
+    public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap,
             TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
@@ -41,6 +41,7 @@ public class AddBatchController {
         int delUpdated = -1;
         int auUpdated = -1;
         int luUpdated = -1;
+        int notFound = -1;
         //put the results into aa hashmap to return to bootstrap action
         TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
@@ -72,15 +73,10 @@ public class AddBatchController {
         isr = new InputStreamReader(zipInputStream);
         br = new BufferedReader(isr);
         entry = null;
-        System.out.println("e");
         while ((entry = zipInputStream.getNextEntry()) != null) {
-            System.out.println("d");
             String fileName = entry.getName();
-            System.out.println("c");
             if (fileName.equals("app.csv")) {
-                System.out.println("b");
                 reader = new CsvReader(br);
-                System.out.println("A");
                 auUpdated = auDao.add(reader, auErrMap, conn);
                 break;
             } else {
@@ -115,26 +111,24 @@ public class AddBatchController {
             String fileName = entry.getName();
             if (fileName.equals("location-delete.csv")) {
                 reader = new CsvReader(br);
-                int[] updatedRecords = luDao.delete(reader, delErrMap, conn);
+                int[] updatedRecords = luDao.delete(reader, conn);
                 delUpdated = updatedRecords[0];
+                notFound = updatedRecords[1];
+                break;
             } else {
                 zipInputStream.closeEntry();
             }
         }
 
         ConnectionManager.close(conn);
-        if (userUpdated >= 0) {
-            result.put("demographics.csv", userUpdated);
-        }
-        if (auUpdated >= 0) {
-            result.put("app.csv", auUpdated);
-        }
-        if (luUpdated >= 0) {
-            result.put("location.csv", luUpdated);
-        }
-        if (delUpdated >= 0) {
-            result.put("location-delete.csv", delUpdated);
-        }
+        //LOADS UNNECESSARY THINGS FOR THE UI CHECKING TO CORRESP WITH BOOTSTRAP
+        result.put("app-lookup.csv", -1);
+        result.put("location-lookup.csv", -1);
+        result.put("demographics.csv", userUpdated);
+        result.put("app.csv", auUpdated);
+        result.put("location.csv", luUpdated);
+        result.put("location-delete.csv", delUpdated);
+        result.put("deletenotfound", notFound);
         return result;
     }
 }

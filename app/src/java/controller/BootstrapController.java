@@ -29,13 +29,32 @@ import javax.servlet.http.Part;
  *
  * @author Shuwen
  */
+
+/**
+ * Bootstrap controls all actions related TopkReport related functionality
+ */
 public class BootstrapController {
 
+    
 	//handles the number of rows updated 
 	//and the error message of the different files - pass to DAO to handle
 	//RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
+    
+      /**
+     * Retrieves a TreeMap<String, Integer> object for the data bootstrapping of zip file
+     *
+     * @param filePart The zipped input file
+     * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
+     * @param appErrMap The map that contains error messages and its corresponding row from app-lookup.csv
+     * @param locErrMap The map that contains error messages and its corresponding row from location-lookup.csv
+     * @param auErrMap The map that contains error messages and its corresponding row from app.csv
+     * @param luErrMap The map that contains error messages and its corresponding row from location.csv
+     * @param errors The errors generated from the top-k apps
+     * @return A sorted ArrayList of Hashmap objects that belongs contains the
+     * Top-k most used apps(Given a school)
+     */
 	public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
-			TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, TreeMap<Integer, String> delErrMap)
+			TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap)
 			throws IOException {
 
 		InputStream fileContent = filePart.getInputStream();
@@ -59,6 +78,7 @@ public class BootstrapController {
 		int auUpdated = -1;
 		int luUpdated = -1;
 		int delUpdated = -1;
+                int notFound = -1;
 		//put the results into aa hashmap to return to bootstrap action
 		TreeMap<String, Integer> result = new TreeMap<String, Integer>();
 
@@ -85,8 +105,7 @@ public class BootstrapController {
 				//returns number of successfully entered entries
 				//success >= 0;
 				//unsuccess: anything other than a number;
-				int[] updatedRecords = {};
-				updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
+				int[] updatedRecords = appDao.insert(reader, appErrMap, conn, appIdList);
 				//count how many 1 = success. Sets updated records to empty so that in case theres nothing, the updated records return NOTHING.
                                 appUpdated = updatedRecords.length;
 				break;
@@ -108,8 +127,7 @@ public class BootstrapController {
 			if (fileName.equals("demographics.csv")) {
 				userUpdated = 0;
 				reader = new CsvReader(br);
-				int[] updatedRecords = {};
-				updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
+				int[] updatedRecords = uDao.insert(reader, userErrMap, conn, macList);
 				userUpdated = updatedRecords.length;
 				break;
 			} else {
@@ -129,10 +147,7 @@ public class BootstrapController {
 			if (fileName.equals("app.csv")) {
 				auUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-				updatedRecords = auDao.insert(reader, auErrMap, conn, macList, appIdList);
-				auUpdated = updatedRecords.length;
+				auUpdated = auDao.insert(reader, auErrMap, conn, macList, appIdList);
 				break;
 			} else {
 				zipInputStream.closeEntry();
@@ -151,9 +166,7 @@ public class BootstrapController {
 			if (fileName.equals("location-lookup.csv")) {
 				locUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-                                updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
+                                int[] updatedRecords = lDao.insert(reader, locErrMap, conn, locationIdList);
 				locUpdated = updatedRecords.length;
 				break;
 			} else {
@@ -173,10 +186,7 @@ public class BootstrapController {
 			if (fileName.equals("location.csv")) {
 				luUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-				updatedRecords = luDao.insert(reader, luErrMap, conn, locationIdList);
-				luUpdated = updatedRecords.length;
+				luUpdated = luDao.insert(reader, luErrMap, conn, locationIdList);
 				break;
 			} else {
 				zipInputStream.closeEntry();
@@ -196,10 +206,9 @@ public class BootstrapController {
 			if (fileName.equals("location-delete.csv")) {
 				delUpdated = 0;
 				reader = new CsvReader(br);
-				
-				int[] updatedRecords = {};
-				updatedRecords = luDao.delete(reader, delErrMap, conn);
+				int[] updatedRecords = luDao.delete(reader, conn);
                                 delUpdated = updatedRecords[0];
+                                notFound = updatedRecords[1];
 				break;
 			} else {
 				zipInputStream.closeEntry();
@@ -213,6 +222,7 @@ public class BootstrapController {
 		result.put("app.csv", auUpdated);
 		result.put("location.csv", luUpdated);
 		result.put("location-delete.csv", delUpdated);
+                result.put("deletenotfound", notFound);
 		try {
 			InitDAO.enableForeignKey(conn);
 

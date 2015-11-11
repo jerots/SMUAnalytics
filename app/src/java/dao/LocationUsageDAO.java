@@ -35,7 +35,7 @@ public class LocationUsageDAO {
         locationList = new TreeMap<>();
     }
 
-    public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException {
+    public int insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException {
         int[] updateCounts = {};
         try {
             int index = 2;
@@ -46,52 +46,46 @@ public class LocationUsageDAO {
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
-                String errorMsg = null;
-                if(errMap.containsKey(index)){
-                    errorMsg = errMap.get(index);
-                }
-                if (errorMsg == null) {
-                    errorMsg = "";
-                }
+                String errorMsg = "";
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
                 if (date == null) {
-                    errorMsg += ",invalid timestamp";
-                    err = true;
+                    errorMsg += ",blank timestamp";
+                    
+                }else{
+                    if(!Utility.checkDate(date)){
+                        errorMsg += ",invalid timestamp";
+                    }
                 }
 
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
-                    errorMsg += ",mac address cannot be blank";
-                    err = true;
+                    errorMsg += ",blank mac-address";
+                    
                 } else if (!Utility.checkHexadecimal(macAdd)) {
-
-                    errorMsg += ",invalid mac address";
-                    err = true;
+                    errorMsg += ",invalid mac-address";
+                    
+                } else {
+                    macAdd = macAdd.toLowerCase();
                 }
-                macAdd = macAdd.toLowerCase();
-
                 //check locid
                 int locationId = Utility.parseInt(reader.get("location-id"));
                 if (locationId <= 0) {
-                    errorMsg += ",location id cannot be blank";
-                    err = true;
+                    errorMsg += ",blank location-id";
+                    
                 } else if (!locationIdList.containsKey(locationId)) {
 
                     errorMsg += ",invalid location";
-                    err = true;
+                    
 
                 }
 
-                if (!err) {
+                if (errorMsg.length() == 0) {
                     String key = date + macAdd;
                     Integer exisMac = duplicate.get(key);
                     if (exisMac != null) {
-
-                        errMap.put(index, "duplicate row " + exisMac);
-
+                        errMap.put(exisMac, "duplicate row");
                     }
                     duplicate.put(key, index);
                     //add to list
@@ -111,13 +105,13 @@ public class LocationUsageDAO {
             }
             //insert into tables
 
-            updateCounts = stmt.executeBatch();
+            stmt.executeBatch();
             conn.commit();
             stmt.close();
         } catch (SQLException e) {
 
         }
-        return updateCounts;
+        return duplicate.size();
     }
 
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
@@ -129,61 +123,57 @@ public class LocationUsageDAO {
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
                 String errorMsg = "";
 
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null || !Utility.checkDate(date)) {
-                    errorMsg += ",invalid timestamp";
-                    err = true;
+                if (date == null) {
+                    errorMsg += ",blank timestamp";
+                }else{
+                    if(!Utility.checkDate(date)){
+                        errorMsg += ",invalid timestamp";
+                    }
                 }
 
                 //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
                 if (macAdd == null) {
-                    errorMsg += ",mac address cannot be blank";
-                    err = true;
+                    errorMsg += ",blank mac-address";
+                    
                 } else if (!Utility.checkHexadecimal(macAdd)) {
-                    errorMsg += ",invalid mac address";
-                    err = true;
+                    errorMsg += ",invalid mac-address";
+                    
                 } else {
                     macAdd = macAdd.toLowerCase();
                 }
 
                 //check appid
                 int locationId = Utility.parseInt(reader.get("location-id"));
-                if (locationId == -1) {
-                    errorMsg += ",location id cannot be blank";
-                    err = true;
-
+                if (locationId <= -1) {
+                    errorMsg += ",blank location-id";
                     //IF LOCATION ID NOT BLANK
                 } else {
-
                     String query = "select locationid from location where locationid = ?;";
                     PreparedStatement pStmt = conn.prepareStatement(query);
                     pStmt.setInt(1, locationId);
                     ResultSet rs = pStmt.executeQuery();
                     if (!rs.next()) {
-                        errorMsg += ",mac address cannot be blank";
-                        err = true;
+                        errorMsg += ",invalid location";
+                        
                     }
                     pStmt.close();
                 }
 
                 //IF ALL VALIDATIONS ARE PASSED
-                if (!err) {
+                if (errorMsg.length() == 0) {
                     if (duplicate.containsKey(date + macAdd)) {
-                        errorMsg += ",duplicate row " + duplicate.get(date + macAdd); 
-                        err = true;
+                        errMap.put(duplicate.get(date + macAdd), "duplicate row");
+                        
                     }
                     duplicate.put(date + macAdd, index);
                     locationList.put(date + macAdd, new LocationUsage(date, macAdd, locationId));
-                }
-                if(errorMsg != null && errorMsg.length() > 0){
-                    errorMsg = errorMsg.substring(1, errorMsg.length());
-                    System.out.println(errorMsg);
-                    errMap.put(index, errorMsg);
+                }else{
+                    errMap.put(index, errorMsg.substring(1));
                 }
 
                 //row number increased
@@ -193,8 +183,8 @@ public class LocationUsageDAO {
 
             //CHECK FOR DUPLICATES IN DATABASE
             ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>(locationList.values());
-
-            try {
+            
+            try{
                 for (LocationUsage loc : locList) {
                     stmt.setString(1, loc.getTimestamp());
                     stmt.setString(2, loc.getMacAddress());
@@ -205,107 +195,70 @@ public class LocationUsageDAO {
                 for (int i : updatedArr) {
                     updateCounts += i;
                 }
-                conn.commit();
-
                 //CATCH WHEN THERE IS DUPLICATE
             } catch (BatchUpdateException e) {
                 int[] updatedArr = e.getUpdateCounts();
-
                 for (int i = 0; i < updatedArr.length; i++) {
                     if (updatedArr[i] == Statement.EXECUTE_FAILED) {
                         // This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
                         int row = duplicate.get(locList.get(i).getTimestamp() + locList.get(i).getMacAddress());
                         String errorMsg = "";
-                        if(errMap.containsKey(index)){
+                        if (errMap.containsKey(index)) {
                             errorMsg = errMap.get(index);
                         }
-                        if(errorMsg != null && errorMsg.length() != 0){
+                        if (errorMsg != null && errorMsg.length() != 0) {
                             errorMsg += ",duplicate row";
-                        }else{
+                        } else {
                             errorMsg += "duplicate row";
                         }
                         errMap.put(row, errorMsg);
                     }
                     if (updatedArr[i] >= 0) {
-
                         updateCounts += updatedArr[i];
                     }
                 }
             }
+            conn.commit();
             reader.close();
             stmt.close();
         } catch (SQLException e) {
-
+            
         }
-        Iterator<Integer> iter2 = errMap.keySet().iterator();
         return updateCounts;
     }
 
-    public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
+    public int[] delete(CsvReader reader, Connection conn) throws IOException {
         int[] toReturn = new int[2];
-        int index = 2; //counts the row of the record.
         int notFound = 0;
         int found = 0;
+        int[] updateCounts = {};
         try {
             String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(sql);    
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
-
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null || !Utility.checkDate(date)) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid timestamp");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid timestamp");
-                    }
-                    err = true;
-                }
-
-                //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "mac address cannot be blank");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "mac address cannot be blank");
-                    }
-                    err = true;
-                }
-                if (macAdd != null && !Utility.checkHexadecimal(macAdd)) {
-                    String errorMsg = errMap.get(index);
-                    if (errorMsg == null) {
-                        errMap.put(index, "invalid mac address");
-                    } else {
-                        errMap.put(index, errorMsg + "," + "invalid mac address");
-                    }
-                    err = true;
-                }
-                macAdd = macAdd.toLowerCase();
-
-                if (!err) {
-                    found++;
+                if (date != null && Utility.checkDate(date) && macAdd != null && Utility.checkHexadecimal(macAdd)) {
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
                     stmt.addBatch();
                 }
                 if (stmt != null) {
-                    int[] updateCounts = stmt.executeBatch();
+                    updateCounts = stmt.executeBatch();
                     conn.commit();
                     for (int i : updateCounts) {
-                        if (i == 0) {
+                        if (!(i > 0)) { //Can be 0 or anything else
                             notFound++;
+                        }else{
+                            found += i;
                         }
                     }
                 }
-                index++;
             }
-
+            conn.commit();
             reader.close();
             ConnectionManager.close(conn, stmt);
 
@@ -314,7 +267,7 @@ public class LocationUsageDAO {
         } catch (SQLException e) {
 
         }
-        toReturn[0] = found - notFound; //Valid Records which have successfully deleted rows in the database
+        toReturn[0] = found; //Valid Records which have successfully deleted rows in the database
         toReturn[1] = notFound; //Valid Records which are succesful but have not deleted rows in the database
         return toReturn;
     }

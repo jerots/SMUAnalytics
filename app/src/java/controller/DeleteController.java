@@ -108,14 +108,13 @@ public class DeleteController {
         //MACADDRESS VALIDATION - This one COULD be input as the login person is admin, and therefore not retrieve the user's own macadd like activeness
         if(macAdd != null && macAdd.length() != 0){
             if (!Utility.checkHexadecimal(macAdd)) {
-                errors += ", invalid mac address";
+                errors += ", invalid mac-address";
                 
             //Retrieves the Userlist to check the macAdd
             }else{
                 UserDAO userDao = new UserDAO();
                 if(!userDao.checkMacAdd(conn, macAdd)){
-                    errors += ", invalid mac address";
-                    
+                    errors += ", invalid mac-address";
                 }                
             }
         }
