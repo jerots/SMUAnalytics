@@ -91,7 +91,7 @@ public class Bootstrap extends HttpServlet {
 					errors.add("missing file");
 				}else{
                                     String name = filePart.getName();
-                                    if(!name.substring(name.length()-4 ,name.length()).equals(".zip")){
+                                    if(!name.endsWith(".zip")){
                                         errors.add("invalid file");
                                     }
                                 }
