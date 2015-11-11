@@ -31,7 +31,7 @@ import javax.servlet.http.Part;
  */
 
 /**
- * Bootstrap controls all actions related TopkReport related functionality
+ * Bootstrap controls all actions related to bootstrap related functionality
  */
 public class BootstrapController {
 
@@ -49,9 +49,8 @@ public class BootstrapController {
      * @param locErrMap The map that contains error messages and its corresponding row from location-lookup.csv
      * @param auErrMap The map that contains error messages and its corresponding row from app.csv
      * @param luErrMap The map that contains error messages and its corresponding row from location.csv
-     * @param errors The errors generated from the top-k apps
-     * @return A sorted ArrayList of Hashmap objects that belongs contains the
-     * Top-k most used apps(Given a school)
+     * @return A treemap objects that belongs contains the
+     * records successfully updated for each csv file in the input Zipped File
      */
 	public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
 			TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap)
