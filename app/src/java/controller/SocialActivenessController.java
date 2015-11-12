@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import dao.AppUsageDAO;
@@ -23,10 +18,19 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 /**
- *
- * @author Boyofthefuture
+ * SocialActivenessController controls all actions related to SocialActiveness
+ * functionality
  */
 public class SocialActivenessController {
+
+    /**
+     * Retrieves a HashMap object for the location usages in the semantic place
+     *
+     * @param onlyDate The date input by user
+     * @param macAddress macAddress of the User
+     * @param errors The errors 
+     * @return A HashMap object that contains the data category and its breakdown value
+     */
 
     public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress, String errors) {
         //THIS METHOD is going to store first for the user all his apps and THEN check for social
@@ -339,11 +343,11 @@ public class SocialActivenessController {
             long group = 0;
             for (Activeness active : userOverlapList) {
                 group += active.getTime();
-                
+
             }
-            
+
             String groupPercent = df.format((double) group / overall * 100);
-            
+
             long soloPercent = 100 - Utility.parseInt(groupPercent);
             overallMap.put("total-time-spent-in-sis", new Breakdown("" + overall / 1000));
             overallMap.put("group-percent", new Breakdown("" + groupPercent));
@@ -357,7 +361,14 @@ public class SocialActivenessController {
         return overallMap;
     }
 
-    //This method will check whether there is an overlap between this user and the current user in process.
+    /**
+     * This method will check whether there is an overlap between this user and the current user in process.
+     * @param userList The list of users 
+     * @param singleList The list of activeness of a single user
+     * @param ac The Activeness Object that is to be compared with
+     * @param loc The Location of the Activeness
+     */
+    
     public void overlapUser(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
         if (userList.containsKey(loc)) {
             ArrayList<Activeness> activeList = userList.get(loc);
@@ -380,7 +391,14 @@ public class SocialActivenessController {
             }
         }
     }
-
+    /**
+     * This method will check if the Activeness hits 5 minutes, if not, removed the activeness
+     * @param userList The list of users 
+     * @param singleList The list of activeness of a single user
+     * @param ac The Activeness Object that is to be compared with
+     * @param loc The Location of the Activeness
+     */
+    
     public void checkMinutes(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
         //If it is NOT a continuation, you will check the entire makeup of the previous set to check if it is 5 minutes. If not, delete.
         //Reverse to check the last few if they make up 5 minutes, if not DELETE.
