@@ -10,42 +10,52 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+/**
+ * HeatmapController controls all actions related to Heatmap functionality
+ */
 public class HeatmapController {
 
-	public TreeMap<String, ArrayList<LocationUsage>> generateHeatmap(Date datetime, String floor) {
-		
-		LocationUsageDAO luDAO = new LocationUsageDAO();
+    /**
+     * Retrieves a TreeMap object for the location usages in the semantic place
+     * @param datetime The datetime input by user
+     * @param floor The floor input by the user
+     * @return A TreeMap object that contains the semantic place and its usages. 
+     */
 
-		//for each location, count unique users
-		TreeMap<String, ArrayList<LocationUsage>> result = new TreeMap<String, ArrayList<LocationUsage>>();
+    public TreeMap<String, ArrayList<LocationUsage>> generateHeatmap(Date datetime, String floor) {
 
-		LocationDAO locDAO = new LocationDAO();
+        LocationUsageDAO luDAO = new LocationUsageDAO();
 
-		//retrieve all the floors
-		ArrayList<String> floorLocationList = locDAO.retrieve(floor);
-		HashMap<String,LocationUsage> luMap = luDAO.retrieveByFloor(datetime, floor);
-		//get all locationUsage on this floor, latest timing
-		//for each location in the floor
-		for (int i = 0; i < floorLocationList.size(); i++) {
-			String loc = floorLocationList.get(i);
+        //for each location, count unique users
+        TreeMap<String, ArrayList<LocationUsage>> result = new TreeMap<String, ArrayList<LocationUsage>>();
 
-			//instantiate arraylist
-			ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>();
-			result.put(loc, locList);
-			
-			Iterator<String> keyIter = luMap.keySet().iterator();
-			while (keyIter.hasNext()){
-				String macAddress = keyIter.next();
-				LocationUsage lu = luMap.get(macAddress);
-				Location location = lu.getLocation();
-				
-				if (loc.equals(location.getSemanticPlace())) {
-					locList.add(lu);
-				}
-			}
-		}
+        LocationDAO locDAO = new LocationDAO();
 
-		return result;
-	}
+        //retrieve all the floors
+        ArrayList<String> floorLocationList = locDAO.retrieve(floor);
+        HashMap<String, LocationUsage> luMap = luDAO.retrieveByFloor(datetime, floor);
+        //get all locationUsage on this floor, latest timing
+        //for each location in the floor
+        for (int i = 0; i < floorLocationList.size(); i++) {
+            String loc = floorLocationList.get(i);
+
+            //instantiate arraylist
+            ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>();
+            result.put(loc, locList);
+
+            Iterator<String> keyIter = luMap.keySet().iterator();
+            while (keyIter.hasNext()) {
+                String macAddress = keyIter.next();
+                LocationUsage lu = luMap.get(macAddress);
+                Location location = lu.getLocation();
+
+                if (loc.equals(location.getSemanticPlace())) {
+                    locList.add(lu);
+                }
+            }
+        }
+
+        return result;
+    }
 
 }
