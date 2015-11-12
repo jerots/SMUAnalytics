@@ -442,14 +442,14 @@ public class BasicAppController {
 
     }
 
-    public TreeMap<String, Double[]> generateAppCategory(Date startDate, Date endDate) {
+    public TreeMap<String, Integer[]> generateAppCategory(Date startDate, Date endDate) {
 
         //Total Usage Time for each appid
         TreeMap<Integer, Double> appResult = new TreeMap<Integer, Double>();
         //Total Usage Time for each category
         TreeMap<String, Double> result = new TreeMap<String, Double>();
         //Total Usage Time and Percent for each category
-        TreeMap<String, Double[]> toResult = new TreeMap<String, Double[]>();
+        TreeMap<String, Integer[]> toResult = new TreeMap<String, Integer[]>();
 
         AppUsageDAO auDAO = new AppUsageDAO();
         ArrayList<User> userList = new ArrayList<User>();
@@ -602,16 +602,16 @@ public class BasicAppController {
             }
 
             Iterator<String> iterator = result.keySet().iterator();
-            DecimalFormat df = new DecimalFormat("####0.0");
             //Calculate the percentage for each category
             while (iterator.hasNext()) {
 
                 String name = iterator.next();
                 double duration = result.get(name);
                 double percent = (duration / totTime) * 100;
-                Double[] arrToReturn = new Double[2];
-                arrToReturn[0] = Double.valueOf(df.format(duration));
-                arrToReturn[1] = Double.valueOf(df.format(percent));
+                Integer[] arrToReturn = new Integer[2];
+                
+                arrToReturn[0] = Integer.valueOf(Math.round(duration)+ "");
+                arrToReturn[1] = Integer.valueOf(Math.round(percent) + "");
                 toResult.put(name, arrToReturn);
 
             }
@@ -621,9 +621,9 @@ public class BasicAppController {
 
         for (String cat : catList) {
             if (!toResult.containsKey(cat)) {
-                Double[] arrToReturn = new Double[2];
-                arrToReturn[0] = 0.0;
-                arrToReturn[1] = 0.0;
+                Integer[] arrToReturn = new Integer[2];
+                arrToReturn[0] = 0;
+                arrToReturn[1] = 0;
                 toResult.put(cat, arrToReturn);
             }
         }

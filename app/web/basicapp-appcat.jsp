@@ -114,7 +114,7 @@
                             out.println("</ul>");
 
                         } else {
-                            TreeMap<String, Double[]> catList = (TreeMap<String, Double[]>) request.getAttribute("result");
+                            TreeMap<String, Integer[]> catList = (TreeMap<String, Integer[]>) request.getAttribute("result");
 
                             if (catList != null) {
                                 if (catList.size() <= 0) {
@@ -130,9 +130,9 @@
 
                                         String catName = iter.next();
 
-                                        Double[] infoArr = catList.get(catName);
-                                        long duration = Math.round(infoArr[0]);
-                                        long percent = Math.round(infoArr[1]);
+                                        Integer[] infoArr = catList.get(catName);
+                                        int duration = Math.round(infoArr[0]);
+                                        int percent = Math.round(infoArr[1]);
                                         out.println("<tr><td>" + catName + "</td><td>" + duration + "</td><td>" + percent + "% of total</td></tr>");
 
                                     }
