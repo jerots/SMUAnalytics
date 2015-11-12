@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package json;
 
 import com.google.gson.Gson;
@@ -29,10 +24,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author ASUS-PC
- */
 @WebServlet(name = "SmartphoneOveruseReport", urlPatterns = {"/json/overuse-report"})
 public class SmartphoneOveruseReport extends HttpServlet {
 
@@ -158,11 +149,12 @@ public class SmartphoneOveruseReport extends HttpServlet {
 
 			output.addProperty("status", "success");
 			TreeMap<String, String> results = ctrl.generateReport(user, dateFormattedStart, dateFormattedEnd);
-
+                        
+                        JsonObject res = new JsonObject();
+                        res.addProperty("overuse-index", results.get("overuse-index"));
+                     
 			JsonArray metrics = new JsonArray();
-
-			output.addProperty("overuse-index", results.get("overuse-index"));
-
+			res.add("metrics", metrics);
 			JsonObject usageObj = new JsonObject();
 			usageObj.addProperty("usage-category", results.get("usage-category"));
 			usageObj.addProperty("usage-duration", Integer.parseInt(results.get("usage-duration")));
@@ -177,8 +169,7 @@ public class SmartphoneOveruseReport extends HttpServlet {
 			accessObj.addProperty("accessfrequency-category", results.get("accessfrequency-category"));
 			accessObj.addProperty("accessfrequency", Double.parseDouble(results.get("accessfrequency")));
 			metrics.add(accessObj);
-
-			output.add("metrics", metrics);
+                        output.add("results", res);
 			out.println(gson.toJson(output));
 		}
 	}
