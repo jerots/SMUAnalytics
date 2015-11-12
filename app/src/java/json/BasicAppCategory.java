@@ -132,7 +132,7 @@ public class BasicAppCategory extends HttpServlet {
 
 			BasicAppController ctrl = new BasicAppController();
 
-			TreeMap<String, Double[]> resultMap = ctrl.generateAppCategory(startDate, endDate);
+			TreeMap<String, Integer[]> resultMap = ctrl.generateAppCategory(startDate, endDate);
 
 			JsonArray basicAppCat = new JsonArray();
 			Iterator<String> iter = resultMap.keySet().iterator();
@@ -141,11 +141,11 @@ public class BasicAppCategory extends HttpServlet {
 
 				String name = iter.next();
 				currLoc.addProperty("category-name", name);
-				Double[] infoArr = resultMap.get(name);
-				double duration = infoArr[0];
+				Integer[] infoArr = resultMap.get(name);
+				int duration = infoArr[0];
 				//double duration = resultMap.get(name);
 				currLoc.addProperty("category-duration", duration);
-				double percent = infoArr[1];
+				int percent = infoArr[1];
 				currLoc.addProperty("category-percent", percent);
 				//currLoc.addProperty("crowd-density", density);
 				basicAppCat.add(currLoc);

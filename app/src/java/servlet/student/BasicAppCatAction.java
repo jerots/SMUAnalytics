@@ -69,7 +69,7 @@ public class BasicAppCatAction extends HttpServlet {
                 rd.forward(request, response);
                 return;
             } else {
-                TreeMap<String, Double[]> catList = bacCtrl.generateAppCategory(startDate, endDate);
+                TreeMap<String, Integer[]> catList = bacCtrl.generateAppCategory(startDate, endDate);
                 request.setAttribute("result", catList);
                 RequestDispatcher rd = request.getRequestDispatcher("basicapp-appcat.jsp");
                 rd.forward(request,response);
