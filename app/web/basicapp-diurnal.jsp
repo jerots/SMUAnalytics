@@ -4,6 +4,7 @@
     Author     : jeremyongts92
 --%>
 
+<%@page import="dao.Utility"%>
 <%@page import="dao.UserDAO"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.TreeMap"%>
@@ -101,7 +102,7 @@
                                     if (yearFilter == null) {
                                         yearFilter = "";
                                     }
-                                    ArrayList<String> years = userDAO.getYears();
+                                    ArrayList<String> years = Utility.getYears();
                                     for (String year : years) {
                                         String code = "";
                                         if (year.equals(yearFilter)) {
@@ -123,7 +124,7 @@
                                     if (genderFilter == null) {
                                         genderFilter = "";
                                     }
-                                    ArrayList<String> genders = userDAO.getGenders();
+                                    ArrayList<String> genders = Utility.getGenders();
                                     for (String gender : genders) {
                                         String code = "";
                                         if (gender.equals(genderFilter)) {
@@ -144,7 +145,7 @@
                                     if (schoolFilter == null) {
                                         schoolFilter = "";
                                     }
-                                    ArrayList<String> schools = userDAO.getSchools();
+                                    ArrayList<String> schools = Utility.retrieveSchools();
                                     for (String school : schools) {
                                         String code = "";
                                         if (school.equals(schoolFilter)) {
