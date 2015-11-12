@@ -7,18 +7,28 @@ import dao.Utility;
 import entity.AppUsage;
 import entity.Breakdown;
 import entity.User;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+/**
+ * BasicAppController controls all actions related to basic app report functionality
+ */
 public class BasicAppController {
-
+    
+    /**
+     * Retrieves a Breakdown object to display usage duration and percentage of the total based on category
+     * @param startDate The start date specified by user
+     * @param endDate The end date specified by the user
+     * @param userList User List based on one filter demographics else default null
+     * @param total Total number of user based all filter else default -1
+     * @return Breakdown object contains ArrayList of HashMap with usage duration category and percentage
+     */
+   
     public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList, double total) {
 
         //INTIATING VARIABLES
@@ -154,6 +164,13 @@ public class BasicAppController {
         return result;
     }
 
+    /**
+     * Retrieves a Breakdown object with filters and its breakdown 
+     * @param startDate The start date specified by user 
+     * @param endDate The end date specified by the user
+     * @param demoArr List of filter specified by the user
+     * @return Breakdown object contains ArrayList of HashMap with filter and its breakdown
+     */
     public Breakdown generateReportByDemo(Date startDate, Date endDate, String[] demoArr) {
 
         //INSTANTIATING VARIABLES
@@ -380,6 +397,13 @@ public class BasicAppController {
         return result;
     }
 
+    /**
+     * Retrieves a list of User based on filter
+     * @param demo a value of the demoType
+     * @param demoType a filter
+     * @param userList userList to filter
+     * @return ArrayList of user based on the specified filter
+     */
     public ArrayList<User> filterDemo(String demo, String demoType, ArrayList<User> userList) {
 
         ArrayList<User> toParse = (ArrayList<User>) userList.clone();
@@ -432,6 +456,11 @@ public class BasicAppController {
 
     }
 
+    /**
+     * Method calculate the percent for each Breakdown
+     * @param breakdown ArrayList of HashMap with filer and its breakdown
+     * @param total Total number of user based all filter
+     */
     public void generatePercentage(Breakdown breakdown, double total) {
 
         ArrayList<HashMap<String, Breakdown>> list1 = breakdown.getBreakdown();
@@ -444,7 +473,13 @@ public class BasicAppController {
         }
 
     }
-
+    
+    /**
+     * Retrieves a TreeMap object of app usage duration and overall percentage for each category
+     * @param startDate The start date specified by user
+     * @param endDate The end date specified by the user
+     * @return A TreeMap object that contains the app usage duration and overall percentage for each category
+     */
     public TreeMap<String, Integer[]> generateAppCategory(Date startDate, Date endDate) {
 
         //Total Usage Time for each appid
@@ -633,6 +668,12 @@ public class BasicAppController {
         return toResult;
     }
 
+    /**
+     * Retrieves a Breakdown object of app usage duration based on hours
+     * @param startDate The start date specified by user
+     * @param demoArr The filter specified by the user
+     * @return A Breakdown object of app usage duration based on hours
+     */
     public Breakdown generateDiurnalReport(Date startDate, String[] demoArr) {
 
         Breakdown result = new Breakdown();
