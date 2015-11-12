@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package servlet.student;
 
 import controller.BasicAppController;
@@ -21,10 +16,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author zhihui
- */
 @WebServlet(name = "BasicAppDiurnalAction", urlPatterns = {"/BasicAppDiurnalAction"})
 public class BasicAppDiurnalAction extends HttpServlet {
 
