@@ -202,11 +202,11 @@ public final class Utility {
 
     public static void loadSchools() {
         schoolList = new ArrayList<>();
-        schoolList.add("business");
         schoolList.add("accountancy");
-        schoolList.add("sis");
+        schoolList.add("business");
         schoolList.add("economics");
         schoolList.add("law");
+        schoolList.add("sis");
         schoolList.add("socsc");
     }
 
@@ -236,8 +236,8 @@ public final class Utility {
     
     public static void loadGenders(){
         genders = new ArrayList<String>();
-        genders.add("m");
         genders.add("f");
+        genders.add("m");
     }
 
     public static ArrayList<String> getYears() {

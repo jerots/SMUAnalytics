@@ -10,6 +10,8 @@ import entity.User;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -167,7 +169,8 @@ public class BasicAppController {
         ArrayList<String> years = Utility.getYears();
         ArrayList<String> genders = Utility.getGenders();
         ArrayList<String> ccas = userDAO.getCCAs();
-
+        Collections.sort(ccas);
+                
         ArrayList<String> demo1List = new ArrayList<String>();
         ArrayList<String> demo2List = new ArrayList<String>();
         ArrayList<String> demo3List = new ArrayList<String>();
