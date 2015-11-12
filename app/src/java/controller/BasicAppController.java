@@ -163,9 +163,9 @@ public class BasicAppController {
 
         Breakdown result = new Breakdown();
 
-        ArrayList<String> schools = userDAO.getSchools();
-        ArrayList<String> years = userDAO.getYears();
-        ArrayList<String> genders = userDAO.getGenders();
+        ArrayList<String> schools = Utility.retrieveSchools();
+        ArrayList<String> years = Utility.getYears();
+        ArrayList<String> genders = Utility.getGenders();
         ArrayList<String> ccas = userDAO.getCCAs();
 
         ArrayList<String> demo1List = new ArrayList<String>();

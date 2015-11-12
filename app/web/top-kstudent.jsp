@@ -1,4 +1,5 @@
 
+<%@page import="java.util.TreeMap"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.HashMap"%>
@@ -152,7 +153,7 @@
                                                         HashMap<String, String> other = values.get(j);
                                                         if(Utility.parseInt(other.get("rank")) == rank){
                                                             names += ", " + other.get("name");
-                                                            macAdd += ", " + other.get("app-name");
+                                                            macAdd += ", " + other.get("mac-address");
                                                             i++;
                                                         }else{
                                                             break;

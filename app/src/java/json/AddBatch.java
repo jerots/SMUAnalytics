@@ -39,8 +39,7 @@ public class AddBatch extends HttpServlet {
             String token = request.getParameter("token");
             Part filePart = null;
             try {
-                filePart = request.getPart("addbatch-file");
-
+                filePart = request.getPart("bootstrap-file");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,6 +71,11 @@ public class AddBatch extends HttpServlet {
                 //IF bootstrap-file field not found
                 if (filePart == null && filePart.getSize() < 0) {
                     errors.add("missing file");
+                }else{
+                    String name = filePart.getName();
+                    if(!name.endsWith(".zip")){
+                        errors.add("invalid file");
+                    }
                 }
 
                 //If not zip file
@@ -89,16 +93,15 @@ public class AddBatch extends HttpServlet {
                 TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
-                TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
 
                 TreeMap<String, Integer> recordMap = null;
 
                 try {
                     AddBatchController ctrl = new AddBatchController();
-                    recordMap = ctrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
+                    recordMap = ctrl.addBatch(filePart, userErrMap, auErrMap, luErrMap);
                     //Returns success as the head of the JSON if it is a success.
                     boolean success = false;
-                    if (userErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty() && delErrMap.isEmpty()) {
+                    if (userErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty()) {
                         success = true;
                         output.addProperty("status", "success");
                     } else {
@@ -111,10 +114,16 @@ public class AddBatch extends HttpServlet {
                     JsonObject list = new JsonObject();
                     while (iter.hasNext()) {
                         String fileName = iter.next();
-                        list.addProperty(fileName, recordMap.get(fileName));
+                        if(recordMap.get(fileName) >= 0){
+                            list.addProperty(fileName, recordMap.get(fileName));
+                        }
                     }
                     arr.add(list);
                     output.add("num-record-uploaded", arr);
+                    if(recordMap.get("location-delete.csv") >= 0){
+                        output.addProperty("num-record-deleted", recordMap.get("location-delete.csv"));
+                        output.addProperty("num-record-not-found", recordMap.get("deletenotfound"));
+                    }
                     if (!success) { //This only occurs when there is an error in the upload
                         if(userErrMap != null && userErrMap.size() != 0 ){
                             //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
@@ -139,7 +148,6 @@ public class AddBatch extends HttpServlet {
                         }
                         
                         if(auErrMap != null && auErrMap.size() != 0){
-                            System.out.println("haha");
                             //Iterates through to find the unique row numbers that are affected. This is for App-lookup.csv/AppUsageDAO
                             Iterator<Integer> iterInt = auErrMap.keySet().iterator();
                             arr = new JsonArray();
@@ -161,7 +169,6 @@ public class AddBatch extends HttpServlet {
                             }
                         }
                         if(luErrMap != null && luErrMap.size() != 0){
-                            System.out.println("hoho");
                             //Iterates through to find the unique row numbers that are affected. This is for LocationUsageDAO/location.csv
                             Iterator<Integer> iterInt = luErrMap.keySet().iterator();
                             arr = new JsonArray();
@@ -182,28 +189,6 @@ public class AddBatch extends HttpServlet {
                                 list = new JsonObject();
                             }
                             
-                        }
-                        
-                        if(delErrMap != null && delErrMap.size() != 0){
-                            //Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
-                            Iterator<Integer> iterInt = delErrMap.keySet().iterator();
-                            arr = new JsonArray();
-                            list = new JsonObject();
-                            errors = new JsonArray();
-                            //Goes through the list to split all the error messages into a jsonarray
-                            while (iterInt.hasNext()) {
-                                int id = iterInt.next();
-                                list.addProperty("file", "location-delete.csv");
-                                list.addProperty("line", id);
-                                String[] messages = delErrMap.get(id).split(",");
-                                for (String msg : messages) {
-                                    errors.add(msg);
-                                }
-                                list.add("message", errors);
-                                errors = new JsonArray();
-                                arr.add(list);
-                                list = new JsonObject();
-                            }
                         }
                         
                         output.add("error", arr);

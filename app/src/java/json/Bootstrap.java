@@ -58,7 +58,6 @@ public class Bootstrap extends HttpServlet {
 			Part filePart = null;
 			try {
 				filePart = request.getPart("bootstrap-file");
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -88,9 +87,14 @@ public class Bootstrap extends HttpServlet {
 				}
 
 				//IF bootstrap-file field not found
-				if (filePart == null && filePart.getSize() < 0) {
+				if (filePart == null || filePart.getSize() < 0) {
 					errors.add("missing file");
-				}
+				}else{
+                                    String name = filePart.getName();
+                                    if(!name.endsWith(".zip")){
+                                        errors.add("invalid file");
+                                    }
+                                }
 
 				//If not zip file
 			}
@@ -110,15 +114,14 @@ public class Bootstrap extends HttpServlet {
 			TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
 			TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
 			TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
-			TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
 
 			TreeMap<String, Integer> recordMap = null;
 
 			BootstrapController ctrl = new BootstrapController();
-			recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
+			recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap);
 			//Returns success as the head of the JSON if it is a success.
 			boolean success = false;
-			if (userErrMap.isEmpty() && appErrMap.isEmpty() && locErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty() && delErrMap.isEmpty()) {
+			if (userErrMap.isEmpty() && appErrMap.isEmpty() && locErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty()) {
 				success = true;
 				output.addProperty("status", "success");
 			} else {
@@ -141,8 +144,13 @@ public class Bootstrap extends HttpServlet {
 				}
 
 			}
-			output.add("num-record-uploaded", updatedArr);
-
+			output.add("num-record-loaded", updatedArr);
+                        
+                        if(recordMap.get("location-delete.csv") >= 0){
+                            output.addProperty("num-record-deleted", recordMap.get("location-delete.csv"));
+                            output.addProperty("num-record-not-found", recordMap.get("deletenotfound"));
+                        }
+                        
 			//PRINTING OF ERRORS
 			if (!success) { //This only occurs when there is an error
 				//Iterates through to find the unique row numbers that are affected. This is for AppDAO or app-lookup.csv
@@ -230,20 +238,7 @@ public class Bootstrap extends HttpServlet {
 				}
 //
 //				//Iterates through to find the unique row numbers that are affected. This is for UserDAO/demographics.csv
-				iterInt = delErrMap.keySet().iterator();
-				while (iterInt.hasNext()) {
-					JsonObject errorObj = new JsonObject();
-					JsonArray msgArr = new JsonArray();
-					int id = iterInt.next();
-					errorObj.addProperty("file", "location-delete.csv");
-					errorObj.addProperty("line", id);
-					String[] messages = delErrMap.get(id).split(",");
-					for (String msg : messages) {
-						msgArr.add(msg);
-					}
-					errorObj.add("message", msgArr);
-					errorArr.add(errorObj);
-				}
+				
 
 				output.add("error", errorArr);
 			}

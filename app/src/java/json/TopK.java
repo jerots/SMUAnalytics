@@ -19,8 +19,6 @@ import is203.JWTException;
 import is203.JWTUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -106,15 +104,14 @@ public class TopK extends HttpServlet {
 			} else if (startdate.length() == 0) {
 				errors.add("blank startdate");
 			} else {
-				startdate = startdate.trim();
-				if (startdate.length() != 10) {
-					errors.add("invalid startdate");
-				} else {
-					dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
-					if (dateFormattedStart == null) {
-						errors.add("invalid startdate");
-					}
-				}
+                            if (startdate.length() != 10) {
+                                    errors.add("invalid startdate");
+                            } else {
+                                dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
+                                if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
+                                    errors.add("invalid startdate");
+                                }
+                            }
 			}
 
 			//END DATE VALIDATION
@@ -124,15 +121,14 @@ public class TopK extends HttpServlet {
 			} else if (enddate.length() == 0) {
 				errors.add("blank enddate");
 			} else {
-				enddate = enddate.trim();
-				if (enddate.length() != 10) {
-					errors.add("invalid enddate");
-				} else {
-					dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
-					if (dateFormattedEnd == null) {
-						errors.add("invalid enddate");
-					}
-				}
+                            if (enddate.length() != 10) {
+                                    errors.add("invalid enddate");
+                            } else {
+                                dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
+                                if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
+                                    errors.add("invalid enddate");
+                                }
+                            }
 			}
 			if (dateFormattedStart != null && dateFormattedEnd != null && dateFormattedStart.after(dateFormattedEnd)) {
 				errors.add("invalid startdate");
@@ -148,7 +144,6 @@ public class TopK extends HttpServlet {
 				selected = selected.toLowerCase().trim();
 				if (!Utility.checkSchools(selected)) {
 					errors.add("invalid school");
-
 				}
 			}
 

@@ -18,44 +18,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 public class UserDAO {
-
-    private ArrayList<String> schools;
-    private ArrayList<String> years;
-    private ArrayList<String> genders;
-
-    public UserDAO() {
-        schools = new ArrayList<String>();
-        schools.add("business");
-        schools.add("accountancy");
-        schools.add("sis");
-        schools.add("economics");
-        schools.add("law");
-        schools.add("socsc");
-
-        years = new ArrayList<String>();
-        years.add("2011");
-        years.add("2012");
-        years.add("2013");
-        years.add("2014");
-        years.add("2015");
-
-        genders = new ArrayList<String>();
-        genders.add("m");
-        genders.add("f");
-    }
-
-    public ArrayList<String> getSchools() {
-        return schools;
-    }
-
-    public ArrayList<String> getYears() {
-        return years;
-    }
-
-    public ArrayList<String> getGenders() {
-        return genders;
-    }
-
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
     public int[] insert(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String, String> macList) throws IOException {
         int[] updateCounts = {};

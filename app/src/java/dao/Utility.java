@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  *
@@ -20,14 +21,18 @@ public final class Utility {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static ArrayList<String> schoolList;
     private static ArrayList<String> categories;
+    private static ArrayList<String> years;
+    private static ArrayList<String> genders;
 
     static {
         loadSchools();
         loadCategories();
+        loadYears();
+        loadGenders();
     }
 
     public static Date parseDate(String date) {
-        
+        date = parseString(date);
         if (date != null && date.length() > 0) {
             try {
                 return df.parse(date);
@@ -48,7 +53,7 @@ public final class Utility {
     }
 
     public static Date parseOnlyDate(String date) {
-        
+        date = parseString(date);
         if (date != null && date.length() > 0) {
             try {
                 return sdf.parse(date);
@@ -149,11 +154,11 @@ public final class Utility {
         return categories;
     }
 
-    public static ArrayList<String> compareSchools(ArrayList<String> schools) {
-        ArrayList<String> missing = new ArrayList<>();
+    public static HashMap<String,Long> compareSchools(HashMap<String,Long> schools) {
+        HashMap<String,Long> missing = new HashMap<>();
         for (String s : schoolList) {
-            if (!schools.contains(s)) {
-                missing.add(s);
+            if (!schools.containsKey(s)) {
+                schools.put(s, (long) 0);
             }
         }
         return missing;
@@ -218,6 +223,29 @@ public final class Utility {
         categories.add("fitness");
         categories.add("games");
         categories.add("others");
+    }
+    
+    public static void loadYears(){
+        years = new ArrayList<String>();
+        years.add("2011");
+        years.add("2012");
+        years.add("2013");
+        years.add("2014");
+        years.add("2015");
+    }
+    
+    public static void loadGenders(){
+        genders = new ArrayList<String>();
+        genders.add("m");
+        genders.add("f");
+    }
+
+    public static ArrayList<String> getYears() {
+        return years;
+    }
+
+    public static ArrayList<String> getGenders() {
+        return genders;
     }
 
 }

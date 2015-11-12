@@ -4,8 +4,8 @@ import dao.AppUsageDAO;
 import dao.Utility;
 import entity.App;
 import entity.AppUsage;
+import entity.UserComparator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class TopkReportController {
         ArrayList<AppUsage> aList = auDAO.getAppsBySchool(school, strDate, endDate);
         Iterator<AppUsage> iter = aList.iterator();
         //Ordered by appId.
-        HashMap<App, Long> storage = new HashMap<>();
+        TreeMap<App, Long> storage = new TreeMap<>();
 
         /* initialisation of computation data */
         /*preset time*/
@@ -234,6 +234,7 @@ public class TopkReportController {
             }
             userTime.put(macAdd, userTotal);
         }
+        
         //ArrayList to store the variables and return
         ArrayList<HashMap<String, String>> returnList = new ArrayList<>();
         HashMap<String, String> kDetails = new HashMap<>();
@@ -258,12 +259,12 @@ public class TopkReportController {
             }
             kFound = (returnList.size() + 1);
         }
+        Collections.sort(returnList, new UserComparator());
         if (returnList.size() < topK) {
             errors += "not enough data";
         } else if (returnList.isEmpty()) {
             errors += "there is no data";
         }
-        System.out.println(returnList.size());
         return returnList;
     }
 
@@ -394,7 +395,6 @@ public class TopkReportController {
         } else if (returnList.isEmpty()) {
             errors += "there is no data";
         }
-        System.out.println(returnList.size());
         return returnList;
     }
 }

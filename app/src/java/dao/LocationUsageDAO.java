@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package dao;
 
 import com.csvreader.CsvReader;
@@ -13,8 +18,13 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeMap;
 
+/**
+ *
+ * @author ASUS-PC
+ */
 public class LocationUsageDAO {
 
     private TreeMap<String, LocationUsage> locationList;
@@ -88,6 +98,10 @@ public class LocationUsageDAO {
                     errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
+//			if (index % 10000 == 0){
+//				stmt.executeBatch();
+//			}
+
             }
             //insert into tables
 
@@ -169,8 +183,8 @@ public class LocationUsageDAO {
 
             //CHECK FOR DUPLICATES IN DATABASE
             ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>(locationList.values());
-
-            try {
+            
+            try{
                 for (LocationUsage loc : locList) {
                     stmt.setString(1, loc.getTimestamp());
                     stmt.setString(2, loc.getMacAddress());
@@ -181,12 +195,9 @@ public class LocationUsageDAO {
                 for (int i : updatedArr) {
                     updateCounts += i;
                 }
-                conn.commit();
-
                 //CATCH WHEN THERE IS DUPLICATE
             } catch (BatchUpdateException e) {
                 int[] updatedArr = e.getUpdateCounts();
-
                 for (int i = 0; i < updatedArr.length; i++) {
                     if (updatedArr[i] == Statement.EXECUTE_FAILED) {
                         // This method retrieves the row fail, and then searches the locationid corresponding and then uses the duplicate TreeMap to find the offending row.
@@ -203,66 +214,51 @@ public class LocationUsageDAO {
                         errMap.put(row, errorMsg);
                     }
                     if (updatedArr[i] >= 0) {
-
                         updateCounts += updatedArr[i];
                     }
                 }
             }
+            conn.commit();
             reader.close();
             stmt.close();
         } catch (SQLException e) {
-
+            
         }
         return updateCounts;
     }
 
-    public int[] delete(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
+    public int[] delete(CsvReader reader, Connection conn) throws IOException {
         int[] toReturn = new int[2];
-        int index = 2; //counts the row of the record.
         int notFound = 0;
         int found = 0;
+        int[] updateCounts = {};
         try {
             String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(sql);    
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                String errorMsg = "";
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null || !Utility.checkDate(date)) {
-                    errorMsg += ",invalid timestamp";
-                }
-
-                //check macAdd
                 String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    errorMsg += ",blank mac-address";
-                }else if(!Utility.checkHexadecimal(macAdd)) {
-                    errorMsg += ",invalid mac address";
-                } else {
-                    macAdd = macAdd.toLowerCase();
-                }
-                if (errorMsg.length() == 0) {
-                    found++;
+                if (date != null && Utility.checkDate(date) && macAdd != null && Utility.checkHexadecimal(macAdd)) {
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
                     stmt.addBatch();
-                }else{
-                    errMap.put(index, errorMsg.substring(1));
                 }
                 if (stmt != null) {
-                    int[] updateCounts = stmt.executeBatch();
+                    updateCounts = stmt.executeBatch();
                     conn.commit();
                     for (int i : updateCounts) {
-                        if (i == 0) {
+                        if (!(i > 0)) { //Can be 0 or anything else
                             notFound++;
+                        }else{
+                            found += i;
                         }
                     }
                 }
-                index++;
             }
-
+            conn.commit();
             reader.close();
             ConnectionManager.close(conn, stmt);
 
@@ -271,7 +267,7 @@ public class LocationUsageDAO {
         } catch (SQLException e) {
 
         }
-        toReturn[0] = found - notFound; //Valid Records which have successfully deleted rows in the database
+        toReturn[0] = found; //Valid Records which have successfully deleted rows in the database
         toReturn[1] = notFound; //Valid Records which are succesful but have not deleted rows in the database
         return toReturn;
     }
@@ -426,9 +422,8 @@ public class LocationUsageDAO {
                     + "    where au.macaddress = lu.macaddress\n"
                     + "    and lu.locationid = l.locationid \n"
                     + "    and semanticplace like ?\n"
-                    + "    AND lu.timestamp >= ? and lu.timestamp < ?\n"
-                    + "    and au.timestamp >= ? and au.timestamp < ?\n"
-                    + "    group by lu.macaddress \n"
+                    + "    AND lu.timestamp >= ? and lu.timestamp <= ?\n"
+                    + "    and au.timestamp >= ? and au.timestamp <= ?\n"
                     + "    order by lu.macaddress, lu.timestamp;";
 
             conn = ConnectionManager.getConnection();

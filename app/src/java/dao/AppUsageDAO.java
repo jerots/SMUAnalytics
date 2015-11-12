@@ -26,7 +26,6 @@ public class AppUsageDAO {
     }
 
     public int insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException {
-        int[] updatedRecords = {};
         try {
             int index = 2;
             String sql = "insert into appusage (timestamp, macaddress, appid) values(STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s'),?,?) ON DUPLICATE KEY UPDATE appid "
@@ -40,9 +39,7 @@ public class AppUsageDAO {
                 //check timestamp
                 String date = Utility.parseString(reader.get("timestamp"));
                 if (date == null) {
-
                     errorMsg += ",blank timestamp";
-
                 }else{
                     if(!Utility.checkDate(date)){
                         errorMsg += ",invalid timestamp";
@@ -111,7 +108,6 @@ public class AppUsageDAO {
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
-                boolean err = false;
                 String errorMsg = "";
 
                 //check timestamp
@@ -189,8 +185,6 @@ public class AppUsageDAO {
                     }
                 }
 
-                conn.commit();
-
             } catch (BatchUpdateException e) {
                 int[] updateArr = e.getUpdateCounts();
                 for (int i = 0; i < updateArr.length; i++) {
@@ -214,10 +208,9 @@ public class AppUsageDAO {
                     }
                 }
             }
-
+            conn.commit();
             reader.close();
             stmt.close();
-
         } catch (NullPointerException e) {
 //            e.printStackTrace();
         }

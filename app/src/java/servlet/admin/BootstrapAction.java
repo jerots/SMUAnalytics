@@ -32,55 +32,35 @@ public class BootstrapAction extends HttpServlet {
         String option = request.getParameter("option");
         Part filePart = request.getPart("zipFile");
 		long timeBefore = System.currentTimeMillis();
-        if(option.equals("bootstrap")){
-            
+        //Create ERROR MAPS - and pass to boostrapController/addbatchcontroller to generate
+        TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
+        TreeMap<Integer, String> appErrMap = new TreeMap<Integer, String>();
+        TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
+        TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
+        TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+        //SET FOR UI TO GET THE ATTRIBUTES.
+        request.setAttribute("userErrMap", userErrMap);
+        request.setAttribute("appErrMap", appErrMap);
+        request.setAttribute("locErrMap", locErrMap);
+        request.setAttribute("auErrMap", auErrMap);
+        request.setAttribute("luErrMap", luErrMap);
+        if(option.equals("bootstrap")){    
             //BOOTSTRAP
-
-             // Retrieves <input type="file" name="zipFile">
-                if (filePart != null && filePart.getSize() > 0) {
-
-                    //Create ERROR MAPS - and pass to boostrapController to generate
-                    TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> appErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
-
-                    //SET FOR UI TO GET THE ATTRIBUTES.
-                    request.setAttribute("userErrMap", userErrMap);
-                    request.setAttribute("appErrMap", appErrMap);
-                    request.setAttribute("locErrMap", locErrMap);
-                    request.setAttribute("auErrMap", auErrMap);
-                    request.setAttribute("luErrMap", luErrMap);
-                    request.setAttribute("delErrMap", delErrMap);
-
-                    BootstrapController ctrl = new BootstrapController();
-
-                    recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delErrMap);
-                }
+            // Retrieves <input type="file" name="zipFile">
+            if (filePart != null && filePart.getSize() > 0) {
+                BootstrapController ctrl = new BootstrapController();
+                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap);
+            }
 
         } else {
-            
             //ADD BATCH
             try {
                 if(filePart != null && filePart.getSize() > 0){
-				     TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
-                    TreeMap<Integer, String> delErrMap = new TreeMap<Integer, String>();
-
-                    request.setAttribute("userErrMap", userErrMap);
-                    request.setAttribute("auErrMap", auErrMap);
-                    request.setAttribute("luErrMap", luErrMap);
-                    request.setAttribute("delErrMap", delErrMap);
-
                     AddBatchController cntrl = new AddBatchController();
-                    recordMap = cntrl.addBatch(filePart, userErrMap, delErrMap, auErrMap, luErrMap);
+                    recordMap = cntrl.addBatch(filePart, userErrMap, auErrMap, luErrMap);
                 }
 
             }catch (Exception e) {
-                System.out.println("Exception Caught in bootstrap action.java");
                 e.printStackTrace();
             }
         }
@@ -91,6 +71,8 @@ public class BootstrapAction extends HttpServlet {
 		
 		request.setAttribute("timeTaken", "" + timeTaken);
         request.setAttribute("recordMap", recordMap);
+        request.setAttribute("option", option);
+        request.setAttribute("printer", "print");
         RequestDispatcher rd = request.getRequestDispatcher("admin");
         rd.forward(request, response);
         

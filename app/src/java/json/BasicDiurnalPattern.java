@@ -95,7 +95,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 
 			//YEAR FILTER VALIDATION
 			UserDAO userDAO = new UserDAO();
-			ArrayList<String> years = userDAO.getYears();
+			ArrayList<String> years = Utility.getYears();
 			if (yearFilter == null) {
 				errors.add("missing yearfilter");
 			} else if (yearFilter.length() == 0) {
@@ -108,7 +108,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			}
 
 			//GENDER FILTER VALIDATION
-			ArrayList<String> genders = userDAO.getGenders();
+			ArrayList<String> genders = Utility.getGenders();
 			if (genderFilter == null) {
 				errors.add("missing genderfilter");
 			} else if (genderFilter.length() == 0) {
@@ -121,7 +121,7 @@ public class BasicDiurnalPattern extends HttpServlet {
 			}
 
 			//SCHOOL FILTER VALIDATION
-			ArrayList<String> schools = userDAO.getSchools();
+			ArrayList<String> schools = Utility.retrieveSchools();
 			if (schoolFilter == null) {
 				errors.add("missing schoolfilter");
 			} else if (schoolFilter.length() == 0) {
