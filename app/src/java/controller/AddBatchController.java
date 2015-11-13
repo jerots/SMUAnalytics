@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -39,11 +40,12 @@ public class AddBatchController {
      * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
      * @param auErrMap The map that contains error messages and its corresponding row from app.csv
      * @param luErrMap The map that contains error messages and its corresponding row from location.csv
+     * @param delMap The map that contains uploaded successful row and non successful rows from location-delete.csv
      * @return A treemap objects that belongs contains the
      * records successfully updated for each csv file in the input Zipped File
      */
     public TreeMap<String, Integer> addBatch(Part filePart, TreeMap<Integer, String> userErrMap,
-            TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap) throws SQLException, IOException {
+            TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, HashMap<String, Integer> delMap) throws SQLException, IOException {
         Connection conn = ConnectionManager.getConnection();
         conn.setAutoCommit(false);
         InputStream fileContent = filePart.getInputStream();
@@ -142,8 +144,8 @@ public class AddBatchController {
         result.put("demographics.csv", userUpdated);
         result.put("app.csv", auUpdated);
         result.put("location.csv", luUpdated);
-        result.put("location-delete.csv", delUpdated);
-        result.put("deletenotfound", notFound);
+        delMap.put("location-delete.csv", delUpdated);
+        delMap.put("deletenotfound", notFound);
         return result;
     }
 }

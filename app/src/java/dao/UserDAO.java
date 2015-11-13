@@ -25,63 +25,88 @@ public class UserDAO {
             String sql = "insert into user values(?,?,?,?,?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
+            String[] headers = reader.getHeaders();
             int index = 2;
             while (reader.readRecord()) {
                 //retrieving per row
-
                 String errorMsg = "";
-                String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    errorMsg += ",blank mac-address";
-                } else {
-                    macAdd = macAdd.toLowerCase();
-                    if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac address";
+                
+                //Sets Values
+                String macAdd = null;
+                String name = null;
+                String password = null;
+                String email = null;
+                String g = null;
+                String cca = null;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "mac-address":
+                            macAdd = Utility.parseString(reader.get("mac-address"));
+                            if (macAdd == null) {
+                                errorMsg += ",blank mac-address";
+                            } else {
+                                macAdd = macAdd.toLowerCase();
+                                if (!Utility.checkHexadecimal(macAdd)) {
+                                    errorMsg += ",invalid mac address";
+                                }
+                            }
+                            break;
+                            
+                        case "name":
+                            name = Utility.parseString(reader.get("name"));
+                            if (name == null) {
+                                errorMsg += ",blank name";
+                            }
+                            break;
+                            
+                        case "password":
+                            password = Utility.parseString(reader.get("password"));
+                            if (password == null) {
+                                errorMsg += ",blank password";
+                            } else {
+                                if (!Utility.checkPassword(password)) {
+                                    errorMsg += ",invalid password";
+                                }
+                            }
+                            break;
+                            
+                        case "email":
+                            email = Utility.parseString(reader.get("email"));
+                            if (email == null) {
+                                errorMsg += ",blank email";
+                            } else {
+                                email = email.toLowerCase();
+                                if (!Utility.checkEmail(email)) {
+                                    errorMsg += ",invalid email";
+                                }
+                            }
+                            break;
+                            
+                        case "gender":
+                            g = Utility.parseString(reader.get("gender"));
+                            if (g == null) {
+                                errorMsg += ",blank gender";
+                            } else {
+                                g = g.toLowerCase();
+                                if (!g.equals("f") && !g.equals("m")) {
+                                    errorMsg += ",invalid gender";
+                                }
+                            }
+                            break;
+                        
+                        case "cca":
+                            cca = Utility.parseString(reader.get("cca"));
+                            if (cca == null) {
+                                errorMsg += ",blank cca";
+                            } else if (cca.length() > 63) {
+                                errorMsg += ",cca record too long";
+                            } else {
+                                cca = cca.toLowerCase();
+                            }
+                            break;
+                        
                     }
-                }
-
-                String name = Utility.parseString(reader.get("name"));
-
-                if (name == null) {
-                    errorMsg += ",blank name";
-                }
-
-                String password = Utility.parseString(reader.get("password"));
-                if (password == null) {
-                    errorMsg += ",blank password";
-                } else {
-                    if (!Utility.checkPassword(password)) {
-                        errorMsg += ",invalid password";
-                    }
-                }
-
-                String email = Utility.parseString(reader.get("email"));
-                if (email == null) {
-                    errorMsg += ",blank email";
-                } else {
-                    email = email.toLowerCase();
-                    if (!Utility.checkEmail(email)) {
-                        errorMsg += ",invalid email";
-                    }
-                }
-
-                String g = Utility.parseString(reader.get("gender"));
-                if (g == null) {
-                    errorMsg += ",blank gender";
-                } else {
-                    g = g.toLowerCase();
-                    if (!g.equals("f") && !g.equals("m")) {
-                        errorMsg += ",invalid gender";
-                    }
-                }
-
-                String cca = Utility.parseString(reader.get("cca"));
-                if (cca == null) {
-                    errorMsg += ",blank cca";
-                } else if (cca.length() > 63) {
-                    errorMsg += ",cca record too long";
-                } else {
-                    cca = cca.toLowerCase();
                 }
 
                 if (errorMsg.length() == 0) {
@@ -116,64 +141,87 @@ public class UserDAO {
             String sql = "insert into user values(?,?,?,?,?,?);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
-
+            String[] headers = reader.getHeaders();
             int index = 2;
             while (reader.readRecord()) {
                 //retrieving per row
-
                 String errorMsg = "";
-                String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    errorMsg += ",blank mac-address";
-                } else {
-                    macAdd = macAdd.toLowerCase();
-                    if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac-address";
+                
+                //Sets Values
+                String macAdd = null;
+                String name = null;
+                String password = null;
+                String email = null;
+                String g = null;
+                String cca = null;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "mac-address":
+                            macAdd = Utility.parseString(reader.get("mac-address"));
+                            if (macAdd == null) {
+                                errorMsg += ",blank mac-address";
+                            } else {
+                                macAdd = macAdd.toLowerCase();
+                                if (!Utility.checkHexadecimal(macAdd)) {
+                                    errorMsg += ",invalid mac address";
+                                }
+                            }
+                            break;
+                            
+                        case "name":
+                            name = Utility.parseString(reader.get("name"));
+                            if (name == null) {
+                                errorMsg += ",blank name";
+                            }
+                            break;
+                        
+                        case "password":
+                            password = Utility.parseString(reader.get("password"));
+                            if (password == null) {
+                                errorMsg += ",blank password";
+                            } else {
+                                if (!Utility.checkPassword(password)) {
+                                    errorMsg += ",invalid password";
+                                }
+                            }
+                            break;
+                            
+                        case "email":
+                            email = Utility.parseString(reader.get("email"));
+                            if (email == null) {
+                                errorMsg += ",blank email";
+                            } else {
+                                email = email.toLowerCase();
+                                if (!Utility.checkEmail(email)) {
+                                    errorMsg += ",invalid email";
+                                }
+                            }
+                            break;
+                            
+                        case "gender":
+                            g = Utility.parseString(reader.get("gender"));
+                            if (g == null) {
+                                errorMsg += ",blank gender";
+                            } else {
+                                 g = g.toLowerCase();
+                                if (!g.equals("f") && !g.equals("m")) {
+                                    errorMsg += ",invalid gender";
+                                }
+                            }
+                            break;
+                        
+                        case "cca":
+                            cca = Utility.parseString(reader.get("cca"));
+                            if (cca == null) {
+                                errorMsg += ",blank cca";
+                            } else if (cca.length() > 63) {
+                                errorMsg += ",cca record too long";
+                            } else {
+                                cca = cca.toLowerCase();
+                            }
+                            break;
                     }
-                }
-
-                String name = Utility.parseString(reader.get("name"));
-
-                if (name == null) {
-                    errorMsg += ",blank name";
-                }
-
-                String password = Utility.parseString(reader.get("password"));
-                if (password == null) {
-                    errorMsg += ",blank password";
-                } else {
-                    if (!Utility.checkPassword(password)) {
-                        errorMsg += ",invalid password";
-                    }
-                }
-
-                String email = Utility.parseString(reader.get("email"));
-                if (email == null) {
-                    errorMsg += ",blank email";
-                } else {
-                    email = email.toLowerCase();
-                    if (!Utility.checkEmail(email)) {
-                        errorMsg += ",invalid email";
-                    }
-                }
-
-                String g = Utility.parseString(reader.get("gender"));
-                if (g == null) {
-                    errorMsg += ",blank gender";
-                } else {
-                     g = g.toLowerCase();
-                    if (!g.equals("f") && !g.equals("m")) {
-                        errorMsg += ",invalid gender";
-                    }
-                }
-
-                String cca = Utility.parseString(reader.get("cca"));
-                if (cca == null) {
-                    errorMsg += ",blank cca";
-                } else if (cca.length() > 63) {
-                    errorMsg += ",cca record too long";
-                } else {
-                    cca = cca.toLowerCase();
                 }
 
                 if (errorMsg.length() == 0) {
