@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package servlet.student;
 
 import controller.SocialActivenessController;
@@ -10,7 +5,6 @@ import dao.Utility;
 import entity.Breakdown;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,10 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Boyofthefuture
- */
 @WebServlet(name = "SocialActivenessAction", urlPatterns = {"/SocialActivenessAction"})
 public class SocialActivenessAction extends HttpServlet {
 
@@ -43,9 +33,8 @@ public class SocialActivenessAction extends HttpServlet {
             String macAdd = request.getParameter("macadd");
             //This Error means NOTHING ELSE is printed
             String errors = "";
+            
             //Checks Date
-            //Places this outside to compare dates later
-            Date dateFormatted = null;
             if(date == null){
                 errors += ",missing date";
             }else if (date.length() == 0) {
@@ -54,17 +43,12 @@ public class SocialActivenessAction extends HttpServlet {
                 if(date.length() != 10){
                     errors += ",invalid date";
                 }else{
-                    dateFormatted = Utility.parseOnlyDate(date);
-                    if (dateFormatted == null) {
+                    date = Utility.parseString(date);
+                    if (date == null || !Utility.checkOnlyDate(date)) {
                         errors += ",invalid date";
-                    }else{
-                        date = Utility.formatOnlyDate(dateFormatted);
-                        if(date == null){
-                            errors += ",invalid date";
-                        }
                     }
                 }
-            }
+            }        
             //check macAdd
             if (macAdd == null) {
                 errors += ",missing mac-address";
@@ -77,7 +61,7 @@ public class SocialActivenessAction extends HttpServlet {
             HashMap<String, Breakdown> resultsMap = null;
             if(errors.length() == 0){
                 SocialActivenessController cntrl = new SocialActivenessController();
-                resultsMap = cntrl.generateAwarenessReport(date, macAdd, errors);
+                resultsMap = cntrl.generateAwarenessReport(date, macAdd);
             }else{
                 errors = errors.substring(1);
             }

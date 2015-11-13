@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
 
 /**
@@ -13,28 +8,47 @@ package entity;
  * Activeness represents a user's social activeness in a location between a time
  * interval
  */
+import java.util.ArrayList;
+import java.util.Date;
+
 public class Activeness implements Comparable<Activeness> {
 
     //Why long? because long will make it very quick to calculate differences, and will help with the controller.
     //Activeness streamlines the problem of Social Activeness by just storing both start and end
     private long startTime;
     private long endTime;
-    private String macAddress;
     private Location location;
+    private App app;
 
     /**
-     * Creates a Activeness object with startTime, endTime, macAddress, location
+     * Creates a Activeness object with startTime, endTime, location
      *
      * @param startTime The given start time of interest
      * @param endTime The given end time of interest
-     * @param macAddress The mac address of a User
      * @param location The location object
      */
-    public Activeness(long startTime, long endTime, String macAddress, Location location) {
+    public Activeness(long startTime, long endTime, Location location) {
         this.startTime = startTime;
         this.endTime = endTime;
-        this.macAddress = macAddress;
         this.location = location;
+    }
+
+    /**
+     * Set the app of a social activeness
+     *
+     * @param app The App of a social activeness
+     */
+    public void setApp(App app) {
+        this.app = app;
+    }
+
+    /**
+     * Get the App object of a user's social activeness
+     *
+     * @return the App object
+     */
+    public App getApp() {
+        return app;
     }
 
     /**
@@ -74,15 +88,6 @@ public class Activeness implements Comparable<Activeness> {
     }
 
     /**
-     * Get the mac address of the User of the Social Activeness
-     *
-     * @return the mac address of the User of the Social Activeness
-     */
-    public String getMacAddress() {
-        return macAddress;
-    }
-
-    /**
      * Set the Start Time of the User's Usage in the Social Activeness
      *
      * @param startTime The given start time of interest
@@ -101,45 +106,36 @@ public class Activeness implements Comparable<Activeness> {
     }
 
     /**
-     * Set the mac address of the user in Activeness
-     *
-     * @param macAddress The mac address of a User
-     */
-    public void setMacAddress(String macAddress) {
-        this.macAddress = macAddress;
-    }
-
-    /**
      * Check if two Activeness overlaps
      *
      * @param active The other Activeness object for comparison
      * @return an Activeness object
      */
-    //This method DOES return an overlap if it is less than 5 minutes
     public Activeness overlap(Activeness active) { //Puts the overlap into a new activeness
-        //Checks for location initially as well to make sure that their locations are correct so that they can overlap
-        if (!(active.endTime <= startTime || active.startTime >= endTime) && active.location.equals(location)) {
+             //Checks for location initially as well to make sure that their locations are correct so that they can overlap
+        if(!(active.endTime <= startTime || active.startTime >= endTime) && active.location.equals(location)){
             //If there is an overlap, returns the millisecs that is overlapped
-            if (active.startTime <= startTime) {
+            if(active.startTime <= startTime){
                 long activeEnd = active.endTime;
-                if (activeEnd <= endTime) {
-                    //This means that it is within/end time is after this active's end time
-                    return new Activeness(startTime, activeEnd, active.macAddress, location);
-                } else {
-                    return new Activeness(startTime, endTime, active.macAddress, location);
+                if(activeEnd <= endTime){
+                //This means that it is within/end time is after this active's end time
+                    return new Activeness(startTime, activeEnd, location);
+                }else{
+                    return new Activeness(startTime, endTime, location);
                 }
-            } else {
+            }else{
                 long activeStart = active.startTime;
                 long activeEnd = active.endTime;
-                if (activeEnd <= endTime) {
-                    return new Activeness(activeStart, activeEnd, active.macAddress, location);
-                } else {
-                    return new Activeness(activeStart, endTime, active.macAddress, location);
+                if(activeEnd <= endTime){
+                    return new Activeness(activeStart, activeEnd, location);
+                }else{
+                    return new Activeness(activeStart, endTime, location);
                 }
             }
         }
         return null;
     }
+               
 
     /**
      * Check if two Activeness are continuous
@@ -147,7 +143,8 @@ public class Activeness implements Comparable<Activeness> {
      * @param overlap The other Activeness object for comparison
      * @return true if they are continuous, false otherwise
      */
-    public boolean continuation(Activeness overlap) {
+                         
+     public boolean continuation(Activeness overlap){
         //Purpose of this is to correlate a startdate with an end date to make sure two activeness are CONTINUOUS
         //The item here compared MUST BE THE ENDING ACTIVENESS.
         return endTime == overlap.startTime;
@@ -168,20 +165,21 @@ public class Activeness implements Comparable<Activeness> {
      * @param active The Activeness Object
      * @return Activeness object
      */
-    public Activeness combine(Activeness active) {
+    public Activeness combine(Activeness active){
+        //The purpose of this method is to combine activeness that are overlapping and return a new activeness
         long start = 0;
-        if (active.startTime < startTime) {
+        if(active.startTime < startTime){
             start = active.startTime;
-        } else {
+        }else{
             start = startTime;
         }
         long end = 0;
-        if (active.endTime < endTime) {
+        if(active.endTime < endTime){
             end = endTime;
-        } else {
+        }else{
             end = active.endTime;
         }
-        return new Activeness(start, end, macAddress, location);
+        return new Activeness(start, end, location);
     }
 
     /**
