@@ -13,9 +13,23 @@ import java.util.TreeMap;
 
 public class LocationDAO {
 
+    /**
+     * LocationDAO handles interactions between Location and Controllers
+     */
     public LocationDAO() {
     }
 
+    /**
+     * Inserts rows into Location in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @param locationIdList The list of location id that is successfully
+     * uploaded to the database
+     * @return an array of int, any number above 0 is the row is success
+     * updated, otherwise not successfully updated.
+     */
     public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException {
         int[] updateCounts = {};
         try {
@@ -28,25 +42,25 @@ public class LocationDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Sets Values
                 int locationId = -1;
                 String semanticPl = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "location-id":
                             String locId = Utility.parseString(reader.get("location-id"));
-                            if(locId == null){
+                            if (locId == null) {
                                 errorMsg += ",blank location-id";
-                            }else{
+                            } else {
                                 locationId = Utility.parseInt(locId);
                                 if (locationId <= 0) {
                                     errorMsg += ",invalid location id";
                                 }
                             }
                             break;
-                        
+
                         case "semantic-place":
                             semanticPl = Utility.parseString(reader.get("semantic-place"));
                             if (semanticPl == null) {
@@ -70,7 +84,7 @@ public class LocationDAO {
                     stmt.setInt(1, locationId);
                     stmt.setString(2, semanticPl);
                     stmt.addBatch();
-                }else{
+                } else {
                     errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
@@ -86,6 +100,12 @@ public class LocationDAO {
         return updateCounts;
     }
 
+    /**
+     * Retrieve a list of semantic place given the floor of the location
+     *
+     * @param floor The floor of the location
+     * @return an arraylist of semantic place
+     */
     public ArrayList<String> retrieve(String floor) {
 
         ArrayList<String> result = new ArrayList<String>();
@@ -117,6 +137,11 @@ public class LocationDAO {
         return result;
     }
 
+    /**
+     * Retrieve a list of semantic place
+     *
+     * @return an arraylist of semantic place
+     */
     public ArrayList<String> retrieveAll() {
         ArrayList<String> result = new ArrayList<String>();
         Connection conn = null;
@@ -142,6 +167,13 @@ public class LocationDAO {
         return result;
     }
 
+    /**
+     * Retrieve semanticplace given a locationId and connection
+     *
+     * @param conn The connection to the database
+     * @param locationId The unique id that identifies a semantic place
+     * @return The corresponding semantic place
+     */
     public String checkLocationId(Connection conn, int locationId) {
 
         try {
@@ -165,6 +197,12 @@ public class LocationDAO {
         return null;
     }
 
+    /**
+     * Retrieve Location object given a semantic Place
+     *
+     * @param semanticPlace The Semantic Place of interest
+     * @return The Location object
+     */
     public Location retrieveSemPl(String semanticPlace) {
 
         String sql = "SELECT * FROM location WHERE semanticplace=?";

@@ -15,16 +15,34 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * AppUsageDAO handles interactions between AppUsage and Controllers
+ */
 public class AppUsageDAO {
 
     private TreeMap<String, Integer> duplicate;
     private TreeMap<String, AppUsage> appList;
 
+    /* Loads the list of App list and Duplicate list
+     */
     public AppUsageDAO() {
         appList = new TreeMap<>();
         duplicate = new TreeMap<>();
     }
 
+    /**
+     * Inserts rows into AppUsage in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @param macList The list og mac address
+     * @param appIdList The list of app id that is successfully uploaded to the
+     * database
+     * @throws IOException An error found
+     * @return an array of int, anything above 0 is the row is success updated,
+     * otherwise not successfully updated.
+     */
     public int insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<String, String> macList, HashMap<Integer, String> appIdList) throws IOException {
         try {
             int index = 2;
@@ -37,26 +55,26 @@ public class AppUsageDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Values declared
                 String date = null;
                 int appId = -1;
                 String macAdd = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "timestamp":
                             //check timestamp
                             date = Utility.parseString(reader.get("timestamp"));
                             if (date == null) {
                                 errorMsg += ",blank timestamp";
-                            }else{
-                                if(!Utility.checkDate(date)){
+                            } else {
+                                if (!Utility.checkDate(date)) {
                                     errorMsg += ",invalid timestamp";
                                 }
                             }
                             break;
-                        
+
                         case "mac-address":
                             //check macAdd
                             macAdd = Utility.parseString(reader.get("mac-address"));
@@ -75,9 +93,9 @@ public class AppUsageDAO {
                         case "app-id":
                             //check appid
                             String appIdS = Utility.parseString(reader.get("app-id"));
-                            if(appIdS == null){
+                            if (appIdS == null) {
                                 errorMsg += ",blank app-id";
-                            }else{
+                            } else {
                                 appId = Utility.parseInt(appIdS);
                                 if (appId <= 0) {
                                     errorMsg += ",invalid app id";
@@ -94,7 +112,7 @@ public class AppUsageDAO {
                         errMap.put(duplicate.get(date + macAdd), "duplicate row");
                     }
                     duplicate.put(date + macAdd, index);
-                    
+
                     //add to list
                     stmt.setString(1, date);
                     stmt.setString(2, macAdd);
@@ -116,6 +134,15 @@ public class AppUsageDAO {
         return duplicate.size();
     }
 
+    /**
+     * Add rows into AppUsage in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @return number of rows updated
+     * @throws SQLException An error caused by SQL
+     */
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException, SQLException {
         int updateCounts = 0;
         try {
@@ -130,26 +157,26 @@ public class AppUsageDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Declare values
                 String date = null;
                 String macAdd = null;
                 int appId = -1;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "timestamp":
                             //check timestamp
                             date = Utility.parseString(reader.get("timestamp"));
                             if (date == null) {
                                 errorMsg += ",blank timestamp";
-                            }else{
-                                if(!Utility.checkDate(date)){
+                            } else {
+                                if (!Utility.checkDate(date)) {
                                     errorMsg += ",invalid timestamp";
                                 }
                             }
                             break;
-                        
+
                         case "mac-address":
                             //check macAdd
                             macAdd = Utility.parseString(reader.get("mac-address"));
@@ -173,13 +200,13 @@ public class AppUsageDAO {
                                 }
                             }
                             break;
-                        
-                        case "app-id":                            
+
+                        case "app-id":
                             //check appid
                             String appIdS = Utility.parseString(reader.get("app-id"));
-                            if(appIdS == null){
+                            if (appIdS == null) {
                                 errorMsg += ",blank app-id";
-                            }else{
+                            } else {
                                 appId = Utility.parseInt(appIdS);
                                 if (appId <= 0) {
                                     errorMsg += ",invalid app id";
@@ -198,13 +225,13 @@ public class AppUsageDAO {
                     }
                 }
 
-                if (errorMsg.length() == 0 ) {
+                if (errorMsg.length() == 0) {
                     if (duplicate.containsKey(date + macAdd)) {
                         errMap.put(duplicate.get(date + macAdd), "duplicate row");
                     }
                     duplicate.put(date + macAdd, index);
                     appList.put(date + macAdd, new AppUsage(date, macAdd, appId));
-                }else{
+                } else {
                     errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
@@ -220,7 +247,7 @@ public class AppUsageDAO {
                 //closing
                 int[] updatedArr = stmt.executeBatch();
                 for (int i : updatedArr) {
-                    if(i >= 0){
+                    if (i >= 0) {
                         updateCounts += i;
                     }
                 }
@@ -232,12 +259,12 @@ public class AppUsageDAO {
                         // This method retrieves the row fail, and then searches the prikey corresponding and then uses the duplicate TreeMap to find the offending row.
                         int row = duplicate.get(appArray.get(i).getTimestamp() + appArray.get(i).getMacAddress());
                         String errorMsg = "";
-                        if(errMap.containsKey(row)){
+                        if (errMap.containsKey(row)) {
                             errorMsg = errMap.get(row);
                         }
-                        if(errorMsg != null && errorMsg.length() != 0){
+                        if (errorMsg != null && errorMsg.length() != 0) {
                             errorMsg += ",duplicate row";
-                        }else{
+                        } else {
                             errorMsg += "duplicate row";
                         }
                         errMap.put(row, errorMsg);
@@ -257,6 +284,13 @@ public class AppUsageDAO {
         return updateCounts;
     }
 
+    /**
+     * Retrieve users who have appusage between the input startdate and enddate
+     *
+     * @param startDate The startdate of interest
+     * @param endDate The enddate of interest
+     * @return an arraylist of users
+     */
     public ArrayList<User> retrieveUsers(Date startDate, Date endDate) {
 
         ArrayList<User> result = new ArrayList<User>();
@@ -295,6 +329,15 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve users who have appusage between the input startdate and enddate
+     * and the given sql statement
+     *
+     * @param startDate The startdate of interest
+     * @param endDate The enddate of interest
+     * @param sql The sql statement to be executed
+     * @return an arraylist of mac addresses in String
+     */
     public ArrayList<String> retrieveUsers(Date startDate, Date endDate, String sql) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -326,6 +369,15 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve users who have appusage between the input startdate and enddate
+     * and for the specific mac address
+     *
+     * @param macAdd The mac address of a user
+     * @param startDate The startdate of interest
+     * @param endDate The enddate of interest
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> retrieveByUser(String macAdd, Date startDate, Date endDate) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -367,6 +419,15 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve users who have appusage between the input startHour and endHour
+     * and for the specific mac address
+     *
+     * @param macAdd The mac address of a user
+     * @param startHour The starting time in hours of interest
+     * @param endHour The ending time in hours of interest
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> retrieveByUserHourly(String macAdd, Date startHour, Date endHour) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -403,6 +464,14 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve Users who have appusage between the input startHour and endHour
+     *
+     * @param startHour The starting time in hours of interest
+     * @param endHour The ending time in hours of interest
+     * @param demoArr The arraylist containing year,gender and school of User
+     * @return an arraylist of User
+     */
     public ArrayList<User> retrieveUserByDemo(Date startHour, Date endHour, String[] demoArr) {
 
         ArrayList<User> result = new ArrayList<User>();
@@ -466,6 +535,16 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve AppUsage who have appusage between the input startHour and
+     * endHour for a specific macAdd with the specific appCat
+     *
+     * @param startHour The starting time in hours of interest
+     * @param endHour The ending time in hours of interest
+     * @param macAdd The mac address of a user
+     * @param appCat The app category of an app
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> retrieveByAppCat(Date startHour, Date endHour, String macAdd, String appCat) {
 
         ArrayList<AppUsage> result = new ArrayList<AppUsage>();
@@ -507,6 +586,14 @@ public class AppUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve AppUsage by the given school
+     *
+     * @param school The school of interest
+     * @param startDate The start date of interest
+     * @param endDate The end date of interest
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> getAppsBySchool(String school, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
         Connection conn = null;
@@ -548,6 +635,15 @@ public class AppUsageDAO {
         return aList;
     }
 
+    /**
+     * Retrieve AppUsage of a student by the given category
+     *
+     * @param priKMac The hashmap of mac address as the key, and username as the
+     * value
+     * @param startDate The start date of interest
+     * @param endDate The end date of interest
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> getStudentsByCategory(HashMap<String, String> priKMac, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
 
@@ -590,6 +686,15 @@ public class AppUsageDAO {
         return aList;
     }
 
+    /**
+     * Retrieve AppUsage of a school by the given category
+     *
+     * @param priKSch The hashmap of mac address as the key, and username as the
+     * value
+     * @param startDate The start date of interest
+     * @param endDate The end date of interest
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> getSchoolsByCategory(HashMap<String, String> priKSch, Date startDate, Date endDate) {
         ArrayList<AppUsage> aList = new ArrayList<>();
         Connection conn = null;
@@ -639,6 +744,13 @@ public class AppUsageDAO {
         return aList;
     }
 
+    /**
+     * Retrieve AppUsage of a user for the given date
+     *
+     * @param date The date of interest
+     * @param macAdd The macAddress of the user
+     * @return an arraylist of AppUsage
+     */
     public ArrayList<AppUsage> getUserAppsForSocial(String date, String macAdd) {
         ArrayList<AppUsage> sList = new ArrayList<>();
 

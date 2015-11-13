@@ -20,8 +20,23 @@ import java.util.TreeMap;
  *
  * @author ASUS-PC
  */
+/**
+ * AppDAO handles interactions between App and Controllers
+ */
 public class AppDAO {
 
+    /**
+     * Inserts rows into app in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @param appIdList The list of app id that is successfully uploaded to the
+     * database
+     * @throws IOException An error found
+     * @return an array of 0 or 1, 1 is a successfully updated record, otherwise
+     * 
+     */
     public int[] insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> appIdList) throws IOException {
         int[] updatedRecords = {};
         try {
@@ -34,43 +49,43 @@ public class AppDAO {
             int index = 2;
             while (reader.readRecord()) {
                 String errorMsg = "";
-                
+
                 //Values declared
                 int appId = -1;
                 String name = null;
                 String cat = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "app-id":
                             //APPID VALIDATION
                             String appIdS = reader.get("app-id");
-                            if(appIdS == null || appIdS.length() == 0){
+                            if (appIdS == null || appIdS.length() == 0) {
                                 errorMsg += ",blank app-id";
-                            }else{
+                            } else {
                                 appId = Utility.parseInt(appIdS);
                                 if (appId <= 0) {
                                     errorMsg += ",invalid app id";
                                 }
                             }
                             break;
-                        
+
                         case "app-name":
                             name = Utility.parseString(reader.get("app-name"));
                             if (name == null) {
                                 errorMsg += ",blank app-name";
                             } else {
-                                 name = name.replace("\"", "");
+                                name = name.replace("\"", "");
                             }
                             break;
-                        
+
                         case "app-category":
                             cat = Utility.parseString(reader.get("app-category"));
                             if (cat == null) {
                                 errorMsg += ",blank app-category";
-                            }else{
+                            } else {
                                 cat = cat.toLowerCase();
-                                 cat = cat.replace("\"", "");
+                                cat = cat.replace("\"", "");
                                 if (!Utility.checkCategory(cat)) {
                                     errorMsg += ",invalid app category";
                                 }
@@ -85,7 +100,7 @@ public class AppDAO {
                     stmt.setString(2, name);
                     stmt.setString(3, cat);
                     stmt.addBatch();
-                }else{
+                } else {
                     errMap.put(index, errorMsg.substring(1));
                 }
                 index++;
@@ -102,6 +117,12 @@ public class AppDAO {
         return updatedRecords;
     }
 
+    /**
+     * Retrieve an app by the given app id
+     *
+     * @param appId The app id that uniquely identifies an app
+     * @return App object
+     */
     public App retrieveAppbyId(int appId) {
 
         String sql = "SELECT * FROM app WHERE appid = ? ";
@@ -132,6 +153,11 @@ public class AppDAO {
         return null;
     }
 
+    /**
+     * Retrieve a TreeMap of each app category with its corresponding count
+     *
+     * @return a treemap of app category with its corresponding count
+     */
     public TreeMap<String, ArrayList<Integer>> retrieveByCategory() {
 
         TreeMap<String, ArrayList<Integer>> result = new TreeMap<String, ArrayList<Integer>>();

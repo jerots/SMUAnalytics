@@ -25,16 +25,32 @@ import java.util.TreeMap;
  *
  * @author ASUS-PC
  */
+/**
+ * LocationUsageDAO handles interactions between LocationUsage and Controllers
+ */
 public class LocationUsageDAO {
 
     private TreeMap<String, LocationUsage> locationList;
     private TreeMap<String, Integer> duplicate;
 
+    /* Loads the list of Location list and Duplicate list
+     */
     public LocationUsageDAO() {
         duplicate = new TreeMap<>();
         locationList = new TreeMap<>();
     }
 
+    /**
+     * Inserts rows into LocationUsage in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @param locationIdList The list of location id that is successfully
+     * uploaded to the database
+     * @return an array of int, any number above 0 is the row is success
+     * updated, otherwise not successfully updated.
+     */
     public int insert(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn, HashMap<Integer, String> locationIdList) throws IOException {
         try {
             int index = 2;
@@ -44,31 +60,31 @@ public class LocationUsageDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
             String[] headers = reader.getHeaders();
-            
+
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Declare Values
                 int locationId = -1;
                 String date = null;
                 String macAdd = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "timestamp":
                             //check timestamp
                             date = Utility.parseString(reader.get("timestamp"));
                             if (date == null) {
                                 errorMsg += ",blank timestamp";
 
-                            }else{
-                                if(!Utility.checkDate(date)){
+                            } else {
+                                if (!Utility.checkDate(date)) {
                                     errorMsg += ",invalid timestamp";
                                 }
                             }
                             break;
-                            
+
                         case "mac-address":
                             //check macAdd
                             macAdd = Utility.parseString(reader.get("mac-address"));
@@ -82,13 +98,13 @@ public class LocationUsageDAO {
                                 macAdd = macAdd.toLowerCase();
                             }
                             break;
-                            
+
                         case "location-id":
                             //check locid
                             String locId = Utility.parseString(reader.get("location-id"));
-                            if(locId == null){
+                            if (locId == null) {
                                 errorMsg += ",blank location-id";
-                            }else{
+                            } else {
                                 locationId = Utility.parseInt(locId);
                                 if (locationId <= 0) {
                                     errorMsg += ",invalid location id";
@@ -133,6 +149,14 @@ public class LocationUsageDAO {
         return duplicate.size();
     }
 
+    /**
+     * Add rows into LocationUsage in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param errMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @return number of rows updated
+     */
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
         int updateCounts = 0;
         try {
@@ -149,21 +173,21 @@ public class LocationUsageDAO {
                 int locationId = -1;
                 String date = null;
                 String macAdd = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "timestamp":
                             //check timestamp
                             date = Utility.parseString(reader.get("timestamp"));
                             if (date == null) {
                                 errorMsg += ",blank timestamp";
-                            }else{
-                                if(!Utility.checkDate(date)){
+                            } else {
+                                if (!Utility.checkDate(date)) {
                                     errorMsg += ",invalid timestamp";
                                 }
                             }
                             break;
-                            
+
                         case "mac-address":
                             //check macAdd
                             macAdd = Utility.parseString(reader.get("mac-address"));
@@ -177,13 +201,13 @@ public class LocationUsageDAO {
                                 macAdd = macAdd.toLowerCase();
                             }
                             break;
-                        
+
                         case "location-id":
                             //check locid
                             String locId = Utility.parseString(reader.get("location-id"));
-                            if(locId == null){
+                            if (locId == null) {
                                 errorMsg += ",blank location-id";
-                            }else{
+                            } else {
                                 locationId = Utility.parseInt(locId);
                                 if (locationId <= 0) {
                                     errorMsg += ",invalid location id";
@@ -208,11 +232,11 @@ public class LocationUsageDAO {
                 if (errorMsg.length() == 0) {
                     if (duplicate.containsKey(date + macAdd)) {
                         errMap.put(duplicate.get(date + macAdd), "duplicate row");
-                        
+
                     }
                     duplicate.put(date + macAdd, index);
                     locationList.put(date + macAdd, new LocationUsage(date, macAdd, locationId));
-                }else{
+                } else {
                     errMap.put(index, errorMsg.substring(1));
                 }
 
@@ -223,8 +247,8 @@ public class LocationUsageDAO {
 
             //CHECK FOR DUPLICATES IN DATABASE
             ArrayList<LocationUsage> locList = new ArrayList<LocationUsage>(locationList.values());
-            
-            try{
+
+            try {
                 for (LocationUsage loc : locList) {
                     stmt.setString(1, loc.getTimestamp());
                     stmt.setString(2, loc.getMacAddress());
@@ -262,11 +286,19 @@ public class LocationUsageDAO {
             reader.close();
             stmt.close();
         } catch (SQLException e) {
-            
+
         }
         return updateCounts;
     }
 
+    /**
+     * Delete rows in LocationUsage
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param conn The connection to the database
+     * @return array list of rows deleted. For each row, anything above 0 is the
+     * row is success updated, otherwise not successfully updated.
+     */
     public int[] delete(CsvReader reader, Connection conn) throws IOException {
         int[] toReturn = new int[2];
         int notFound = 0;
@@ -274,7 +306,7 @@ public class LocationUsageDAO {
         int[] updateCounts = {};
         try {
             String sql = "delete from locationusage where timestamp = STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s') and macaddress = ?;";
-            PreparedStatement stmt = conn.prepareStatement(sql);    
+            PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
@@ -292,7 +324,7 @@ public class LocationUsageDAO {
                     for (int i : updateCounts) {
                         if (!(i > 0)) { //Can be 0 or anything else
                             notFound++;
-                        }else{
+                        } else {
                             found += i;
                         }
                     }
@@ -312,6 +344,18 @@ public class LocationUsageDAO {
         return toReturn;
     }
 
+    /**
+     * Delete rows in LocationUsage
+     *
+     * @param conn The connection to the database
+     * @param macAdd The macAdd of a user
+     * @param startDate The start date of interest
+     * @param endDate The end date of interest
+     * @param locationId The unique id of a location
+     * @param semanticPlace The corresponding place of the locationId
+     * @throws SQLException
+     * @return array list LocationUsage
+     */
     public ArrayList<LocationUsage> delete(Connection conn, String macAdd, String startDate, String endDate, int locationId, String semanticPlace) throws SQLException {
         ArrayList<LocationUsage> lList = new ArrayList<LocationUsage>();
         int stringCount = 2;
@@ -402,6 +446,13 @@ public class LocationUsageDAO {
         return lList;
     }
 
+    /**
+     * Retrieve LocationUsage given the date and location
+     *
+     * @param date The date of interest
+     * @param loc The location
+     * @return an arraylist of LocationUsage
+     */
     public ArrayList<LocationUsage> retrieve(java.util.Date date, String loc) {
         ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
         Connection conn = null;
@@ -451,6 +502,13 @@ public class LocationUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve LocationUsage given the date and floor for each user
+     *
+     * @param date The date of interest
+     * @param floor The floor number of location
+     * @return an HashMap of macAddress and its corresponding LocationUsage
+     */
     public HashMap<String, LocationUsage> retrieveByFloor(java.util.Date date, String floor) {
         HashMap<String, LocationUsage> result = new HashMap<String, LocationUsage>();
         Connection conn = null;
@@ -498,6 +556,14 @@ public class LocationUsageDAO {
         return result;
     }
 
+    /**
+     * Retrieve LocationUsage given the date and floor of a specific user
+     *
+     * @param macAdd The mac address of a specific user
+     * @param startDate The start date of interest
+     * @param endDate The start date of interest
+     * @return an HashMap of LocationUsage
+     */
     public ArrayList<LocationUsage> retrieveByUser(String macAdd, java.util.Date startDate, java.util.Date endDate) {
 
         ArrayList<LocationUsage> result = new ArrayList<LocationUsage>();
@@ -538,6 +604,16 @@ public class LocationUsageDAO {
 
     }
 
+    /**
+     * Create LocationUsage object
+     *
+     * @param startInLocation The starting location id
+     * @param endInLocation The ending location id
+     * @param prevLocationId The previous location id
+     * @param macAddress The mac address of a specific user
+     * @param totalAUList The list of AppUsage
+     * @return an HashMap of LocationUsage
+     */
     public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress, ArrayList<LocationUsage> totalAUList) {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -578,6 +654,11 @@ public class LocationUsageDAO {
 
     }
 
+    /* Retrieve LocationUsage given the date and macAdd of a user
+     * @param date The date of interest
+     * @param macAdd The macAdd of the user
+     * @return an HashMap of LocationUsage
+     */
     public ArrayList<LocationUsage> retrieveUserLocationUsage(String date, String macAdd) {
         ArrayList<LocationUsage> locList = new ArrayList<>();
         // This method gets a Single user's locationusage
@@ -616,6 +697,11 @@ public class LocationUsageDAO {
         return locList;
     }
 
+    /* Retrieve LocationUsage of all users except the user of the macAddress in the input
+     * @param date The date of interest
+     * @param macAdd The macAdd of the user
+     * @return an HashMap of LocationUsage
+     */
     public ArrayList<LocationUsage> retrievePeopleExceptUserLocationUsage(String date, String macAddress) {
         //This is to get EVERYONE's location usage
         ArrayList<LocationUsage> locList = new ArrayList<>();
