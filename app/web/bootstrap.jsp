@@ -1,9 +1,3 @@
-add-data<%-- 
-    Document   : home
-    Created on : Sep 30, 2015, 1:12:53 PM
-    Author     : jeremyongts92
---%>
-
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.TreeMap"%>
@@ -18,7 +12,8 @@ add-data<%--
         <%@include file="import-css.jsp" %>
     </head>
     <body>
-        <%			Admin admin = (Admin) session.getAttribute("admin");
+        <%            
+            Admin admin = (Admin) session.getAttribute("admin");
             String option = (String) request.getAttribute("option");
             String printer = (String) request.getAttribute("printer");
             String bootstrap = "";
@@ -173,7 +168,7 @@ add-data<%--
                     <P>
                         <%---location---%>
                         <%int locationCount = recordMap.get("location-lookup.csv");
-                        if (locationCount >= 0) { %>    
+                            if (locationCount >= 0) { %>    
                     <h4><b> location-lookup.csv</b> </h4>
                     <hr>
                     <%
@@ -243,41 +238,41 @@ add-data<%--
 
 
                         <%  int locationUsageCount = recordMap.get("location.csv");
-                        if (locationUsageCount >= 0) { %>
+                            if (locationUsageCount >= 0) { %>
                     <h4><b> location.csv</b> </h4><hr>
                     <%
-                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
-                            out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
-                            out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationUsageCount);
-                            out.println("</td></tr><tr><td>");
-                            TreeMap<Integer, String> luErrMap = (TreeMap<Integer, String>) request.getAttribute("luErrMap");
-                            Iterator<Integer> luiter = luErrMap.keySet().iterator();
+                                out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'>");
+                                out.println("<b>LocationUsage</b>" + "</td></tr><tr><td>");
+                                out.println("<b>LocationUsage updated </b> " + "</td><td>" + locationUsageCount);
+                                out.println("</td></tr><tr><td>");
+                                TreeMap<Integer, String> luErrMap = (TreeMap<Integer, String>) request.getAttribute("luErrMap");
+                                Iterator<Integer> luiter = luErrMap.keySet().iterator();
 
-                            out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
-                            if (luErrMap != null && luErrMap.size() != 0) {
-                                out.println("<tr><td><b>" + "Row");
-                                out.println("</b></td><td><b>" + "Error Messages");
-                                out.println("</b></td></tr>");
-                                while (luiter.hasNext()) {
-                                    out.println("<tr><td>");
-                                    int rowWithErr = luiter.next();
-                                    String errAtThatRow = luErrMap.get(rowWithErr);
-                                    out.println(rowWithErr);
-                                    out.println("</td><td>");
-                                    out.println(errAtThatRow);
-                                    out.println("</td></tr>");
+                                out.println("<b>Number of rows with error </b> " + "</td><td>" + luErrMap.size() + "</td></tr>");
+                                if (luErrMap != null && luErrMap.size() != 0) {
+                                    out.println("<tr><td><b>" + "Row");
+                                    out.println("</b></td><td><b>" + "Error Messages");
+                                    out.println("</b></td></tr>");
+                                    while (luiter.hasNext()) {
+                                        out.println("<tr><td>");
+                                        int rowWithErr = luiter.next();
+                                        String errAtThatRow = luErrMap.get(rowWithErr);
+                                        out.println(rowWithErr);
+                                        out.println("</td><td>");
+                                        out.println(errAtThatRow);
+                                        out.println("</td></tr>");
+                                    }
                                 }
-                            }
 
-                            out.println("</table>");
-                        }
+                                out.println("</table>");
+                            }
                         }
                     %>
                     <P>
                         <%---locationUsageDelete---%>
 
-                        <% if(delMap != null){	
-                        int locationDeleteCount = delMap.get("location-delete.csv");
+                        <% if (delMap != null) {
+                                int locationDeleteCount = delMap.get("location-delete.csv");
                                 if (locationDeleteCount >= 0) {
                                     out.println("<h4><b> location-delete.csv</b> </h4><hr>");
                                     if (delMap.get("location-delete.csv") >= 0) {
@@ -287,7 +282,7 @@ add-data<%--
 
                                     }
                                 }
-                        }
+                            }
                             if (recordMap == null && delMap == null && printer != null) {
                                 out.println("<br><br><h4><b>You have not uploaded any files.</b></h4>");
                             }

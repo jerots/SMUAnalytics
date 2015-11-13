@@ -1,9 +1,3 @@
-<%-- 
-    Document   : bootstrap-json
-    Created on : Oct 10, 2015, 6:17:49 AM
-    Author     : jeremyongts92
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>

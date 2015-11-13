@@ -1,4 +1,3 @@
-
 <%@page import="java.util.TreeMap"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.HashMap"%>
@@ -16,7 +15,8 @@
 		<%@include file="import-css.jsp" %>
     </head>
     <body>
-		<%			User user = (User) session.getAttribute("user");
+		<%			
+                    User user = (User) session.getAttribute("user");
 
 		%>	
 		<!--NAVBAR-->
@@ -40,17 +40,17 @@
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Basic App Usage <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="student">Basic App (with demographic)</a></li>
-                                        <li><a href="basicapp-appcat.jsp">App category</a></li>
-                                        <li><a href="basicapp-diurnal.jsp">Diurnal Report</a></li>
+                                        <li><a href="student">Usage Time</a></li>
+                                        <li><a href="basicapp-appcat.jsp">App Category</a></li>
+                                        <li><a href="basicapp-diurnal.jsp">Diurnal Pattern</a></li>
                                     </ul>
                                 </li>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-                                        <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                        <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                                        <li><a href="top-kreport.jsp">Most used apps</a></li>
+                                        <li><a href="top-kstudent.jsp">Students with most app usage</a></li>
+                                        <li><a href="top-kschool.jsp">Schools with most app usage</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
