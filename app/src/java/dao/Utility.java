@@ -15,7 +15,6 @@ import java.util.HashMap;
  *
  * @author ASUS-PC
  */
-
 /**
  * Utility handles interactions between DAOs and Controllers that involves
  * validation
@@ -29,7 +28,6 @@ public final class Utility {
     private static ArrayList<String> years;
     private static ArrayList<String> genders;
 
-    
     /* Loads the list of Schools and Categories
      */
     static {
@@ -39,8 +37,9 @@ public final class Utility {
         loadGenders();
     }
 
-     /**
+    /**
      * Converts a date with type "String" into a Date object
+     *
      * @param Date in String for formatting
      * @return Date object in "yyyy-MM-dd HH:mm:ss"
      */
@@ -55,8 +54,9 @@ public final class Utility {
         return null;
     }
 
-      /**
+    /**
      * Format a date into DateFormat "yyyy-MM-dd HH:mm:ss"
+     *
      * @param Date object for formatting
      * @return String object of the input date in "yyyy-MM-dd HH:mm:ss"
      */
@@ -70,9 +70,9 @@ public final class Utility {
         return null;
     }
 
-    
     /**
      * Format a date into DateFormat "yyyy-MM-dd"
+     *
      * @param Date in String for formatting
      * @return Date object in "yyyy-MM-dd"
      */
@@ -87,8 +87,9 @@ public final class Utility {
         return null;
     }
 
-        /**
+    /**
      * Format a date into DateFormat "yyyy-MM-dd"
+     *
      * @param Date object for formatting
      * @return String object of input Date in "yyyy-MM-dd"
      */
@@ -102,8 +103,9 @@ public final class Utility {
         return null;
     }
 
-        /**
+    /**
      * Validate that date is in the correct format "yyyy-MM-dd HH:mm:ss"
+     *
      * @param Date in String for validation
      * @return true if date is valid, false if otherwise
      */
@@ -113,17 +115,18 @@ public final class Utility {
                 + "\\s(([0-1]\\d)|(2[0-3])):([0-5]\\d):([0-5]\\d)");
     }
 
-  /**
+    /**
      * Validate that date is in the correct format "yyyy-MM-dd"
+     *
      * @param Date in String for validation
      * @return true if date is valid, false if otherwise
-     */    
+     */
     public static boolean checkOnlyDate(String str) {
         return str.matches("((((19[7-9]\\d)|([2-9]\\d{3}))-(0[13578]|1[02])-31)|(((19[7-9]\\d)|([2-9]\\d{3}))-(0[13456789]|1[012])-(0[1-9]|[12]\\d|30))|"
                 + "(((19[7-9]\\d)|([2-9]\\d{3}))-02-(0[1-9]|1\\d|2[0-8]))|((19([79][26])|(8[048]))|([2-9]\\d(([13579][26])|([24680][048])))-02-29)).*");
     }
 
-        /* Validate that number is an Integer
+    /* Validate that number is an Integer
      * @param Integer in String for validation
      * @return The number in Integer if number is an Integer, -1 if otherwise
      */
@@ -138,7 +141,7 @@ public final class Utility {
         return num;
     }
 
-        /* Validate that String input is a Hexadecimal
+    /* Validate that String input is a Hexadecimal
      *
      * @return true if String is a Hexadecimal, false if otherwise
      */
@@ -146,7 +149,7 @@ public final class Utility {
         return (str.length() == 40 && str.matches("[0-9a-fA-F]+"));
     }
 
-     /* Validate that String input is a valid String
+    /* Validate that String input is a valid String
      * @param String for validation
      * @return String is a valid String, null if otherwise
      */
@@ -157,7 +160,6 @@ public final class Utility {
         return null;
     }
 
-    
     /* Validate that input is a valid password
      * @param password in String for validation
      * @return true if input is a valid password, false if otherwise
@@ -171,7 +173,7 @@ public final class Utility {
         return str.length() >= 8;
     }
 
-        /* Validate that input is in the correct Email Address format
+    /* Validate that input is in the correct Email Address format
      * @param email address in String for validation
      * @return true if Email Address is in the correct format, false if otherwise
      */
@@ -198,7 +200,6 @@ public final class Utility {
         return false;
     }
 
-    
     /* Validate that input is within the list of valid Categories
      * @param Category in String for validation
      * @return true if category is valid, false if otherwise
@@ -211,7 +212,7 @@ public final class Utility {
         return false;
     }
 
-     /**
+    /**
      * Retrieve an ArrayList of all valid schools
      *
      * @return an ArrayList of all valid schools
@@ -220,7 +221,7 @@ public final class Utility {
         return schoolList;
     }
 
-       /**
+    /**
      * Retrieve an ArrayList of all valid categories
      *
      * @return an ArrayList of all valid categories
@@ -229,15 +230,16 @@ public final class Utility {
         return categories;
     }
 
-        /**
+    /**
      * Retrieve an ArrayList of all schools that are not in the input list of
      * schools
+     *
      * @param an ArrayList of all schools that exist in the list of schools
      * @return an ArrayList of all schools that are not in the input list of
      * schools
      */
-    public static HashMap<String,Long> compareSchools(HashMap<String,Long> schools) {
-        HashMap<String,Long> missing = new HashMap<>();
+    public static HashMap<String, Long> compareSchools(HashMap<String, Long> schools) {
+        HashMap<String, Long> missing = new HashMap<>();
         for (String s : schoolList) {
             if (!schools.containsKey(s)) {
                 schools.put(s, (long) 0);
@@ -246,7 +248,7 @@ public final class Utility {
         return missing;
     }
 
-      /* Validate that school is within the list of valid Schools
+    /* Validate that school is within the list of valid Schools
      * @school School of a user
      * @return true if school is valid, false if otherwise
      */
@@ -258,7 +260,7 @@ public final class Utility {
         return false;
     }
 
-        /* Retrieve that school of a user from the given email address
+    /* Retrieve that school of a user from the given email address
      * @param email Email Address of a user
      * @return School from the given email address
      */
@@ -266,7 +268,7 @@ public final class Utility {
         return email.substring(email.indexOf("@") + 1, email.indexOf(".", email.indexOf("@")));
     }
 
-      /* Calculates the number of seconds between two given dates
+    /* Calculates the number of seconds between two given dates
      * @param startDate The start of the period of interest
      *  @param endDate The end of the period of interest
      * @return the number of seconds between two given dates
@@ -275,7 +277,7 @@ public final class Utility {
         return (endDate.getTime() - startDate.getTime()) / 1000;
     }
 
-       /* Calculates the number of days between two given dates
+    /* Calculates the number of days between two given dates
      * @param startDate The start of the period of interest
      * @param endDate The end of the period of interest
      * @return the number of days between two given dates
@@ -285,7 +287,7 @@ public final class Utility {
     }
 
     /* Get the next hour of the date in time
-      * @param startDate The start of the period of interest
+     * @param startDate The start of the period of interest
      * @Date the Date corresponding to it
      */
     public static Date getNextHour(Date startDate) {
@@ -298,8 +300,9 @@ public final class Utility {
         return schoolList;
     }
 
-        /**
+    /**
      * Calculates the time in milliseconds after 24 hours
+     *
      * @param the time of the date for conversion
      * @result the time of the input date after 24 hours
      */
@@ -307,7 +310,7 @@ public final class Utility {
         return (time / (60 * 60 * 24 * 1000) + 1) * (60 * 60 * 24 * 1000);
     }
 
-       /**
+    /**
      * Loads all valid Schools to an ArrayList
      *
      */
@@ -321,7 +324,10 @@ public final class Utility {
         schoolList.add("socsc");
     }
 
-       
+    /**
+     * Loads all categories to an ArrayList
+     *
+     */
     public static void loadCategories() {
         categories = new ArrayList<>();
         categories.add("books");
@@ -336,8 +342,12 @@ public final class Utility {
         categories.add("games");
         categories.add("others");
     }
-    
-    public static void loadYears(){
+
+        /**
+     * Loads all years to an ArrayList
+     *
+     */
+    public static void loadYears() {
         years = new ArrayList<String>();
         years.add("2011");
         years.add("2012");
@@ -345,17 +355,28 @@ public final class Utility {
         years.add("2014");
         years.add("2015");
     }
-    
-    public static void loadGenders(){
+
+        /**
+     * Loads all genders to an ArrayList
+     *
+     */
+    public static void loadGenders() {
         genders = new ArrayList<String>();
         genders.add("f");
         genders.add("m");
     }
-
+    /**
+     * Get an arraylist of available years
+     *
+     */
     public static ArrayList<String> getYears() {
         return years;
     }
 
+    /**
+     * Get an arraylist of available gender
+     *
+     */
     public static ArrayList<String> getGenders() {
         return genders;
     }
