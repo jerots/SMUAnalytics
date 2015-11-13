@@ -1,9 +1,3 @@
-<%-- 
-    Document   : home
-    Created on : Sep 30, 2015, 1:22:22 PM
-    Author     : jeremyongts92
---%>
-
 <%@page import="java.util.TreeMap"%>
 <%@page import="java.util.TreeSet"%>
 <%@page import="dao.LocationDAO"%>
@@ -22,8 +16,8 @@
         <%@include file="import-css.jsp" %>
     </head>
     <body>
-        <%			User user = (User) session.getAttribute("user");
-
+        <%
+            User user = (User) session.getAttribute("user");
         %>	
         <!--NAVBAR-->
         <nav class="navbar-static-top navbar-default">
@@ -54,10 +48,10 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                 <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-                                        <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                        <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
-                                   </ul>
+                                <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
+                                <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
+                                <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                            </ul>
                         </li>
                         <li><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
                         <li class="active"><a href="#">Smartphone Usage Heatmap</a></li>
@@ -92,7 +86,6 @@
             ArrayList<String> locationList = locDAO.retrieveAll();
             TreeSet<String> levelSet = new TreeSet<String>();
             //for each location in locationList
-            System.out.println("LOCATIONLIST SIZE " + locationList.size());
             for (String location : locationList) {
                 //Scan all basements
                 String trimmed = location.replace("SMUSIS", "").toUpperCase();
@@ -127,7 +120,6 @@
                             <label for="startdate">Floor</label>
                             <select class="form-control" name="floor">
                                 <%
-                                    System.out.println("LEVEL SIZE " + levelSet.size());
                                     for (String level : levelSet) {
                                         String levelCode = "";
                                         if (level.equals(floor)) {
@@ -135,15 +127,6 @@
                                         }
                                         out.println("<option value='" + level + "' " + levelCode + ">" + level + "</option>");
                                     }
-                                %>
-
-
-
-                                <!--<option value="B1">B1</option>-->
-                                <%
-//									for (int i = 1; i <= 5; i++) {
-//										out.println("<option value='L" + i + "'>L" + i + "</option>");
-//									}
                                 %>
                             </select>
                         </div>
@@ -196,7 +179,7 @@
                                 out.println("<td>" + loc + "</td>");
                                 out.println("<td>" + density + "</td>");
                                 out.println("<td>" + desc + "</td>");
-								out.println("<td>" + numUsers + "</td>");
+                                out.println("<td>" + numUsers + "</td>");
 
                                 out.println("</tr>");
                             }
