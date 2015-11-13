@@ -32,42 +32,62 @@ public class AppUsageDAO {
                     + " = VALUES(appid);";
             PreparedStatement stmt = conn.prepareStatement(sql);
             reader.readHeaders();
+            String[] headers = reader.getHeaders();
 
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                //check timestamp
-                String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null) {
-                    errorMsg += ",blank timestamp";
-                }else{
-                    if(!Utility.checkDate(date)){
-                        errorMsg += ",invalid timestamp";
+                
+                //Values declared
+                String date = null;
+                int appId = -1;
+                String macAdd = null;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "timestamp":
+                            //check timestamp
+                            date = Utility.parseString(reader.get("timestamp"));
+                            if (date == null) {
+                                errorMsg += ",blank timestamp";
+                            }else{
+                                if(!Utility.checkDate(date)){
+                                    errorMsg += ",invalid timestamp";
+                                }
+                            }
+                            break;
+                        
+                        case "mac-address":
+                            //check macAdd
+                            macAdd = Utility.parseString(reader.get("mac-address"));
+                            if (macAdd == null) {
+                                errorMsg += ",blank mac-address";
+                            } else {
+                                macAdd = macAdd.toLowerCase();
+                                if (!Utility.checkHexadecimal(macAdd)) {
+                                    errorMsg += ",invalid mac address";
+                                } else if (!macList.containsKey(macAdd)) {
+                                    errorMsg += ",no matching mac address";
+                                }
+                            }
+                            break;
+
+                        case "app-id":
+                            //check appid
+                            String appIdS = Utility.parseString(reader.get("app-id"));
+                            if(appIdS == null){
+                                errorMsg += ",blank app-id";
+                            }else{
+                                appId = Utility.parseInt(appIdS);
+                                if (appId <= 0) {
+                                    errorMsg += ",invalid app id";
+                                } else if (!appIdList.containsKey(appId)) {
+                                    errorMsg += ",invalid app";
+                                }
+                            }
+                            break;
                     }
                 }
-
-                //check macAdd
-                String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    errorMsg += ",blank mac-address";
-                } else {
-                    macAdd = macAdd.toLowerCase();
-
-                    if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac-address";
-                    } else if (!macList.containsKey(macAdd)) {
-                        errorMsg += ",no matching mac address";
-                    }
-                }
-
-                //check appid
-                int appId = Utility.parseInt(reader.get("app-id"));
-                if (appId <= 0) {
-                    errorMsg += ",blank app-id";
-                } else if (!appIdList.containsKey(appId)) {
-                    errorMsg += ",invalid app";
-                }
-
                 if (errorMsg.length() == 0) {
 
                     if (duplicate.containsKey(date + macAdd)) {
@@ -106,56 +126,76 @@ public class AppUsageDAO {
             PreparedStatement pStmt = null;
             ResultSet rs = null;
             reader.readHeaders();
+            String[] headers = reader.getHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
+                
+                //Declare values
+                String date = null;
+                String macAdd = null;
+                int appId = -1;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "timestamp":
+                            //check timestamp
+                            date = Utility.parseString(reader.get("timestamp"));
+                            if (date == null) {
+                                errorMsg += ",blank timestamp";
+                            }else{
+                                if(!Utility.checkDate(date)){
+                                    errorMsg += ",invalid timestamp";
+                                }
+                            }
+                            break;
+                        
+                        case "mac-address":
+                            //check macAdd
+                            macAdd = Utility.parseString(reader.get("mac-address"));
+                            if (macAdd == null) {
+                                errorMsg += ",blank mac-address";
+                            } else {
+                                macAdd = macAdd.toLowerCase();
 
-                //check timestamp
-                String date = Utility.parseString(reader.get("timestamp"));
-                if (date == null) {
-                    errorMsg += ",blank timestamp";
-                }else{
-                    if(!Utility.checkDate(date)){
-                        errorMsg += ",invalid timestamp";
+                                if (!Utility.checkHexadecimal(macAdd)) {
+                                    errorMsg += ",invalid mac address";
+                                } else {
+                                    query = "select macaddress from user where macaddress = ?;";
+                                    pStmt = conn.prepareStatement(query);
+                                    pStmt.setString(1, macAdd);
+
+                                    rs = pStmt.executeQuery();
+                                    if (!rs.next()) {
+                                        errorMsg += ",no matching mac address";
+                                    }
+                                    pStmt.close();
+                                }
+                            }
+                            break;
+                        
+                        case "app-id":                            
+                            //check appid
+                            String appIdS = Utility.parseString(reader.get("app-id"));
+                            if(appIdS == null){
+                                errorMsg += ",blank app-id";
+                            }else{
+                                appId = Utility.parseInt(appIdS);
+                                if (appId <= 0) {
+                                    errorMsg += ",invalid app id";
+                                } else {
+                                    query = "select appid from app where appid = ?;";
+                                    pStmt = conn.prepareStatement(query);
+                                    pStmt.setInt(1, appId);
+                                    rs = pStmt.executeQuery();
+                                    if (!rs.next()) {
+                                        errorMsg += ",invalid app";
+                                    }
+                                    pStmt.close();
+                                }
+                            }
+                            break;
                     }
-                }
-
-                //check macAdd
-                String macAdd = Utility.parseString(reader.get("mac-address"));
-                if (macAdd == null) {
-                    errorMsg += ",blank mac-address";
-                } else {
-                    macAdd = macAdd.toLowerCase();
-
-                    if (!Utility.checkHexadecimal(macAdd)) {
-                        errorMsg += ",invalid mac-address";
-
-                    } else {
-                        query = "select macaddress from user where macaddress = ?;";
-                        pStmt = conn.prepareStatement(query);
-                        pStmt.setString(1, macAdd);
-
-                        rs = pStmt.executeQuery();
-                        if (!rs.next()) {
-                            errorMsg += ",no matching mac-address";
-                        }
-                        pStmt.close();
-                    }
-                }
-                //check appid
-                int appId = Utility.parseInt(reader.get("app-id"));
-                if (appId <= 0) {
-                    errorMsg += ",blank app-id";
-                } else {
-                    query = "select appid from app where appid = ?;";
-                    pStmt = conn.prepareStatement(query);
-                    pStmt.setInt(1, appId);
-                    rs = pStmt.executeQuery();
-                    if (!rs.next()) {
-                        errorMsg += ",invalid app";
-
-                    }
-                    pStmt.close();
                 }
 
                 if (errorMsg.length() == 0 ) {
@@ -616,6 +656,47 @@ public class AppUsageDAO {
             //Assumes that checks have been done prior already
             pStmt.setString(1, date);
             pStmt.setString(2, macAdd);
+
+            ResultSet rs = pStmt.executeQuery();
+
+            //NOTE: WHY DO WE NOT SET CATEGORY = SOCIAL. BECAUSE YOU NEED TO MINUS THE NEXT TO CHECK THE TOTAL USAGE TIME. Category check later
+            while (rs.next()) {
+                String appName = rs.getString(1);
+                String timeStamp = rs.getString(2);
+                int appId = rs.getInt(3);
+                String category = rs.getString(4);
+
+                sList.add(new AppUsage(timeStamp, macAdd, appId, new App(appId, appName, category)));
+            }
+            rs.close();
+            pStmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sList;
+    }
+    
+    public ArrayList<AppUsage> getUserNonProductiveApps(java.util.Date startDate, java.util.Date endDate, String macAdd) {
+        ArrayList<AppUsage> sList = new ArrayList<>();
+
+        String query = "SELECT appname, timestamp, a.appid, appcategory\n"
+                + "FROM appusage au, user u, app a\n"
+                + "WHERE au.macaddress = u.macaddress\n"
+                + "AND a.appid = au.appid\n"
+                + "AND timestamp >= ?\n"
+                + "AND timestamp <= ?\n"
+                + "AND au.macaddress = ?\n"
+                + "ORDER BY timestamp, a.appid;"; //Note that it is already sorted by user and therefore dont need to resort by macadd.
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pStmt = conn.prepareStatement(query);
+            //Assumes that checks have been done prior already
+            pStmt.setString(1, new java.sql.Timestamp(startDate.getTime()).toString());
+            pStmt.setString(2, new java.sql.Timestamp(endDate.getTime()).toString());
+            pStmt.setString(3, macAdd);
 
             ResultSet rs = pStmt.executeQuery();
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Iterator;
 import javax.servlet.ServletException;
@@ -69,13 +70,13 @@ public class AddBatch extends HttpServlet {
                 }
 
                 //IF bootstrap-file field not found
-                if (filePart == null && filePart.getSize() < 0) {
+                if (filePart == null || filePart.getSize() <= 0) {
                     errors.add("missing file");
-                }else{
-                    String name = filePart.getName();
-                    if(!name.endsWith(".zip")){
-                        errors.add("invalid file");
-                    }
+//                }else{
+//                    String name = filePart.getName();
+//                    if(!name.endsWith(".zip")){
+//                        errors.add("invalid file");
+//                    }
                 }
 
                 //If not zip file
@@ -93,12 +94,13 @@ public class AddBatch extends HttpServlet {
                 TreeMap<Integer, String> userErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
                 TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+                HashMap<String, Integer> delMap = new HashMap<String, Integer>();
 
                 TreeMap<String, Integer> recordMap = null;
 
                 try {
                     AddBatchController ctrl = new AddBatchController();
-                    recordMap = ctrl.addBatch(filePart, userErrMap, auErrMap, luErrMap);
+                    recordMap = ctrl.addBatch(filePart, userErrMap, auErrMap, luErrMap, delMap);
                     //Returns success as the head of the JSON if it is a success.
                     boolean success = false;
                     if (userErrMap.isEmpty() && auErrMap.isEmpty() && luErrMap.isEmpty()) {
@@ -116,13 +118,14 @@ public class AddBatch extends HttpServlet {
                         String fileName = iter.next();
                         if(recordMap.get(fileName) >= 0){
                             list.addProperty(fileName, recordMap.get(fileName));
+                            arr.add(list);
+                            list = new JsonObject();
                         }
                     }
-                    arr.add(list);
-                    output.add("num-record-uploaded", arr);
-                    if(recordMap.get("location-delete.csv") >= 0){
-                        output.addProperty("num-record-deleted", recordMap.get("location-delete.csv"));
-                        output.addProperty("num-record-not-found", recordMap.get("deletenotfound"));
+                    output.add("num-record-loaded", arr);
+                    if(delMap.get("location-delete.csv") >= 0){
+                        output.addProperty("num-record-deleted", delMap.get("location-delete.csv"));
+                        output.addProperty("num-record-not-found", delMap.get("deletenotfound"));
                     }
                     if (!success) { //This only occurs when there is an error in the upload
                         if(userErrMap != null && userErrMap.size() != 0 ){
