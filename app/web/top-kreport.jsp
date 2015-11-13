@@ -138,33 +138,35 @@
                                             }else if(values != null){ //Checks this because in case of category refresh.
                                                 out.println("<h1>Result</h1>");
                                                 //This prints the type of table
-                                                out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
-                                                //Note that the value will never get larger than 0 so it is fine to keep iterating without adding.
-                                                out.println("<td><b>Rank (for most popular apps)</b></td><td><b>App Names</b></td><td><b>App usage Time</b></td></tr>");
-                                                for(int i = 0; i < values.size(); i++){
-                                                    //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
-                                                    HashMap<String, String> indiv = values.get(i);
-                                                    int rank = Utility.parseInt(indiv.get("rank"));
-                                                    //Gets ready the appnames to add on.
-                                                    String appNames = indiv.get("app-name");
-                                                    String duration = indiv.get("duration");
-                                                    out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
-                                                    for(int j = i + 1; j < values.size(); j++){
-                                                        HashMap<String, String> other = values.get(j);
-                                                        if(Utility.parseInt(other.get("rank")) == rank){
-                                                            appNames += ", " + other.get("app-name");
-                                                            i++;
-                                                        }else{
-                                                            break;
+                                                if(!values.isEmpty()){
+                                                    out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
+                                                    //Note that the value will never get larger than 0 so it is fine to keep iterating without adding.
+                                                    out.println("<td><b>Rank (for most popular apps)</b></td><td><b>App Names</b></td><td><b>App usage Time</b></td></tr>");
+                                                    for(int i = 0; i < values.size(); i++){
+                                                        //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
+                                                        HashMap<String, String> indiv = values.get(i);
+                                                        int rank = Utility.parseInt(indiv.get("rank"));
+                                                        //Gets ready the appnames to add on.
+                                                        String appNames = indiv.get("app-name");
+                                                        String duration = indiv.get("duration");
+                                                        out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
+                                                        for(int j = i + 1; j < values.size(); j++){
+                                                            HashMap<String, String> other = values.get(j);
+                                                            if(Utility.parseInt(other.get("rank")) == rank){
+                                                                appNames += ", " + other.get("app-name");
+                                                                i++;
+                                                            }else{
+                                                                break;
+                                                            }
                                                         }
+                                                        out.println("<td>" + appNames + "</td>"); //Prints the concatenated appNames
+                                                        out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
                                                     }
-                                                    out.println("<td>" + appNames + "</td>"); //Prints the concatenated appNames
-                                                    out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
-                                                    if(errors != null && errors.length() >0){
-                                                        out.println("<br><br>");
-                                                        out.println("<h3 style='color:red'>Warning:</h3>");
-                                                        out.println("<h3 style='color:red'>" + errors + "</h3>");
-                                                    }
+                                                }
+                                                if(errors != null && errors.length() > 0){
+                                                    out.println("<br>");
+                                                    out.println("<h3 style='color:red'>Warning:</h3>");
+                                                    out.println("<h3 style='color:red'>" + errors + "</h3>");
                                                 }
                                             }else{
                                                 out.println("<h1>Result</h1>");

@@ -41,7 +41,7 @@ public class BootstrapController {
 	//RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
     
       /**
-     * Retrieves a TreeMap<String, Integer> object for the data bootstrapping of zip file
+     * Retrieves a map object for the data bootstrapping of zip file that reflects the number of updated records per csv file
      *
      * @param filePart The zipped input file
      * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv

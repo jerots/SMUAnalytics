@@ -110,9 +110,11 @@ public class TopKSchool extends HttpServlet {
                             if (startdate.length() != 10) {
                                     errors.add("invalid startdate");
                             } else {
-                                dateFormattedStart = Utility.parseDate(startdate + " 00:00:00");
-                                if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
+                                startdate = Utility.parseString(startdate + " 00:00:00");
+                                if (startdate == null || !Utility.checkDate(startdate)) {
                                     errors.add("invalid startdate");
+                                }else{
+                                    dateFormattedStart = Utility.parseDate(startdate);
                                 }
                             }
 			}
@@ -127,9 +129,11 @@ public class TopKSchool extends HttpServlet {
                             if (enddate.length() != 10) {
                                     errors.add("invalid enddate");
                             } else {
-                                dateFormattedEnd = Utility.parseDate(enddate + " 23:59:59");
-                                if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
+                                enddate = Utility.parseString(enddate + " 23:59:59");
+                                if (enddate == null || !Utility.checkDate(enddate)) {
                                     errors.add("invalid enddate");
+                                }else{
+                                    dateFormattedEnd = Utility.parseDate(enddate);
                                 }
                             }
 			}
@@ -164,7 +168,7 @@ public class TopKSchool extends HttpServlet {
 			TopkReportController ctrl = new TopkReportController();
 
 			//This error string is just passed in, but is meant for the UI and not the JSON.
-			String error = "";
+			ArrayList<String> error = new ArrayList<String>();
 
 			//IF PASSED VALIDATION, PROCEED TO GENERATE REPORT
 			output.addProperty("status", "success");

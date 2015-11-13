@@ -67,21 +67,15 @@ public class DeleteController {
                 }else{
                     startDate += " 00:00:00";
                 }
-                dateFormattedStart = Utility.parseDate(startDate);  
-                if(dateFormattedStart == null){
-                    startDate += ", invalid startdate";
+                if(!Utility.checkOnlyDate(startDate)){
+                    errors += ", invalid startdate";
+                } else if (startDate.length() != 19 || !Utility.checkDate(startDate)) { // if they are of the wrong length
+                    errors += ", invalid starttime";
                 }else{
-                    startDate = Utility.formatDate(dateFormattedStart);
-                    if(!Utility.checkOnlyDate(startDate)){
-                        errors += ", invalid startdate";
-                    } else{
-                        if ((startTime != null && startTime.length() != 0) && startDate.length() != 19 || !Utility.checkDate(startDate)) { // if they are of the wrong length
-                            errors += ", invalid starttime";
-                        }
-                    }
+                    dateFormattedStart = Utility.parseDate(startDate);
                 }
             }
-        } 
+        }
         
         //END DATE VALIDATION
         Date dateFormattedEnd = null;      
@@ -97,18 +91,12 @@ public class DeleteController {
                     }else{
                         endDate += " 00:00:00";
                     }
-                    dateFormattedEnd = Utility.parseDate(endDate);  
-                    if(dateFormattedEnd == null){
-                        endDate += ", invalid enddate";
+                    if(!Utility.checkOnlyDate(endDate)){
+                        errors += ", invalid enddate";
+                    } else if ((endTime != null && endTime.length() != 0) && endDate.length() != 19 || !Utility.checkDate(endDate)) { // if they are of the wrong length
+                        errors += ", invalid endtime";
                     }else{
-                        endDate = Utility.formatDate(dateFormattedEnd);
-                        if(!Utility.checkOnlyDate(endDate)){
-                            errors += ", invalid enddate";
-                        } else{
-                            if ((endTime != null && endTime.length() != 0) && endDate.length() != 19 || !Utility.checkDate(endDate)) { // if they are of the wrong length
-                                errors += ", invalid endtime";
-                            }
-                        }
+                        dateFormattedEnd = Utility.parseDate(endDate);
                     }
                 }
             } 
@@ -121,13 +109,13 @@ public class DeleteController {
         //MACADDRESS VALIDATION - This one COULD be input as the login person is admin, and therefore not retrieve the user's own macadd like activeness
         if(macAdd != null && macAdd.length() != 0){
             if (!Utility.checkHexadecimal(macAdd)) {
-                errors += ", invalid mac-address";
+                errors += ", invalid mac address";
                 
             //Retrieves the Userlist to check the macAdd
             }else{
                 UserDAO userDao = new UserDAO();
                 if(!userDao.checkMacAdd(conn, macAdd)){
-                    errors += ", invalid mac-address";
+                    errors += ", invalid mac address";
                 }                
             }
         }
