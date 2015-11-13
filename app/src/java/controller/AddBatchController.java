@@ -28,19 +28,21 @@ import javax.servlet.http.Part;
  */
 /**
  * AddBatchController controls all actions related to adding of additional data to the original
- * data that a user Bootstrapped
+ * data that a user Bootstrapped 
  */
 public class AddBatchController {
 
     
      /**
-     * Retrieves a  object for the data add additional data to the bootstrapped files
+     * Retrieves an object for the data add additional data to the bootstrapped files that reflects the number of updated rows for each csv file
      *
-     * @param filePart The zipped input file
+     * @param filePart The zipped input file 
      * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
      * @param auErrMap The map that contains error messages and its corresponding row from app.csv
      * @param luErrMap The map that contains error messages and its corresponding row from location.csv
      * @param delMap The map that contains uploaded successful row and non successful rows from location-delete.csv
+     * @throws SQLException if there is SQL error
+     * @throws IOException if there is an error
      * @return A treemap objects that belongs contains the
      * records successfully updated for each csv file in the input Zipped File
      */
