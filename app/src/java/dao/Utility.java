@@ -321,9 +321,7 @@ public final class Utility {
         schoolList.add("socsc");
     }
 
-       /**
-     * Loads all valid categories to an ArrayList
-     *
+       
     public static void loadCategories() {
         categories = new ArrayList<>();
         categories.add("books");
