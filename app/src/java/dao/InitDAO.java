@@ -13,6 +13,9 @@ import java.sql.Statement;
  *
  * @author jeremyongts92
  */
+/**
+ * A class that initialises data to the database.
+ */
 public class InitDAO {
 
 //	public static void initAdmin() {
@@ -38,31 +41,34 @@ public class InitDAO {
 //		}
 //
 //	}
-	public static void truncateTable(Connection conn) throws SQLException {
-		Statement stmt = conn.createStatement();
+    /**
+     * Truncate the table
+     *
+     * @param conn The current connection
+     * @throws SQLException The error from SQL
+     */
+    public static void truncateTable(Connection conn) throws SQLException {
+        Statement stmt = conn.createStatement();
 
 //		stmt.addBatch("DROP SCHEMA IF EXISTS se;");
 //		stmt.addBatch("CREATE SCHEMA se CHARACTER SET utf8 COLLATE utf8_bin;");
-		stmt.addBatch("USE se;");
+        stmt.addBatch("USE se;");
 //		stmt.addBatch("CREATE TABLE IF NOT EXISTS admin (\n"
 //				+ "  username varchar(128) NOT NULL,\n"
 //				+ "  password varchar(128) NOT NULL, \n"
 //				+ "   CONSTRAINT admin_pk PRIMARY KEY(username)\n"
 //				+ "   \n"
 //				+ ");");
-		stmt.addBatch("SET FOREIGN_KEY_CHECKS = 0");
+        stmt.addBatch("SET FOREIGN_KEY_CHECKS = 0");
 //		stmt.addBatch("TRUNCATE TABLE admin;");
 //		stmt.addBatch("INSERT INTO admin VALUES ('admin','123')");
-		stmt.addBatch("TRUNCATE TABLE appusage;");
-		stmt.addBatch("TRUNCATE TABLE locationusage;");
-		stmt.addBatch("TRUNCATE TABLE user;");
-		stmt.addBatch("TRUNCATE TABLE app;");
-		stmt.addBatch("TRUNCATE TABLE location;");
+        stmt.addBatch("TRUNCATE TABLE appusage;");
+        stmt.addBatch("TRUNCATE TABLE locationusage;");
+        stmt.addBatch("TRUNCATE TABLE user;");
+        stmt.addBatch("TRUNCATE TABLE app;");
+        stmt.addBatch("TRUNCATE TABLE location;");
 //		stmt.addBatch("SET FOREIGN_KEY_CHECKS = 1");
-		
-		
-		
-		
+
 //		stmt.addBatch("CREATE TABLE IF NOT EXISTS `user` (\n"
 //				+ "  macaddress varchar(40) NOT NULL,\n"
 //				+ "  name varchar(128) NOT NULL, \n"
@@ -103,22 +109,27 @@ public class InitDAO {
 //				+ "  CONSTRAINT locationUsage_pk PRIMARY KEY (`timestamp`,`locationid`), \n"
 //				+ "   CONSTRAINT locationUsage_fk2 FOREIGN KEY (locationid) REFERENCES location(locationid) \n"
 //				+ ");");
-		//int[] recordsAffected;
-		//recordsAffected = stmt.executeBatch();
-		//conn.commit();
-		stmt.executeBatch();
-		conn.commit();
+        //int[] recordsAffected;
+        //recordsAffected = stmt.executeBatch();
+        //conn.commit();
+        stmt.executeBatch();
+        conn.commit();
 
-	}
-	
-	public static void enableForeignKey(Connection conn) throws SQLException {
-		
-		Statement stmt = conn.createStatement();
-		stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
-		
-		conn.commit();
-		
-		
-	}
-	
+    }
+
+    /**
+     * Enables the Foreign Key
+     *
+     * @param conn The current connection
+     * @throws SQLException The error from SQL
+     */
+    public static void enableForeignKey(Connection conn) throws SQLException {
+
+        Statement stmt = conn.createStatement();
+        stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+        conn.commit();
+
+    }
+
 }

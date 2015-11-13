@@ -17,8 +17,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * UserDAO handles interactions between User and Controllers
+ */
 public class UserDAO {
+
     //NOTE: This method is ALSO used by addbatch because addbatch does the same things as bootstrap for demographics.csv, and clearing is in the servlet.
+
+    /**
+     * Inserts rows into user in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param userMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @param macList The list of mac addressesthat is successfully uploaded
+     * to the database
+     * @throws IOException An error found
+     * @return an array of 0 or 1, 1 is a successfully updated record, otherwise
+     *
+     */
     public int[] insert(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn, HashMap<String, String> macList) throws IOException {
         int[] updateCounts = {};
         try {
@@ -30,7 +47,7 @@ public class UserDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Sets Values
                 String macAdd = null;
                 String name = null;
@@ -38,9 +55,9 @@ public class UserDAO {
                 String email = null;
                 String g = null;
                 String cca = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "mac-address":
                             macAdd = Utility.parseString(reader.get("mac-address"));
                             if (macAdd == null) {
@@ -52,14 +69,14 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "name":
                             name = Utility.parseString(reader.get("name"));
                             if (name == null) {
                                 errorMsg += ",blank name";
                             }
                             break;
-                            
+
                         case "password":
                             password = Utility.parseString(reader.get("password"));
                             if (password == null) {
@@ -70,7 +87,7 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "email":
                             email = Utility.parseString(reader.get("email"));
                             if (email == null) {
@@ -82,7 +99,7 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "gender":
                             g = Utility.parseString(reader.get("gender"));
                             if (g == null) {
@@ -94,7 +111,7 @@ public class UserDAO {
                                 }
                             }
                             break;
-                        
+
                         case "cca":
                             cca = Utility.parseString(reader.get("cca"));
                             if (cca == null) {
@@ -104,7 +121,7 @@ public class UserDAO {
                             } else {
                             }
                             break;
-                        
+
                     }
                 }
 
@@ -119,7 +136,7 @@ public class UserDAO {
                     stmt.setString(5, g);
                     stmt.setString(6, cca);
                     stmt.addBatch();
-                }else{
+                } else {
                     userMap.put(index, errorMsg.substring(1));
                 }
                 index++;
@@ -134,6 +151,15 @@ public class UserDAO {
         return updateCounts;
     }
 
+    /**
+     * Add rows into User in the database
+     *
+     * @param reader The CSV reader used to read the csv file
+     * @param userMap The map that will contain errors messages
+     * @param conn The connection to the database
+     * @throws IOException An error found
+     * @return number of rows updated
+     */
     public int[] add(CsvReader reader, TreeMap<Integer, String> userMap, Connection conn) throws IOException {
         int[] updateCounts = {};
         try {
@@ -145,7 +171,7 @@ public class UserDAO {
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
-                
+
                 //Sets Values
                 String macAdd = null;
                 String name = null;
@@ -153,9 +179,9 @@ public class UserDAO {
                 String email = null;
                 String g = null;
                 String cca = null;
-                
-                for(String s: headers){
-                    switch(s){
+
+                for (String s : headers) {
+                    switch (s) {
                         case "mac-address":
                             macAdd = Utility.parseString(reader.get("mac-address"));
                             if (macAdd == null) {
@@ -167,14 +193,14 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "name":
                             name = Utility.parseString(reader.get("name"));
                             if (name == null) {
                                 errorMsg += ",blank name";
                             }
                             break;
-                        
+
                         case "password":
                             password = Utility.parseString(reader.get("password"));
                             if (password == null) {
@@ -185,7 +211,7 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "email":
                             email = Utility.parseString(reader.get("email"));
                             if (email == null) {
@@ -197,19 +223,19 @@ public class UserDAO {
                                 }
                             }
                             break;
-                            
+
                         case "gender":
                             g = Utility.parseString(reader.get("gender"));
                             if (g == null) {
                                 errorMsg += ",blank gender";
                             } else {
-                                 g = g.toLowerCase();
+                                g = g.toLowerCase();
                                 if (!g.equals("f") && !g.equals("m")) {
                                     errorMsg += ",invalid gender";
                                 }
                             }
                             break;
-                        
+
                         case "cca":
                             cca = Utility.parseString(reader.get("cca"));
                             if (cca == null) {
@@ -233,7 +259,7 @@ public class UserDAO {
                     stmt.setString(5, g);
                     stmt.setString(6, cca);
                     stmt.addBatch();
-                }else{
+                } else {
                     userMap.put(index, errorMsg.substring(1));
                 }
                 index++;
@@ -250,6 +276,13 @@ public class UserDAO {
         return updateCounts;
     }
 
+    /**
+     * Retrieve User given the username and password
+     *
+     * @param username The username of a user
+     * @param password The password of a user
+     * @return a User object
+     */
     public User retrieve(String username, String password) {
         String sql = "SELECT * FROM user WHERE email=? AND password=?";
         Connection conn = null;
@@ -279,6 +312,13 @@ public class UserDAO {
         return null;
     }
 
+    /**
+     * Retrieve User by email id
+     *
+     * @param username The username of a user
+     * @param password The password of a user
+     * @return a User object
+     */
     public User retrieveByEmailId(String username, String password) {
         String sql = "SELECT * FROM user WHERE email LIKE ? AND password=?";
         Connection conn = null;
@@ -309,6 +349,12 @@ public class UserDAO {
         return null;
     }
 
+    /**
+     * Retrieve User by username
+     *
+     * @param username The username of a user
+     * @return a User object
+     */
     public User retrieve(String username) {
         String sql = "SELECT * FROM user WHERE email like ?";
         Connection conn = null;
@@ -337,6 +383,12 @@ public class UserDAO {
         return null;
     }
 
+       /**
+     * Check if mac address exist in the database
+     * @param conn The current connection
+     * @param macAdd The mac address of a user
+     * @return a User object
+     */
     public boolean checkMacAdd(Connection conn, String macAdd) {
         String sql = "SELECT macaddress FROM user WHERE macaddress = ?";
         PreparedStatement ps = null;
@@ -360,6 +412,12 @@ public class UserDAO {
         return false;
     }
 
+       /**
+     * Retrieve User by mac address
+     *
+     * @param macaddress The macaddress of a user
+     * @return a User object
+     */
     public User retrieveByMac(String macaddress) {
         String sql = "SELECT * FROM user WHERE macaddress = ?";
 
@@ -390,6 +448,11 @@ public class UserDAO {
         return null;
     }
 
+     /**
+     * Retrieve an arraylist of CCAs
+     *
+     * @return an arraylist of CCAs
+     */
     public ArrayList<String> getCCAs() {
         ArrayList<String> ccas = new ArrayList<String>();
         String sql = "select cca from user group by cca;";
