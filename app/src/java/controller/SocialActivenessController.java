@@ -17,22 +17,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-/**
- * SocialActivenessController controls all actions related to SocialActiveness
- * functionality
- */
 public class SocialActivenessController {
 
-    /**
-     * Retrieves a HashMap object for the location usages in the semantic place
-     *
-     * @param onlyDate The date input by user
-     * @param macAddress macAddress of the User
-     * @param errors The errors 
-     * @return A HashMap object that contains the data category and its breakdown value
-     */
-
-    public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress, String errors) {
+    public HashMap<String, Breakdown> generateAwarenessReport(String onlyDate, String macAddress) {
         //THIS METHOD is going to store first for the user all his apps and THEN check for social
         //DATE and MACADD have already been checked before
         //--------------------------------------------HERE ONWARDS IS THE ONLINE BREAKDOWN----------------------------------------------------------------
@@ -123,24 +110,17 @@ public class SocialActivenessController {
         //Swapping is so that the top values can be on top. additionally, change them into percentages.
         //From here, starts to get the top few 
         DecimalFormat df = new DecimalFormat("#");
-        ArrayList<Long> valuesArr = new ArrayList<Long>(storage.values());
-        Collections.sort(valuesArr);
-        for (int i = valuesArr.size() - 1; i >= 0; i += 0) {//reverse checking
-            Iterator<App> iterApp = storage.keySet().iterator();
-            while (iterApp.hasNext() && i >= 0) {
-                App app = iterApp.next();
-                long time = storage.get(app);
-                if (time == valuesArr.get(i)) {
-                    //helps to round off the percentage
-                    String strPercent = df.format((double) time / overall * 100);
-                    jsonMap.put("app-name", new Breakdown(app.getAppName()));
-                    jsonMap.put("percent", new Breakdown("" + Utility.parseInt(strPercent)));
-                    jsonResults.add(jsonMap);
-                    jsonMap = new HashMap<>();
-                    i--;
-                }
-            }
+        ArrayList<App> arr = new ArrayList<App>(storage.keySet());
+        Collections.sort(arr);
+        for(App app: arr){
+            long time = storage.get(app);
+            String strPercent = df.format((double) time / overall * 100);
+            jsonMap.put("app-name", new Breakdown(app.getAppName()));
+            jsonMap.put("percent", new Breakdown("" + Utility.parseInt(strPercent)));
+            jsonResults.add(jsonMap);
+            jsonMap = new HashMap<>();
         }
+        
         //Final addition for overall for Part 1 of Social Category
         //Makes overall into seconds, then concats to a string to add to breakdown so that it can be stored. breakdown is used to simul arraylist and string
         overallMap.put("total-social-app-usage-duration", new Breakdown("" + (overall / 1000)));
@@ -191,7 +171,7 @@ public class SocialActivenessController {
                 if (userList.containsKey(loc)) {
                     activeArr = userList.get(loc);
                 }
-                activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc));
+                activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), loc));
                 userList.put(loc, activeArr);
                 overall += total; //adds to overall time
                 total = 0;
@@ -216,7 +196,7 @@ public class SocialActivenessController {
             if (userList.containsKey(loc)) {
                 activeArr = userList.get(loc);
             }
-            activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc));
+            activeArr.add(new Activeness(startDateSecs, (total + startDateSecs), loc));
             userList.put(loc, activeArr);
             overall += total; //adds to overall time
             //--------------------------------------PART II: GROUPING OF LOCATION AND TIME -- INDIVIDUALS.------------------------------------------------------------
@@ -259,7 +239,7 @@ public class SocialActivenessController {
                     total += diff;
                     if (!loc.equals(l) || (time - prevTime) > 300000) {
                         //Creates a new activeness based on what has been calculated
-                        Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc);
+                        Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), loc);
                         //Checks if the location is an overlap to see if it is worth to be stored.
                         overlapUser(userList, singleList, ac, loc);
                         //Resets for next location
@@ -276,7 +256,7 @@ public class SocialActivenessController {
                     }
                     total += diff;
                     //Creates a new activeness based on what has been calculated
-                    Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc);
+                    Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), loc);
                     //This method is below. it helps to tally all the overlaps of a single user. Once overlap is completed, we can start checking for overlap within the 
                     //userOverlapList
                     overlapUser(userList, singleList, ac, loc);
@@ -316,7 +296,7 @@ public class SocialActivenessController {
                 }
                 total += diff;
                 //Creates a new activeness based on what has been calculated
-                Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), macAddress, loc);
+                Activeness ac = new Activeness(startDateSecs, (total + startDateSecs), loc);
                 //This method is below. it helps to tally all the overlaps of a single user. Once overlap is completed, we can start checking for overlap within the 
                 //userOverlapList
                 overlapUser(userList, singleList, ac, loc);
@@ -343,11 +323,11 @@ public class SocialActivenessController {
             long group = 0;
             for (Activeness active : userOverlapList) {
                 group += active.getTime();
-
+                
             }
-
+            
             String groupPercent = df.format((double) group / overall * 100);
-
+            
             long soloPercent = 100 - Utility.parseInt(groupPercent);
             overallMap.put("total-time-spent-in-sis", new Breakdown("" + overall / 1000));
             overallMap.put("group-percent", new Breakdown("" + groupPercent));
@@ -361,14 +341,7 @@ public class SocialActivenessController {
         return overallMap;
     }
 
-    /**
-     * This method will check whether there is an overlap between this user and the current user in process.
-     * @param userList The list of users 
-     * @param singleList The list of activeness of a single user
-     * @param ac The Activeness Object that is to be compared with
-     * @param loc The Location of the Activeness
-     */
-    
+    //This method will check whether there is an overlap between this user and the current user in process.
     public void overlapUser(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
         if (userList.containsKey(loc)) {
             ArrayList<Activeness> activeList = userList.get(loc);
@@ -391,14 +364,7 @@ public class SocialActivenessController {
             }
         }
     }
-    /**
-     * This method will check if the Activeness hits 5 minutes, if not, removed the activeness
-     * @param userList The list of users 
-     * @param singleList The list of activeness of a single user
-     * @param ac The Activeness Object that is to be compared with
-     * @param loc The Location of the Activeness
-     */
-    
+
     public void checkMinutes(HashMap<Location, ArrayList<Activeness>> userList, ArrayList<Activeness> singleList, Activeness ac, Location loc) {
         //If it is NOT a continuation, you will check the entire makeup of the previous set to check if it is 5 minutes. If not, delete.
         //Reverse to check the last few if they make up 5 minutes, if not DELETE.
