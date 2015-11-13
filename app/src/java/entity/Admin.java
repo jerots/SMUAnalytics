@@ -9,24 +9,42 @@ package entity;
  *
  * @author jeremyongts92
  */
+/**
+ * Admin represents the Administrators of the Application
+ */
 public class Admin {
-	
-	String username;
-	String password;
 
-	public Admin(String username, String password) {
-		this.username = username;
-		this.password = password;
-	}
+    String username;
+    String password;
+
+    /**
+     * Creates an Admin object with the specified username and password
+     *
+     * @param username The username of an Admin
+     * @param password The password of an Admin
+     */
+    public Admin(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 //
-	public String getUsername() {
-		return username;
-	}
 
-	public String getPassword() {
-		return password;
-	}
-	
-	
-	
+    /**
+     * Get the username of the Admin
+     *
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Get the password of the Admin
+     *
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
 }
