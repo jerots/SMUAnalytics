@@ -1,9 +1,3 @@
-<%-- 
-    Document   : home
-    Created on : Sep 30, 2015, 1:22:22 PM
-    Author     : jeremyongts92
---%>
-
 <%@page import="java.util.TreeMap"%>
 <%@page import="java.util.TreeSet"%>
 <%@page import="dao.LocationDAO"%>
@@ -22,8 +16,8 @@
         <%@include file="import-css.jsp" %>
     </head>
     <body>
-        <%			User user = (User) session.getAttribute("user");
-
+        <%			
+            User user = (User) session.getAttribute("user");
         %>	
         <!--NAVBAR-->
         <nav class="navbar-static-top navbar-default">
@@ -46,17 +40,17 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Basic App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="student">Basic App (with demographic)</a></li>
-                                <li><a href="basicapp-appcat.jsp">App category</a></li>
-                                <li><a href="basicapp-diurnal.jsp">Diurnal Report</a></li>
+                                <li><a href="student">Usage Time</a></li>
+                                <li><a href="basicapp-appcat.jsp">App Category</a></li>
+                                <li><a href="basicapp-diurnal.jsp">Diurnal Pattern</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Top-K App Usage <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="top-kreport.jsp">Top-k most used apps (given a school)</a></li>
-                                <li><a href="top-kstudent.jsp">Top-k students with most app usage (given an app category)</a></li>
-                                <li><a href="top-kschool.jsp">Top-k schools with most app usage (given an app category)</a></li>
+                                <li><a href="top-kreport.jsp">Most used apps</a></li>
+                                <li><a href="top-kstudent.jsp">Students with most app usage</a></li>
+                                <li><a href="top-kschool.jsp">Schools with most app usage</a></li>
                             </ul>
                         </li>
                         <li class="active"><a href="smartphoneOveruse.jsp">Smartphone Overuse</a></li>
@@ -110,14 +104,16 @@
                 </div>
 
                 <div class="theme-div theme-content" style="width:60%">
-                    <h4><b>Smartphone Overuse</b> </h4> <hr>
+                    <h4><b>Smartphone Overuse Report</b> </h4> <hr>
                     <%
                         TreeMap<String, String> result = (TreeMap<String, String>) request.getAttribute("result");
                         String errors = (String) request.getAttribute("errors");
                         
                         if(errors != null && errors.length() >0){
-                            out.println("<h3 style='color:red'>Warning:</h3>");
-                            out.println("<h3 style='color:red'>" + errors + "</h3>");
+                            out.println("<h1 class=errorMsg>Error!</h1>");
+                            out.println("<ul>");
+                            out.println("<li>" + errors + "</li>");
+                            out.println("</ul>");
                         } else if (result != null) {
                             out.print("Overuse results: ");
 

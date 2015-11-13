@@ -1,9 +1,3 @@
-<%-- 
-    Document   : index
-    Created on : Sep 30, 2015, 12:04:42 PM
-    Author     : jeremyongts92
---%>
-
 <%@page import="java.sql.SQLException"%>
 <%@page import="dao.InitDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
