@@ -60,7 +60,7 @@ public class DeleteLocation extends HttpServlet {
             String endTime = request.getParameter("endtime");
             String locationId = request.getParameter("locationid");
             String semanticPl = request.getParameter("semanticplace");
-            String macAdd = request.getParameter("macadd");
+            String macAdd = request.getParameter("macaddress");
 			
 			if (semanticPl != null){
 				semanticPl = semanticPl.toUpperCase();
@@ -93,28 +93,9 @@ public class DeleteLocation extends HttpServlet {
                     errorArr.add("invalid token");
                 }
 
-            }
+            }			
 			
-			//STARTDATE VALIDATION (mandatory)
-            if (startDate == null) {
-                errorArr.add("missing startdate");
-            } else if (startDate.length() == 0) {
-                errorArr.add("blank startdate");
-            } else {
-				startDate = startDate.trim();
-                if (startDate.length() != 10) {
-                    errorArr.add("invalid startdate");
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-                    Date dateFormatted = sdf.parse(startDate, new ParsePosition(0));
-                    if (dateFormatted == null) {
-                        errorArr.add("invalid startdate");
-                    }
-                }
-            }
-			
-			
-            //ALL OTHER VALIDATIONS ARE DONE BY THE CONTROLLER
+            //ALL VALIDATIONS ARE DONE BY THE CONTROLLER
             DeleteController dCntrl = new DeleteController();
             ArrayList<String> error = new ArrayList<String>();
             ArrayList<LocationUsage> lList = null;
@@ -141,7 +122,7 @@ public class DeleteLocation extends HttpServlet {
 
             if (lList != null && lList.size() != 0) {
                 output.addProperty("status", "success");
-                output.addProperty("num-records-deleted", lList.size());
+                output.addProperty("num-record-deleted", lList.size());
                 JsonArray arr = new JsonArray();
                 for (LocationUsage lu : lList) {
                     JsonObject obj = new JsonObject();
