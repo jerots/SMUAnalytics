@@ -7,16 +7,32 @@ import dao.Utility;
 import entity.AppUsage;
 import entity.Breakdown;
 import entity.User;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+/**
+ * BasicAppController controls all actions related to basic app report
+ * functionality
+ */
 public class BasicAppController {
 
+    /**
+     * Retrieves a Breakdown object to display usage duration and percentage of
+     * the total based on category
+     *
+     * @param startDate The start date specified by user
+     * @param endDate The end date specified by the user
+     * @param userList User List based on one filter demographics else default
+     * null
+     * @param total Total number of user based all filter else default -1
+     * @return Breakdown object contains ArrayList of HashMap with usage
+     * duration category and percentage
+     */
     public Breakdown generateReport(Date startDate, Date endDate, ArrayList<User> userList, double total) {
 
         //INTIATING VARIABLES
@@ -52,7 +68,7 @@ public class BasicAppController {
             Date oldTime = null;
             if (userUsage.size() > 0) {
                 oldTime = userUsage.get(0).getDate();
-                if(oldTime.after(nextDay)) {
+                if (oldTime.after(nextDay)) {
                     nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
                 }
             }
@@ -77,7 +93,7 @@ public class BasicAppController {
 
                 } else {  // NEW TIMING AFTER NEXT DAY
                     nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
-                    
+
                     if (!beforeAppeared) {
                         long difference = Utility.secondsBetweenDates(oldTime, newTime);
                         if (difference <= 2 * 60) {
@@ -104,7 +120,7 @@ public class BasicAppController {
             } else {
                 totalSeconds += 10;
             }
-            
+
             //DIVIDE TO GET INTO DAYS
             long days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24) + 1;
             totalSeconds /= days;
@@ -152,6 +168,15 @@ public class BasicAppController {
         return result;
     }
 
+    /**
+     * Retrieves a Breakdown object with filters and its breakdown
+     *
+     * @param startDate The start date specified by user
+     * @param endDate The end date specified by the user
+     * @param demoArr List of filter specified by the user
+     * @return Breakdown object contains ArrayList of HashMap with filter and
+     * its breakdown
+     */
     public Breakdown generateReportByDemo(Date startDate, Date endDate, String[] demoArr) {
 
         //INSTANTIATING VARIABLES
@@ -167,6 +192,7 @@ public class BasicAppController {
         ArrayList<String> years = Utility.getYears();
         ArrayList<String> genders = Utility.getGenders();
         ArrayList<String> ccas = userDAO.getCCAs();
+        Collections.sort(ccas);
 
         ArrayList<String> demo1List = new ArrayList<String>();
         ArrayList<String> demo2List = new ArrayList<String>();
@@ -377,6 +403,14 @@ public class BasicAppController {
         return result;
     }
 
+    /**
+     * Retrieves a list of User based on filter
+     *
+     * @param demo a value of the demoType
+     * @param demoType a filter
+     * @param userList userList to filter
+     * @return ArrayList of user based on the specified filter
+     */
     public ArrayList<User> filterDemo(String demo, String demoType, ArrayList<User> userList) {
 
         ArrayList<User> toParse = (ArrayList<User>) userList.clone();
@@ -429,6 +463,12 @@ public class BasicAppController {
 
     }
 
+    /**
+     * Method calculate the percent for each Breakdown
+     *
+     * @param breakdown ArrayList of HashMap with filer and its breakdown
+     * @param total Total number of user based all filter
+     */
     public void generatePercentage(Breakdown breakdown, double total) {
 
         ArrayList<HashMap<String, Breakdown>> list1 = breakdown.getBreakdown();
@@ -442,6 +482,15 @@ public class BasicAppController {
 
     }
 
+    /**
+     * Retrieves a TreeMap object of app usage duration and overall percentage
+     * for each category
+     *
+     * @param startDate The start date specified by user
+     * @param endDate The end date specified by the user
+     * @return A TreeMap object that contains the app usage duration and overall
+     * percentage for each category
+     */
     public TreeMap<String, Integer[]> generateAppCategory(Date startDate, Date endDate) {
 
         //Total Usage Time for each appid
@@ -460,11 +509,11 @@ public class BasicAppController {
             User currUser = userList.get(i);
             ArrayList<AppUsage> userUsage = auDAO.retrieveByUser(currUser.getMacAddress(), startDate, endDate);
             Date nextDay = new Date(startDate.getTime() + 60 * 60 * 1000 * 24);
-            
+
             Date oldTime = null;
             if (userUsage.size() > 0) {
                 oldTime = userUsage.get(0).getDate();
-                if(oldTime.after(nextDay)) {
+                if (oldTime.after(nextDay)) {
                     nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
                 }
             }
@@ -478,7 +527,7 @@ public class BasicAppController {
                 boolean beforeAppeared = false;
                 if (newTime.before(nextDay)) {
                     beforeAppeared = true;
-                    
+
                     //difference = usage time of the oldTime appId
                     double difference = Utility.secondsBetweenDates(oldTime, newTime);
 
@@ -503,14 +552,14 @@ public class BasicAppController {
 
                     }
 
-                } else { 
+                } else {
                     nextDay = new Date(nextDay.getTime() + 60 * 60 * 1000 * 24);
-                    
+
                     if (!beforeAppeared) {
                         double diff = Utility.secondsBetweenDates(oldTime, newTime);
                         //add time to the appid
                         if (diff <= 2 * 60) {
-                        // add time to the appId
+                            // add time to the appId
                             if (appResult.containsKey(appId)) {
                                 double value = appResult.get(appId);
                                 appResult.put(appId, (value + diff));
@@ -535,7 +584,7 @@ public class BasicAppController {
                 oldTime = newTime;
 
             }
-            
+
             //get the appId of the last user usage
             int lastAppId = userUsage.get(userUsage.size() - 1).getAppId();
 
@@ -558,7 +607,7 @@ public class BasicAppController {
                     }
                 }
             } else {
-                
+
                 if (appResult.containsKey(lastAppId)) {
                     double value = appResult.get(lastAppId);
                     appResult.put(lastAppId, (value + 10));
@@ -567,7 +616,6 @@ public class BasicAppController {
                 }
 
             }
-            
 
             //DIVIDE TO GET INTO DAYS
             long days = Utility.daysBetweenDates(startDate, endDate);
@@ -594,9 +642,9 @@ public class BasicAppController {
                     }
                     totCatTime += timePerApp;
                 }
-                
+
                 double avgCatTime = totCatTime / days;
-                
+
                 totTime += avgCatTime;
                 result.put(key, avgCatTime);
             }
@@ -609,8 +657,8 @@ public class BasicAppController {
                 double duration = result.get(name);
                 double percent = (duration / totTime) * 100;
                 Integer[] arrToReturn = new Integer[2];
-                
-                arrToReturn[0] = Integer.valueOf(Math.round(duration)+ "");
+
+                arrToReturn[0] = Integer.valueOf(Math.round(duration) + "");
                 arrToReturn[1] = Integer.valueOf(Math.round(percent) + "");
                 toResult.put(name, arrToReturn);
 
@@ -630,6 +678,13 @@ public class BasicAppController {
         return toResult;
     }
 
+    /**
+     * Retrieves a Breakdown object of app usage duration based on hours
+     *
+     * @param startDate The start date specified by user
+     * @param demoArr The filter specified by the user
+     * @return A Breakdown object of app usage duration based on hours
+     */
     public Breakdown generateDiurnalReport(Date startDate, String[] demoArr) {
 
         Breakdown result = new Breakdown();

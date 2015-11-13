@@ -34,11 +34,10 @@ public class AddBatchController {
 
     
      /**
-     * Retrieves a TreeMap<String, Integer> object for the data add additional data to the bootstrapped files
+     * Retrieves a  object for the data add additional data to the bootstrapped files
      *
      * @param filePart The zipped input file
      * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
-     * @param delErrMap The map that contains error messages and its corresponding row from location-delete.csv
      * @param auErrMap The map that contains error messages and its corresponding row from app.csv
      * @param luErrMap The map that contains error messages and its corresponding row from location.csv
      * @param delMap The map that contains uploaded successful row and non successful rows from location-delete.csv

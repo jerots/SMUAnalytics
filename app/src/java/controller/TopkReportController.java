@@ -18,7 +18,7 @@ import java.util.TreeMap;
 public class TopkReportController {
 
     /**
-     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * Retrieves a  object for the data that
      * belongs contains the Top-k most used apps(Given a school)
      *
      * @param topK The top-k apps for a given duration
@@ -146,11 +146,11 @@ public class TopkReportController {
     }
 
     /**
-     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * Retrieves a object for the data that
      * belongs contains the Top-k student(Given a app category)
      *
      * @param topK The top-k students for a given duration
-     * @param category The top-k students for a given category
+     * @param cat The top-k students for a given category
      * @param strDate The top-k students from the given start date
      * @param endDate The top-k students until the given end date
      * @param errors The errors generated from the top-k students
@@ -269,11 +269,11 @@ public class TopkReportController {
     }
 
         /**
-     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
+     * Retrieves a  object for the data that
      * belongs contains the Top-k most school(Given a app category)
      *
      * @param topK The top-k school for a given duration
-     * @param category The top-k school for a given category
+     * @param cat The top-k school for a given category
      * @param strDate The top-k school from the given start date
      * @param endDate The top-k school until the given end date
      * @param errors The errors generated from the top-k school
