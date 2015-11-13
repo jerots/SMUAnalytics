@@ -462,8 +462,9 @@ public class LocationUsageDAO {
                     + "    where au.macaddress = lu.macaddress\n"
                     + "    and lu.locationid = l.locationid \n"
                     + "    and semanticplace like ?\n"
-                    + "    AND lu.timestamp >= ? and lu.timestamp <= ?\n"
-                    + "    and au.timestamp >= ? and au.timestamp <= ?\n"
+                    + "    AND lu.timestamp >= ? and lu.timestamp < ?\n"
+                    + "    and au.timestamp >= ? and au.timestamp < ?\n"
+                    + "    group by lu.macaddress \n"
                     + "    order by lu.macaddress, lu.timestamp;";
 
             conn = ConnectionManager.getConnection();
