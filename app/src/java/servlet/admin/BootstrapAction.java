@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import controller.AddBatchController;
 import controller.BootstrapController;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 @WebServlet(urlPatterns = {"/BootstrapAction"})
@@ -38,18 +39,20 @@ public class BootstrapAction extends HttpServlet {
         TreeMap<Integer, String> locErrMap = new TreeMap<Integer, String>();
         TreeMap<Integer, String> auErrMap = new TreeMap<Integer, String>();
         TreeMap<Integer, String> luErrMap = new TreeMap<Integer, String>();
+        HashMap<String, Integer> delMap = new HashMap<String, Integer>();
         //SET FOR UI TO GET THE ATTRIBUTES.
         request.setAttribute("userErrMap", userErrMap);
         request.setAttribute("appErrMap", appErrMap);
         request.setAttribute("locErrMap", locErrMap);
         request.setAttribute("auErrMap", auErrMap);
         request.setAttribute("luErrMap", luErrMap);
+        request.setAttribute("delMap", delMap);
         if(option.equals("bootstrap")){    
             //BOOTSTRAP
             // Retrieves <input type="file" name="zipFile">
             if (filePart != null && filePart.getSize() > 0) {
                 BootstrapController ctrl = new BootstrapController();
-                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap);
+                recordMap = ctrl.bootstrap(filePart, userErrMap, appErrMap, locErrMap, auErrMap, luErrMap, delMap);
             }
 
         } else {
@@ -57,7 +60,7 @@ public class BootstrapAction extends HttpServlet {
             try {
                 if(filePart != null && filePart.getSize() > 0){
                     AddBatchController cntrl = new AddBatchController();
-                    recordMap = cntrl.addBatch(filePart, userErrMap, auErrMap, luErrMap);
+                    recordMap = cntrl.addBatch(filePart, userErrMap, auErrMap, luErrMap, delMap);
                 }
 
             }catch (Exception e) {

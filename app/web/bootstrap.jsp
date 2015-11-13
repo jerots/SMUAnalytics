@@ -1,9 +1,10 @@
-<%-- 
+add-data<%-- 
     Document   : home
     Created on : Sep 30, 2015, 1:12:53 PM
     Author     : jeremyongts92
 --%>
 
+<%@page import="java.util.HashMap"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.TreeMap"%>
 <%@page import="entity.Admin"%>
@@ -97,6 +98,7 @@
                             out.println("Additional Files time taken: " + timeTaken + " seconds");
                         }
                         TreeMap<String, Integer> recordMap = (TreeMap<String, Integer>) request.getAttribute("recordMap");
+                        HashMap<String, Integer> delMap = (HashMap<String, Integer>) request.getAttribute("delMap");
                         if (recordMap != null) {
                             int appCount = recordMap.get("app-lookup.csv");
                             if (appCount >= 0) {
@@ -269,26 +271,26 @@
 
                             out.println("</table>");
                         }
-
+                        }
                     %>
                     <P>
                         <%---locationUsageDelete---%>
 
-                        <%		int locationDeleteCount = recordMap.get("location-delete.csv");
+                        <% if(delMap != null){	
+                        int locationDeleteCount = delMap.get("location-delete.csv");
                                 if (locationDeleteCount >= 0) {
                                     out.println("<h4><b> location-delete.csv</b> </h4><hr>");
-                                    if (recordMap.get("location-delete.csv") >= 0) {
+                                    if (delMap.get("location-delete.csv") >= 0) {
                                         out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'><td colspan='2'><b>Location Delete</b></td></tr><tr><td>");
-                                        out.println("<b>num-record-deleted</b></td><td>" + recordMap.get("location-delete.csv") + "</td></tr>");
-                                        out.println("<tr><td><b>num-record-not-found</b></td><td>" + recordMap.get("deletenotfound") + "</td></tr></table>");
+                                        out.println("<b>num-record-deleted</b></td><td>" + delMap.get("location-delete.csv") + "</td></tr>");
+                                        out.println("<tr><td><b>num-record-not-found</b></td><td>" + delMap.get("deletenotfound") + "</td></tr></table>");
 
                                     }
                                 }
-
-                            } else if (printer != null) {
+                        }
+                            if (recordMap == null && delMap == null && printer != null) {
                                 out.println("<br><br><h4><b>You have not uploaded any files.</b></h4>");
                             }
-
                         %>
                 </div>
 

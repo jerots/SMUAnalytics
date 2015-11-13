@@ -41,7 +41,7 @@ public class BootstrapController {
 	//RETURNS A COMBINATION OF "DATA FILES & ROWS UPDATED"
     
       /**
-     * Retrieves a  object for the data bootstrapping of zip file
+     * Retrieves a TreeMap<String, Integer> object for the data bootstrapping of zip file
      *
      * @param filePart The zipped input file
      * @param userErrMap The map that contains error messages and its corresponding row from demographics.csv
@@ -49,11 +49,12 @@ public class BootstrapController {
      * @param locErrMap The map that contains error messages and its corresponding row from location-lookup.csv
      * @param auErrMap The map that contains error messages and its corresponding row from app.csv
      * @param luErrMap The map that contains error messages and its corresponding row from location.csv
+     * @param delMap The map that contains uploaded successful row and non successful rows from location-delete.csv
      * @return A treemap objects that belongs contains the
      * records successfully updated for each csv file in the input Zipped File
      */
 	public TreeMap<String, Integer> bootstrap(Part filePart, TreeMap<Integer, String> userErrMap, TreeMap<Integer, String> appErrMap,
-			TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap)
+                TreeMap<Integer, String> locErrMap, TreeMap<Integer, String> auErrMap, TreeMap<Integer, String> luErrMap, HashMap<String, Integer> delMap)
 			throws IOException {
 
 		InputStream fileContent = filePart.getInputStream();
@@ -214,14 +215,14 @@ public class BootstrapController {
 			}
 		}
 		br.close();
-
+                
 		result.put("demographics.csv", userUpdated);
 		result.put("app-lookup.csv", appUpdated);
 		result.put("location-lookup.csv", locUpdated);
 		result.put("app.csv", auUpdated);
 		result.put("location.csv", luUpdated);
-		result.put("location-delete.csv", delUpdated);
-                result.put("deletenotfound", notFound);
+		delMap.put("location-delete.csv", delUpdated);
+                delMap.put("deletenotfound", notFound);
 		try {
 			InitDAO.enableForeignKey(conn);
 

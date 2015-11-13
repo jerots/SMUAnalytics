@@ -24,25 +24,43 @@ public class LocationDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             int index = 2;
             reader.readHeaders();
+            String[] headers = reader.getHeaders();
             while (reader.readRecord()) {
                 //retrieving per row
                 String errorMsg = "";
                 
-                int locationId = Utility.parseInt(reader.get("location-id"));
-                if (locationId <= 0) {
-                    errorMsg += ",invalid location-id";
-                }
+                //Sets Values
+                int locationId = -1;
+                String semanticPl = null;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "location-id":
+                            String locId = Utility.parseString(reader.get("location-id"));
+                            if(locId == null){
+                                errorMsg += ",blank location-id";
+                            }else{
+                                locationId = Utility.parseInt(locId);
+                                if (locationId <= 0) {
+                                    errorMsg += ",invalid location id";
+                                }
+                            }
+                            break;
+                        
+                        case "semantic-place":
+                            semanticPl = Utility.parseString(reader.get("semantic-place"));
+                            if (semanticPl == null) {
+                                errorMsg += ",semantic place cannot be blank";
+                            } else {
+                                semanticPl = semanticPl.toUpperCase();
+                                String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
+                                int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
 
-                String semanticPl = Utility.parseString(reader.get("semantic-place"));
-                if (semanticPl == null) {
-                    errorMsg += ",semantic place cannot be blank";
-                } else {
-                    semanticPl = semanticPl.toUpperCase();
-                    String school = semanticPl.substring(0, 7); //SMUSISL or SMUSISB
-                    int levelNum = Utility.parseInt(semanticPl.substring(7, 8));//1-5
-
-                    if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
-                        errorMsg += ",invalid semantic place";
+                                if (!(school.equals("SMUSISL") || school.equals("SMUSISB")) || levelNum < 1 || levelNum > 5) {
+                                    errorMsg += ",invalid semantic place";
+                                }
+                            }
+                            break;
                     }
                 }
 

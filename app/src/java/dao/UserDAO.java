@@ -102,7 +102,6 @@ public class UserDAO {
                             } else if (cca.length() > 63) {
                                 errorMsg += ",cca record too long";
                             } else {
-                                cca = cca.toLowerCase();
                             }
                             break;
                         

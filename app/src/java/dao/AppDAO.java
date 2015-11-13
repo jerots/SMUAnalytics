@@ -29,34 +29,52 @@ public class AppDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             //Reads the headers to decide where to go!
             reader.readHeaders();
+            String[] headers = reader.getHeaders();
             //index starts at 2 because the headers count as a row.
             int index = 2;
             while (reader.readRecord()) {
                 String errorMsg = "";
-
-                int appId = Utility.parseInt(reader.get("app-id"));
-                if (appId <= 0) {
-                    errorMsg += ",blank app-id";
-                }
-
-                String name = Utility.parseString(reader.get("app-name"));
-               
-                if (name == null) {
-                    errorMsg += ",blank app-name";
-                } else {
-                     name = name.replace("\"", "");
-                }
-
-                String cat = Utility.parseString(reader.get("app-category"));
-               
-
-                if (cat == null) {
-                    errorMsg += ",blank app-category";
-                }else{
-                    cat = cat.toLowerCase();
-                     cat = cat.replace("\"", "");
-                    if (!Utility.checkCategory(cat)) {
-                        errorMsg += ",invalid category";
+                
+                //Values declared
+                int appId = -1;
+                String name = null;
+                String cat = null;
+                
+                for(String s: headers){
+                    switch(s){
+                        case "app-id":
+                            //APPID VALIDATION
+                            String appIdS = reader.get("app-id");
+                            if(appIdS == null || appIdS.length() == 0){
+                                errorMsg += ",blank app-id";
+                            }else{
+                                appId = Utility.parseInt(appIdS);
+                                if (appId <= 0) {
+                                    errorMsg += ",invalid app id";
+                                }
+                            }
+                            break;
+                        
+                        case "app-name":
+                            name = Utility.parseString(reader.get("app-name"));
+                            if (name == null) {
+                                errorMsg += ",blank app-name";
+                            } else {
+                                 name = name.replace("\"", "");
+                            }
+                            break;
+                        
+                        case "app-category":
+                            cat = Utility.parseString(reader.get("app-category"));
+                            if (cat == null) {
+                                errorMsg += ",blank app-category";
+                            }else{
+                                cat = cat.toLowerCase();
+                                 cat = cat.replace("\"", "");
+                                if (!Utility.checkCategory(cat)) {
+                                    errorMsg += ",invalid app category";
+                                }
+                            }
                     }
                 }
 
