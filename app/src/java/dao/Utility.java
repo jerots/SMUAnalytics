@@ -39,8 +39,7 @@ public final class Utility {
 
     /**
      * Converts a date with type "String" into a Date object
-     *
-     * @param Date in String for formatting
+     * @param date in String for formatting
      * @return Date object in "yyyy-MM-dd HH:mm:ss"
      */
     public static Date parseDate(String date) {
@@ -57,7 +56,7 @@ public final class Utility {
     /**
      * Format a date into DateFormat "yyyy-MM-dd HH:mm:ss"
      *
-     * @param Date object for formatting
+     * @param date object for formatting
      * @return String object of the input date in "yyyy-MM-dd HH:mm:ss"
      */
     public static String formatDate(Date date) {
@@ -73,7 +72,7 @@ public final class Utility {
     /**
      * Format a date into DateFormat "yyyy-MM-dd"
      *
-     * @param Date in String for formatting
+     * @param date in String for formatting
      * @return Date object in "yyyy-MM-dd"
      */
     public static Date parseOnlyDate(String date) {
@@ -90,7 +89,7 @@ public final class Utility {
     /**
      * Format a date into DateFormat "yyyy-MM-dd"
      *
-     * @param Date object for formatting
+     * @param date object for formatting
      * @return String object of input Date in "yyyy-MM-dd"
      */
     public static String formatOnlyDate(Date date) {
@@ -106,7 +105,7 @@ public final class Utility {
     /**
      * Validate that date is in the correct format "yyyy-MM-dd HH:mm:ss"
      *
-     * @param Date in String for validation
+     * @param str in String for validation
      * @return true if date is valid, false if otherwise
      */
     public static boolean checkDate(String str) {
@@ -118,7 +117,7 @@ public final class Utility {
     /**
      * Validate that date is in the correct format "yyyy-MM-dd"
      *
-     * @param Date in String for validation
+     * @param str in String for validation
      * @return true if date is valid, false if otherwise
      */
     public static boolean checkOnlyDate(String str) {
@@ -234,7 +233,7 @@ public final class Utility {
      * Retrieve an ArrayList of all schools that are not in the input list of
      * schools
      *
-     * @param an ArrayList of all schools that exist in the list of schools
+     * @param schools an ArrayList of all schools that exist in the list of schools
      * @return an ArrayList of all schools that are not in the input list of
      * schools
      */
@@ -303,8 +302,8 @@ public final class Utility {
     /**
      * Calculates the time in milliseconds after 24 hours
      *
-     * @param the time of the date for conversion
-     * @result the time of the input date after 24 hours
+     * @param time the time of the date for conversion
+     * @return the time of the input date after 24 hours
      */
     public static long getEndTime(long time) {
         return (time / (60 * 60 * 24 * 1000) + 1) * (60 * 60 * 24 * 1000);
@@ -367,7 +366,7 @@ public final class Utility {
     }
     /**
      * Get an arraylist of available years
-     *
+     * @return an arraylist of available years
      */
     public static ArrayList<String> getYears() {
         return years;
@@ -375,7 +374,7 @@ public final class Utility {
 
     /**
      * Get an arraylist of available gender
-     *
+     * @return an arraylist of available gender
      */
     public static ArrayList<String> getGenders() {
         return genders;

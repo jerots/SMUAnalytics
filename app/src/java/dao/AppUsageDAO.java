@@ -142,6 +142,7 @@ public class AppUsageDAO {
      * @param conn The connection to the database
      * @return number of rows updated
      * @throws SQLException An error caused by SQL
+     * @throws IOException An error found
      */
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException, SQLException {
         int updateCounts = 0;

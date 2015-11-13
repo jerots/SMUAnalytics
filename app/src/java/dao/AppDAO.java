@@ -140,11 +140,8 @@ public class AppDAO {
                 int appid = rs.getInt(1);
                 String appname = rs.getString(2);
                 String category = rs.getString(3);
-
                 return new App(appid, appname, category);
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

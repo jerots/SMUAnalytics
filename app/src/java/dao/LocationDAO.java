@@ -27,6 +27,7 @@ public class LocationDAO {
      * @param conn The connection to the database
      * @param locationIdList The list of location id that is successfully
      * uploaded to the database
+     * @throws IOException An error found
      * @return an array of int, any number above 0 is the row is success
      * updated, otherwise not successfully updated.
      */
@@ -139,7 +140,6 @@ public class LocationDAO {
 
     /**
      * Retrieve a list of semantic place
-     *
      * @return an arraylist of semantic place
      */
     public ArrayList<String> retrieveAll() {

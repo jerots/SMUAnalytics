@@ -48,6 +48,7 @@ public class LocationUsageDAO {
      * @param conn The connection to the database
      * @param locationIdList The list of location id that is successfully
      * uploaded to the database
+     * @throws IOException An error found
      * @return an array of int, any number above 0 is the row is success
      * updated, otherwise not successfully updated.
      */
@@ -155,6 +156,7 @@ public class LocationUsageDAO {
      * @param reader The CSV reader used to read the csv file
      * @param errMap The map that will contain errors messages
      * @param conn The connection to the database
+     * @throws IOException An error found
      * @return number of rows updated
      */
     public int add(CsvReader reader, TreeMap<Integer, String> errMap, Connection conn) throws IOException {
@@ -296,6 +298,7 @@ public class LocationUsageDAO {
      *
      * @param reader The CSV reader used to read the csv file
      * @param conn The connection to the database
+     * @throws IOException An error found
      * @return array list of rows deleted. For each row, anything above 0 is the
      * row is success updated, otherwise not successfully updated.
      */
@@ -353,7 +356,7 @@ public class LocationUsageDAO {
      * @param endDate The end date of interest
      * @param locationId The unique id of a location
      * @param semanticPlace The corresponding place of the locationId
-     * @throws SQLException
+     * @throws SQLException An SQL Exception found
      * @return array list LocationUsage
      */
     public ArrayList<LocationUsage> delete(Connection conn, String macAdd, String startDate, String endDate, int locationId, String semanticPlace) throws SQLException {
@@ -610,9 +613,8 @@ public class LocationUsageDAO {
      * @param startInLocation The starting location id
      * @param endInLocation The ending location id
      * @param prevLocationId The previous location id
-     * @param macAddress The mac address of a specific user
+     * @param macaddress The mac address of a specific user
      * @param totalAUList The list of AppUsage
-     * @return an HashMap of LocationUsage
      */
     public void retrieve(java.util.Date startInLocation, java.util.Date endInLocation, int prevLocationId, String macaddress, ArrayList<LocationUsage> totalAUList) {
         Connection conn = null;
