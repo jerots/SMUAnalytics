@@ -159,35 +159,35 @@
 							String names = "";
 							out.println("<h1>Result</h1>");
 							//This prints the type of table
-							out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
+                                                        if(!values.isEmpty()){
+                                                            out.println("<table border=1px class='table table-striped'><tr style='background-color:lightsalmon'>");
+                                                            out.println("<td><b>Rank (for schools with most app usage)</b></td><td><b>School</b></td><td><b>App usage Time</b></td></tr>");
+                                                            for (int i = 0; i < values.size(); i++) {
+                                                                    //This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
+                                                                HashMap<String, String> indiv = values.get(i);
+                                                                int rank = Utility.parseInt(indiv.get("rank"));
+                                                                //Gets ready the schools to add on.
+                                                                names = getSchoolName(indiv.get("school"));
+                                                                schoolList.add(indiv.get("school"));
+                                                                String duration = indiv.get("duration");
+                                                                out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
+                                                                for (int j = i + 1; j < values.size(); j++) {
+                                                                        HashMap<String, String> other = values.get(j);
+                                                                        if (Utility.parseInt(other.get("rank")) == rank) {
+                                                                                names += ", " + getSchoolName(other.get("school"));
+                                                                                schoolList.add(other.get("school")); //this is to check for schools with 0
+                                                                                i++;
+                                                                        } else {
+                                                                                break;
+                                                                        }
+                                                                }
 
-							out.println("<td><b>Rank (for schools with most app usage)</b></td><td><b>School</b></td><td><b>App usage Time</b></td></tr>");
-							for (int i = 0; i < values.size(); i++) {
-								//This starts to retrieve and takes the values of each individual out. It will print based on what is stored.
-								HashMap<String, String> indiv = values.get(i);
-								int rank = Utility.parseInt(indiv.get("rank"));
-								//Gets ready the schools to add on.
-								names = getSchoolName(indiv.get("school"));
-								schoolList.add(indiv.get("school"));
-								String duration = indiv.get("duration");
-								out.println("<tr><td>" + rank + "</td>"); //Prints the Rank
-								for (int j = i + 1; j < values.size(); j++) {
-									HashMap<String, String> other = values.get(j);
-									if (Utility.parseInt(other.get("rank")) == rank) {
-										names += ", " + getSchoolName(other.get("school"));
-										schoolList.add(other.get("school")); //this is to check for schools with 0
-										i++;
-									} else {
-										break;
-									}
-								}
-
-								out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
-								out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
-
-							}
+                                                                out.println("<td>" + names + "</td>"); //Prints the concatenated Schoolnames
+                                                                out.println("<td>" + duration + "</td></tr>"); //Prints the app usage time
+                                                            }
+                                                        }
 							if (errors != null && errors.length() > 0) {
-								out.println("<br><br>");
+								out.println("<br>");
 								out.println("<h3 style='color:red'>Warning:</h3>");
 								out.println("<h3 style='color:red'>" + errors + "</h3>");
 							}

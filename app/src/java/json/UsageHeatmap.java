@@ -176,7 +176,7 @@ public class UsageHeatmap extends HttpServlet {
 				JsonObject currLoc = new JsonObject();
 
 				String loc = iter.next();
-				currLoc.addProperty("semanatic-place", loc);
+				currLoc.addProperty("semantic-place", loc);
 				int numUsers = luMap.get(loc).size();
 				currLoc.addProperty("num-people-using-phone", numUsers);
 

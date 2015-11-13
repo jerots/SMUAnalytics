@@ -42,7 +42,12 @@ public class TopKAction extends HttpServlet {
 		//This Error means NOTHING ELSE is printed
 		String errors = "";
 		//This error means that data is still printed
-		String error = "";
+		ArrayList<String> warnList = new ArrayList<String>();
+                
+                if(selection == null){
+                    RequestDispatcher rd = request.getRequestDispatcher("top-kreport.jsp");
+                    rd.forward(request, response);
+                }
                 
                 //Gets the number of (top) K that the individual wants displayed
 		String entry = request.getParameter("entries");
@@ -58,7 +63,6 @@ public class TopKAction extends HttpServlet {
                         errors += ", invalid k";
                     }
                 }
-                
                 //START DATE VALIDATION
                 Date dateFormattedStart = null;
                 if (startDate == null) {
@@ -67,11 +71,13 @@ public class TopKAction extends HttpServlet {
                         errors += ", blank startdate";
                 } else {
                     if (startDate.length() != 10) {
-                            errors += ", invalid startdate";
+                        errors += ", invalid startdate";
                     } else {
-                        dateFormattedStart = Utility.parseDate(startDate + " 00:00:00");
-                        if (dateFormattedStart == null && Utility.formatDate(dateFormattedStart) != null) {
+                        startDate = Utility.parseString(startDate + " 00:00:00");
+                        if (startDate == null || !Utility.checkDate(startDate)) {
                             errors += ", invalid startdate";
+                        }else{
+                            dateFormattedStart = Utility.parseDate(startDate);
                         }
                     }
                 }
@@ -86,9 +92,11 @@ public class TopKAction extends HttpServlet {
                     if (endDate.length() != 10) {
                             errors += ", invalid enddate";
                     } else {
-                        dateFormattedEnd = Utility.parseDate(endDate + " 23:59:59");
-                        if (dateFormattedEnd == null && Utility.formatDate(dateFormattedEnd) != null) {
+                        endDate = Utility.parseString(endDate + " 23:59:59");
+                        if (endDate == null || !Utility.checkDate(endDate)) {
                             errors += ", invalid enddate";
+                        }else{
+                            dateFormattedEnd = Utility.parseDate(endDate);
                         }
                     }
                 }
@@ -101,7 +109,7 @@ public class TopKAction extends HttpServlet {
 		//All the values are from the same select place. It only changes based on the report selected
 		String selected = request.getParameter("choice");
 		//Checks school/appcategory (Actually this is chosen)
-		if (selection.equals("schoolapps")) {
+                if (selection.equals("schoolapps")) {
                     if(selected == null){
                         errors += ", missing school";
                     }else if(selected.length() == 0){
@@ -109,7 +117,7 @@ public class TopKAction extends HttpServlet {
                     }else if (!Utility.checkSchools(selected)) {
                         errors += ", invalid school";
                     }
-		} else {
+                } else {
                     if(selected == null){
                         errors += ", missing app category";
                     }else if(selected.length() == 0){
@@ -117,7 +125,7 @@ public class TopKAction extends HttpServlet {
                     }else if (!Utility.checkCategory(selected)) {
                         errors += ", invalid app category";
                     }
-		}
+                }
 
 		//Delcares the values to return. Declares both in case of 
 		ArrayList<HashMap<String, String>> catValues = null;
@@ -128,43 +136,43 @@ public class TopKAction extends HttpServlet {
 			switch (selection) {
 				case "schoolapps":
 					//This parameter is only for the school function
-					catValues = ctrl.getTopkApp(topK, selected, dateFormattedStart, dateFormattedEnd, error);
+					catValues = ctrl.getTopkApp(topK, selected, dateFormattedStart, dateFormattedEnd, warnList);
 					break;
 				case "appstudents":
 					//This parameter is only for those who select App Category and return Students
-					catValues = ctrl.getTopkStudents(topK, selected, dateFormattedStart, dateFormattedEnd, error);
+					catValues = ctrl.getTopkStudents(topK, selected, dateFormattedStart, dateFormattedEnd, warnList);
 					break;
 				default:
 					//This parameter is only for those who select App Category and return School
-					catValues = ctrl.getTopkSchool(topK, selected, dateFormattedStart, dateFormattedEnd, error);
+					catValues = ctrl.getTopkSchool(topK, selected, dateFormattedStart, dateFormattedEnd, warnList);
 					break;
 			}
 		} else {
 			//Need to substring for multiple errors
 			errors = errors.substring(2);
 		}
-
+                
 		request.setAttribute("catvalues", catValues);
 		request.setAttribute("choice", selected);
 		request.setAttribute("error", errors);
-		request.setAttribute("errors", error);
+		request.setAttribute("errors", warnList.get(0));
 		request.setAttribute("entries", entry);
 		RequestDispatcher rd = null;
 		//Divides back into where the request came from.
-		switch (selection) {
-			case "schoolapps":
-				//This parameter is only for the school function
-				rd = request.getRequestDispatcher("top-kreport.jsp");
-				break;
-			case "appstudents":
-				//This parameter is only for those who select App Category and return Students
-				rd = request.getRequestDispatcher("top-kstudent.jsp");
-				break;
-			default:
-				//This parameter is only for those who select App Category and return School
-				rd = request.getRequestDispatcher("top-kschool.jsp");
-				break;
-		}
+                switch (selection) {
+                        case "schoolapps":
+                                //This parameter is only for the school function
+                                rd = request.getRequestDispatcher("top-kreport.jsp");
+                                break;
+                        case "appstudents":
+                                //This parameter is only for those who select App Category and return Students
+                                rd = request.getRequestDispatcher("top-kstudent.jsp");
+                                break;
+                        default:
+                                //This parameter is only for those who select App Category and return School
+                                rd = request.getRequestDispatcher("top-kschool.jsp");
+                                break;
+                }
 		rd.forward(request, response);
 	}
 

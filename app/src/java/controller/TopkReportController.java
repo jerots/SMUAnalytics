@@ -18,7 +18,7 @@ import java.util.TreeMap;
 public class TopkReportController {
 
     /**
-     * Retrieves a  object for the data that
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
      * belongs contains the Top-k most used apps(Given a school)
      *
      * @param topK The top-k apps for a given duration
@@ -29,7 +29,7 @@ public class TopkReportController {
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used apps(Given a school)
      */
-    public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, String errors) {
+    public ArrayList<HashMap<String, String>> getTopkApp(int topK, String school, Date strDate, Date endDate, ArrayList<String> errors) {
         AppUsageDAO auDAO = new AppUsageDAO();
 
         /*Return an arraylist of AppUsage of interest (i.e. macAddress and timestamp related to the report), sorted by macAddress then timestamp */
@@ -136,28 +136,29 @@ public class TopkReportController {
             }
             kFound = (returnList.size() + 1);
         }
-        if (returnList.size() < topK) {
-            errors += "not enough data";
-        } else if (returnList.isEmpty()) {
-            errors += "there is no data";
+        String error = "";
+        if (returnList.isEmpty()) {
+            error += "There is no data";
+        } else if (returnList.size() < topK) {
+            error += "Not enough data";
         }
-
+        errors.add(error);
         return returnList;
     }
 
     /**
-     * Retrieves a object for the data that
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
      * belongs contains the Top-k student(Given a app category)
      *
      * @param topK The top-k students for a given duration
-     * @param cat The top-k students for a given category
+     * @param category The top-k students for a given category
      * @param strDate The top-k students from the given start date
      * @param endDate The top-k students until the given end date
      * @param errors The errors generated from the top-k students
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used students(Given a app category)
      */
-    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, String errors) {
+    public ArrayList<HashMap<String, String>> getTopkStudents(int topK, String cat, Date strDate, Date endDate, ArrayList<String> errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and student name
         HashMap<String, String> linkMac = new HashMap<>();
@@ -260,27 +261,29 @@ public class TopkReportController {
             kFound = (returnList.size() + 1);
         }
         Collections.sort(returnList, new UserComparator());
-        if (returnList.size() < topK) {
-            errors += "not enough data";
-        } else if (returnList.isEmpty()) {
-            errors += "there is no data";
+        String error = "";
+        if (returnList.isEmpty()) {
+            error += "There is no data";
+        } else if (returnList.size() < topK) {
+            error += "Not enough data";
         }
+        errors.add(error);
         return returnList;
     }
 
         /**
-     * Retrieves a  object for the data that
+     * Retrieves a ArrayList<HashMap<String, String>> object for the data that
      * belongs contains the Top-k most school(Given a app category)
      *
      * @param topK The top-k school for a given duration
-     * @param cat The top-k school for a given category
+     * @param category The top-k school for a given category
      * @param strDate The top-k school from the given start date
      * @param endDate The top-k school until the given end date
      * @param errors The errors generated from the top-k school
      * @return A sorted ArrayList of Hashmap objects that belongs contains the
      * Top-k most used school(Given a app category)
      */
-    public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, String errors) {
+    public ArrayList<HashMap<String, String>> getTopkSchool(int topK, String cat, Date strDate, Date endDate, ArrayList<String> errors) {
         AppUsageDAO aDao = new AppUsageDAO();
         //This hashmap stores the link between macadd and email
         HashMap<String, String> schoolList = new HashMap<>();
@@ -390,11 +393,13 @@ public class TopkReportController {
             }
             kFound = (returnList.size() + 1);
         }
-        if (returnList.size() < topK) {
-            errors += "not enough data";
-        } else if (returnList.isEmpty()) {
-            errors += "there is no data";
+        String error = "";
+        if (returnList.isEmpty()) {
+            error += "There is no data";
+        } else if (returnList.size() < topK) {
+            error += "Not enough data";
         }
+        errors.add(error);
         return returnList;
     }
 }
