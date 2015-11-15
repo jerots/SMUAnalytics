@@ -138,7 +138,7 @@ public class TopkReportController {
         }
         String error = "";
         if (returnList.isEmpty()) {
-            error += "There is no data";
+            error += "Not all ranks can be displayed due to insufficient data";
         } else if (returnList.size() < topK) {
             error += "Not enough data";
         }
@@ -262,7 +262,7 @@ public class TopkReportController {
         Collections.sort(returnList, new UserComparator());
         String error = "";
         if (returnList.isEmpty()) {
-            error += "There is no data";
+            error += "Not all ranks can be displayed due to insufficient data";
         } else if (returnList.size() < topK) {
             error += "Not enough data";
         }
@@ -394,7 +394,7 @@ public class TopkReportController {
         }
         String error = "";
         if (returnList.isEmpty()) {
-            error += "There is no data";
+            error += "Not all ranks can be displayed due to insufficient data";
         } else if (returnList.size() < topK) {
             error += "Not enough data";
         }
