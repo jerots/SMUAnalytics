@@ -155,7 +155,9 @@ public class TopKAction extends HttpServlet {
 		request.setAttribute("catvalues", catValues);
 		request.setAttribute("choice", selected);
 		request.setAttribute("error", errors);
-		request.setAttribute("errors", warnList.get(0));
+                if(warnList != null && warnList.size() != 0){
+                    request.setAttribute("errors", warnList.get(0));
+                }
 		request.setAttribute("entries", entry);
 		RequestDispatcher rd = null;
 		//Divides back into where the request came from.
