@@ -107,7 +107,7 @@
                     <form action="BasicAppAction">
                         <div class="form-group">
                             <%
-                                out.println("<h4><u>Usage Time Report</u></h4>");
+                                out.println("<h3>Usage Time Report</h3><hr>");
                             %>
                             
                             <label for="date">Start Date</label>
@@ -122,7 +122,7 @@
                             //GENERATE OPTIONS FOR DEMO
                             String[] types = {"gender", "school", "year", "cca"};
                             out.println("<div class='form-group'>");
-                            out.println("<h4><u>Filter by demographic</u></h4>");
+                            out.println("<br><h3>Filter by demographic</h3><hr>");
                             out.println("<select name='filter1' class='form-control'>");
                             out.println("<option value=''>- Filter 1 -</option>");
                             for (String type : types) {
